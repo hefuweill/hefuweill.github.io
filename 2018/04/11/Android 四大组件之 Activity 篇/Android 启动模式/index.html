@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言昨天在复习总结 Activity 相关知识的时候，无意中看到了启动模式，于是就想把启动模式总结下。那么启动模式有什么用？就是指定 Activity 该怎么运行，比如决定新开的 Activity 运行在调用方的任务栈中还是运行于一个新的任务栈等等。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 启动模式">
+<meta property="og:url" content="http://yoursite.com/2018/04/11/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/Android%20%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言昨天在复习总结 Activity 相关知识的时候，无意中看到了启动模式，于是就想把启动模式总结下。那么启动模式有什么用？就是指定 Activity 该怎么运行，比如决定新开的 Activity 运行在调用方的任务栈中还是运行于一个新的任务栈等等。">
+<meta property="article:published_time" content="2018-04-11T05:25:13.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:59:25.909Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/11/Android 四大组件之 Activity 篇/Android 启动模式/"/>
+
+
+
+
+
+  <title>Android 启动模式 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/11/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/Android%20%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 启动模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-11T13:25:13+08:00">
+                2018-04-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>昨天在复习总结 Activity 相关知识的时候，无意中看到了启动模式，于是就想把启动模式总结下。那么启动模式有什么用？就是指定 Activity 该怎么运行，比如决定新开的 Activity 运行在调用方的任务栈中还是运行于一个新的任务栈等等。<a id="more"></a> </p>
+<h2 id="四种启动模式"><a href="#四种启动模式" class="headerlink" title="四种启动模式"></a>四种启动模式</h2><p>下面所讲述的启动模式都是不加 Intent 的 flag 时的情形。</p>
+<h3 id="standard（默认值）"><a href="#standard（默认值）" class="headerlink" title="standard（默认值）"></a>standard（默认值）</h3><p>该启动模式的 Activity 可以位于所有任务栈，每次启动都会新创建一个 Activity 实例，taskAffinity 属性对该模式无影响，新启动的 Activity 始终与原有 Activity 同属于一个栈（前提是原有 Activity 的启动模式不是 singleInstance）。</p>
+<ul>
+<li><strong>例一</strong> 当应用程序 A 的 Activity A1  启动应用程序 B 的  Activity B1（standard），B1 会和 A1同属于一个栈（前提是 A1 的启动模式不是 singleInstance ）。</li>
+<li><strong>例二</strong> 当应用程序 A 的 Activity A1（standard） 不停的启动自己，那么栈中 A1 实例就会越来越多。</li>
+</ul>
+<h3 id="singleTop"><a href="#singleTop" class="headerlink" title="singleTop"></a>singleTop</h3><p>栈顶复用模式，该启动模式与 standard 的区别仅仅在于如果待启动的 Activity 已经处于目标栈顶了那么将不会再次创建实例，而只是调用该 Activity 的 <code>onNewIntent</code> 回调（其实会先调用 <code>onPause</code> 然后才是 <code>onNewIntent</code> 最后 <code>onResume</code> ）。</p>
+<ul>
+<li><strong>例一</strong> 当应用程序 A 的 Activity A1(singleTop) 不停的启动自己，栈中还是只会有一个实例只是 <code>onNewIntent</code> 不断的调用。</li>
+</ul>
+<h3 id="singleTask"><a href="#singleTask" class="headerlink" title="singleTask"></a>singleTask</h3><p>该启动模式的 Activity 整个系统的所有任务栈最多只能拥有一个实例，并且其启动后所在的任务栈是固定的，固定为特定 taskAffinity 的任务栈，如果任务栈中已经拥有了一个该 Activity 的实例那么不会再创建实例而是将该实例上面的所有 Activity 都关闭掉，然后调用该 Activity 的<code>onNewIntent</code>。 </p>
+<ul>
+<li><strong>例一</strong> 当应用程序 A 的 Activity A1 启动应用程序 B 的 Activity B1(singTask) ，B1 <strong>不和 A1 同属于</strong>一个栈（特别的当 A1 与 A2 的 taskAffinity 一致时会运行在同一个栈中）。</li>
+<li><strong>例二</strong> 应用程序 A 有 A1(singleTask)、A2 两个Activity，A1 启动 A2，然后 A2 启动A1，这时候会发现任务栈中只有A1了。</li>
+</ul>
+<h3 id="singleInstance"><a href="#singleInstance" class="headerlink" title="singleInstance"></a>singleInstance</h3><p>该启动模式与 singleTask 的唯一区别就是其会运行在一个单独的栈中，并且该栈中不允许其它Activity 进入。</p>
+<h3 id="返回页面问题"><a href="#返回页面问题" class="headerlink" title="返回页面问题"></a>返回页面问题</h3><p>点击返回键，系统会关闭当前处于前台的任务栈栈顶的 Activity 如果处于前台的任务栈中的 Activity 都被关闭了就会将最近被切换到后台的返回栈切换到前台以此循环。</p>
+<ul>
+<li><strong>例一</strong> 应用程序 A 有 A1、A2（singleTask）两个 Activity，应用程序 B 有 B1 一个 Activity，A1启动 A2 然后切换回后台，启动 B1，B1 再启动 A2，这时候点击返回键会返回哪个页面？答案是 A1，因为当 B1 启动了 A2 时系统判定特定 taskAffinity 的任务栈中 A2 实例是否存在，如果存在就把包括 A1、A2 的任务栈整个切换回前台，所以点击返回键出现的是 A1。</li>
+</ul>
+<h3 id="通过设置常用-Flag-启动-Activity"><a href="#通过设置常用-Flag-启动-Activity" class="headerlink" title="通过设置常用 Flag 启动 Activity"></a>通过设置常用 Flag 启动 Activity</h3><h4 id="FLAG-ACTIVITY-NEW-TASK"><a href="#FLAG-ACTIVITY-NEW-TASK" class="headerlink" title="FLAG_ACTIVITY_NEW_TASK"></a><code>FLAG_ACTIVITY_NEW_TASK</code></h4><p>该 Flag 有以下两个作用</p>
+<ol>
+<li>第一个作用是使非 Activity 的 Context 可以启动 Activity 比如在 Service 里面启动一个 Activity 就得设置这个 Flag。</li>
+<li>第二个作用是将启动模式为 standard、singleTop 的 Activity 运行在特定 taskAffinity 的任务栈中。<strong>注意当设置了该 Flag 以后调用 startActivityForResult 将会立即返回</strong>（启动启动模式为 singleTask 和 singleInstance 的 Activity 自带该 Flag）。</li>
+</ol>
+<ul>
+<li><p><strong>例一</strong> 在不考虑修改了 taskAffinity 的情况下，当应用程序 A 的 Activity A1（standard）通过添加 <code>FLAG_ACTIVITY_NEW_TASK</code> 后启动自己会发现添加了该 Flag 与没加一样，还是会每次创建一个 A1 的实例压入栈，原因是添加了该 Flag 后系统会查询待启动的 Activity 也就是 A1 指定的taskAffinity 栈是否存在，如不存在就创建该栈然后创建一个实例压入栈，如果存在会创建一个实例压入栈。</p>
+<p>  思考：如果在本例中 A1 的启动模式为 singleTop、singleTask、singInstance 又会怎么样？首先对 singleTask 和 singleInstance 无影响因为它们默认就设置了该 Flag，对于 singleTop 在本例中也相当于没设置该 Flag，点击启动不会创建新的实例只是会调用 <code>onNewIntent</code> 。</p>
+</li>
+<li><p><strong>例二</strong> 在不考虑修改了 taskAffinity 的情况下，当应用程序 A 的 Activity A1 通过添加 <code>FLAG_ACTIVITY_NEW_TASK</code>  启动应用程序 B 的 Activity B1(standard) ，一共会有几个任务栈？答案是 2 个，如果没设置这个 Flag 那么结果是 1 个，设置了以后系统发现 B1 指定的taskAffinity 的栈还没启动就会启动然后创建 B1 将其压入栈。</p>
+<p>  思考：如果在本例中 B1 的启动模式为 singleTop、singleTask、singInstance 又会怎么样？首先对 singleTask 和 singleInstance 无影响因为它们默认就设置了该 Flag，对于 singleTop 而言任务栈也会变成两个其原理与 standard 一致。</p>
+</li>
+</ul>
+<h3 id="FLAG-ACTIVITY-SINGLE-TOP"><a href="#FLAG-ACTIVITY-SINGLE-TOP" class="headerlink" title="FLAG_ACTIVITY_SINGLE_TOP"></a><code>FLAG_ACTIVITY_SINGLE_TOP</code></h3><p>该 Flag 只对目标 Activity 启动模式为 standard 起作用，使其产生的行为与 singleTop 一致。</p>
+<h4 id="FLAG-ACTIVITY-CLEAR-TOP"><a href="#FLAG-ACTIVITY-CLEAR-TOP" class="headerlink" title="FLAG_ACTIVITY_CLEAR_TOP"></a><code>FLAG_ACTIVITY_CLEAR_TOP</code></h4><p>对于启动模式为 standard 的 Activity 来说，如果启动时发现在目标栈中已经有该 Activity 的实例了，那么会将该 Activity 及其上面的所有 Activity 全部销毁，然后重建该 Activity，对于启动模式是singTop 或者同时设置了 <code>FLAG_ACTIVITY_CLEAR_TOP</code>与 <code>FLAG_ACTIVITY_SINGLE_TOP</code>来说会将上面的 Activity 销毁然后回调该 Activity 的 <code>onNewIntent</code> （并不会把自己销毁再重建）。</p>
+<h3 id="启动模式的应用场景"><a href="#启动模式的应用场景" class="headerlink" title="启动模式的应用场景"></a>启动模式的应用场景</h3><ul>
+<li>singleTop 比如一个 App 收到若干个通知每个通知都要打开同一个页面查看信息，这时候如果用户看完一个再点击另一个就不会再打开一个该界面而只会刷新数据。</li>
+<li>singleTask 一般用于应用程序的首页，比如浏览器首页。</li>
+<li>singleInstance 应用于社交 App 的分享界面（微博、QQ、微信等），注意这里有个问题，当 A应用程序打开分享页面然后输入了部分内容后然后切到后台，打开 B 应用程序再次打开分享页面，这样由于分享页面是 singleInstance 因此会被复用，那么编辑过的内容也会被保留，如果不需要保留我们可以监听 <code>onNewIntent</code> ，在该回调方法中清除编辑过的内容。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/" rel="next" title="Android 四大组件之 Activity 篇">
+                <i class="fa fa-chevron-left"></i> Android 四大组件之 Activity 篇
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/12/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Service%20%E7%AF%87/" rel="prev" title="Android 四大组件之 Service 篇">
+                Android 四大组件之 Service 篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#四种启动模式"><span class="nav-number">2.</span> <span class="nav-text">四种启动模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#standard（默认值）"><span class="nav-number">2.1.</span> <span class="nav-text">standard（默认值）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#singleTop"><span class="nav-number">2.2.</span> <span class="nav-text">singleTop</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#singleTask"><span class="nav-number">2.3.</span> <span class="nav-text">singleTask</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#singleInstance"><span class="nav-number">2.4.</span> <span class="nav-text">singleInstance</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#返回页面问题"><span class="nav-number">2.5.</span> <span class="nav-text">返回页面问题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过设置常用-Flag-启动-Activity"><span class="nav-number">2.6.</span> <span class="nav-text">通过设置常用 Flag 启动 Activity</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FLAG-ACTIVITY-NEW-TASK"><span class="nav-number">2.6.1.</span> <span class="nav-text">FLAG_ACTIVITY_NEW_TASK</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FLAG-ACTIVITY-SINGLE-TOP"><span class="nav-number">2.7.</span> <span class="nav-text">FLAG_ACTIVITY_SINGLE_TOP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#FLAG-ACTIVITY-CLEAR-TOP"><span class="nav-number">2.7.1.</span> <span class="nav-text">FLAG_ACTIVITY_CLEAR_TOP</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动模式的应用场景"><span class="nav-number">2.8.</span> <span class="nav-text">启动模式的应用场景</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

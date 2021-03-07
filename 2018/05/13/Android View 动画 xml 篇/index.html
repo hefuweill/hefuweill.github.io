@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言Android 中 View 动画对应的 xml 文件放于 res&#x2F;anim 中，其根节点共有以下五种，alpha、scale、translate、rotate、set，里面的值可以直接使用 float，也可以使用 %，或者 %p。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android View 动画 xml 篇">
+<meta property="og:url" content="http://yoursite.com/2018/05/13/Android%20View%20%E5%8A%A8%E7%94%BB%20xml%20%E7%AF%87/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言Android 中 View 动画对应的 xml 文件放于 res&#x2F;anim 中，其根节点共有以下五种，alpha、scale、translate、rotate、set，里面的值可以直接使用 float，也可以使用 %，或者 %p。">
+<meta property="article:published_time" content="2018-05-13T07:16:32.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:53:14.242Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/05/13/Android View 动画 xml 篇/"/>
+
+
+
+
+
+  <title>Android View 动画 xml 篇 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/13/Android%20View%20%E5%8A%A8%E7%94%BB%20xml%20%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android View 动画 xml 篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-05-13T15:16:32+08:00">
+                2018-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Android 中 View 动画对应的 xml 文件放于 res/anim 中，其根节点共有以下五种，alpha、scale、translate、rotate、set，里面的值可以直接使用 float，也可以使用 %，或者 %p。<a id="more"></a> </p>
+<h2 id="公共属性"><a href="#公共属性" class="headerlink" title="公共属性"></a>公共属性</h2><ol>
+<li>android:detachWallpaper 特殊选项窗口动画，如果这个窗口显示在壁纸上不要使用该动画。</li>
+<li>android:duration 动画执行时间，单位 ms。</li>
+<li>android:fillAfter 如果设置为 true，动画结束后，UI 保留在最后一帧。</li>
+<li>android:interpolator 给动画设置插补器，android 提供了多种插补器， @android:anim/linear_interpolator、@android:anim/accelerate_decelerate_interpolator等，也可以在 res/anim中 自定义插补器，android 提供的插补器在结尾说明。</li>
+<li>android:repeatCount 重复次数 1表示执行两次，0 表示执行一次，-1 无限循环。</li>
+<li>android:android:repeatMode repeat | restart(default)。</li>
+<li>android:startOffset 调用 view.startAnimation 后多少 ms 开始执行。</li>
+</ol>
+<h2 id="alpha"><a href="#alpha" class="headerlink" title="alpha"></a>alpha</h2><p>alpha 渐入渐出动画对应于 AlphaAnimation.java，其拥有如下属性：</p>
+<ol>
+<li>android:fromAlpha 从哪个alpha值开始 0.0 表示全透明，1.0 表示全不透明。</li>
+<li>android:toAlpha 目标 alpha 值。</li>
+</ol>
+<h2 id="scale"><a href="#scale" class="headerlink" title="scale"></a>scale</h2><p>scale 缩放动画对应于 ScaleAnimation.java，其拥有如下属性：</p>
+<ol>
+<li>android:fromXScale 起始 X 缩放比。</li>
+<li>android:toXScale 结束 X 缩放比。</li>
+<li>android:fromYScale 起始 Y 缩放比。</li>
+<li>android:toYScale 结束 Y 缩放比。</li>
+<li>android:pivotX X 轴缩放中心点，如果为0，则向右缩放。</li>
+<li>android:pivotY Y 轴缩放中心点，如果为0，则向下缩放。</li>
+</ol>
+<h2 id="translate"><a href="#translate" class="headerlink" title="translate"></a>translate</h2><p> translate 缩放动画对应于 TranslateAnimation.java，其拥有如下属性：</p>
+<ol>
+<li>android:fromXDelta 起始位置的 X 轴的偏移量。</li>
+<li>android:toXDelta 结束位置的 X 轴的偏移量。</li>
+<li>android:fromYDelta 起始位置的 Y 轴的偏移量。</li>
+<li>android:toYDelta 结束位置的 Y 轴的偏移量。</li>
+</ol>
+<h2 id="rotate"><a href="#rotate" class="headerlink" title="rotate"></a>rotate</h2><p>rotate 旋转动画对应于 RotateAnimation.java，其拥有如下属性：</p>
+<ol>
+<li>android:fromDegrees 起始的旋转角度。</li>
+<li>android:toDegrees 结束的旋转角度。</li>
+<li>android:pivotX 旋转的 X 轴中心点。</li>
+<li>android:pivotY 旋转的 Y 轴中心点。</li>
+</ol>
+<h2 id="set"><a href="#set" class="headerlink" title="set"></a>set</h2><p>set 组合动画对应于 AnimationSet.java，给 set 设置属性会覆盖内部的属性，其拥有如下属性：</p>
+<ol>
+<li>android:shareInterpolator 如果设置为 true 插补器会共享给所有子元素。</li>
+</ol>
+<h2 id="Android-提供的差值器"><a href="#Android-提供的差值器" class="headerlink" title="Android 提供的差值器"></a>Android 提供的差值器</h2><ol>
+<li>AccelerateDecelerateInterpolator(default) 先慢中间快后慢。</li>
+<li>AccelerateInterpolator 加速运动。<ul>
+<li>android:factor 加速因子，默认1，该值越大最大速度越大，持续时间一致，所以初始速度回很小。</li>
+</ul>
+</li>
+<li>AnticipateInterpolator 先往反方向运动一段距离再前进。<ul>
+<li>android:tension 张力， 默认2，该值越大往反方向运动距离越大。</li>
+</ul>
+</li>
+<li>AnticipateOvershootInterpolator 先往反方向运动再前进并且超过目标点，最后回到目标点。<ul>
+<li>android:tension 张力， 默认2，该值越大往反方向运动距离越大。</li>
+<li>android:extraTension 额外的张力， 默认1.5，该值越大超过目标点距离越大。</li>
+</ul>
+</li>
+<li>BounceInterpolator 类似球落地时的反弹效果。</li>
+<li>CycleInterpolator 循环，先往正向运动到终点，然后向反方向运动知道运动到-终点处再回来。<ul>
+<li>android:cycles 循环次数，默认值为1。</li>
+</ul>
+</li>
+<li>DecelerateInterpolator 减速运动。<ul>
+<li>android:factor 减速因子，默认为1，越大速度变化越不明显。</li>
+</ul>
+</li>
+<li>LinearInterpolator 匀速运动。</li>
+<li>OvershootInterpolator 移动超过目标点，然后再回来。<ul>
+<li>android:tension 张力， 默认2，该值越大超过目标点距离越大。</li>
+</ul>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/26/Android%20%E6%80%A7%E8%83%BD%E4%BC%98%E5%8C%96/" rel="next" title="Android 性能优化">
+                <i class="fa fa-chevron-left"></i> Android 性能优化
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/14/Android%20%E5%B1%9E%E6%80%A7%E5%8A%A8%E7%94%BB%20xml%20%20%E7%AF%87/" rel="prev" title="Android 属性动画 xml 篇">
+                Android 属性动画 xml 篇 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#公共属性"><span class="nav-number">2.</span> <span class="nav-text">公共属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#alpha"><span class="nav-number">3.</span> <span class="nav-text">alpha</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#scale"><span class="nav-number">4.</span> <span class="nav-text">scale</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#translate"><span class="nav-number">5.</span> <span class="nav-text">translate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#rotate"><span class="nav-number">6.</span> <span class="nav-text">rotate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#set"><span class="nav-number">7.</span> <span class="nav-text">set</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Android-提供的差值器"><span class="nav-number">8.</span> <span class="nav-text">Android 提供的差值器</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

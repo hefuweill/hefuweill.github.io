@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言以前学习的 Android 知识杂乱无章，形成不了一个完整的知识体系，因此打算根据知识星球的内容，完整的过一遍，首先来复习一下 Activity。Activity 是 Android 四大组件中最为重要的一个，负责直接与用户交互，先来看看 Activity 的生命周期。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 四大组件之 Activity 篇">
+<meta property="og:url" content="http://yoursite.com/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言以前学习的 Android 知识杂乱无章，形成不了一个完整的知识体系，因此打算根据知识星球的内容，完整的过一遍，首先来复习一下 Activity。Activity 是 Android 四大组件中最为重要的一个，负责直接与用户交互，先来看看 Activity 的生命周期。">
+<meta property="og:image" content="http://yoursite.com/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
+<meta property="article:published_time" content="2018-04-10T03:45:53.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:38:03.051Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/10/Android 四大组件之 Activity 篇/"/>
+
+
+
+
+
+  <title>Android 四大组件之 Activity 篇 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 四大组件之 Activity 篇</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-04-10T11:45:53+08:00">
+                2018-04-10
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以前学习的 Android 知识杂乱无章，形成不了一个完整的知识体系，因此打算根据知识星球的内容，完整的过一遍，首先来复习一下 Activity。Activity 是 Android 四大组件中最为重要的一个，负责直接与用户交互，先来看看 Activity 的生命周期。 <a id="more"></a> </p>
+<h2 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h2><p> 官方文档给出了下面这个图</p>
+<p><img src="/2018/04/10/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png" alt="生命周期"></p>
+<ol>
+<li><code>onCreate(Bundle)</code>  是Activity中除了 <code>attachBaseContext</code> 以外的第一个回调方法，该方法一般用于调用 <code>setContentView</code>，如果在该方法内直接调用 <code>finish</code> 那么该方法执行完后会直接执行 <code>onDestroy</code> 。</li>
+<li><code>onStart()</code>  当Activity可见时回调，注意<strong>可见不代表 Activity 的 UI 被显示出来</strong>，因为 View 的三大流程需要在 onResume 回调完后才会开始。</li>
+<li><code>onResume()</code> 当 Activity 获得了焦点后回调（开始可以与用户交互），同样的，Activity 的 UI 也没被显示出来，因此在该方法中直接获取 View 的宽高拿到的都是0，回调完该方法 Activity 就处于运行状态了。</li>
+<li><code>onPause()</code> 当 Activity 失去了焦点后回调，该方法后面可能会调用 onStop、onResume 或者可能被系统杀死。</li>
+<li><code>onStop()</code>  当 Activity 不可见时回调，该方法后面可能会调用 <code>onDestory</code>、<code>onRestart</code> 或者可能被系统杀死</li>
+<li><code>onRestart()</code>  当 Activity 处于 stop 状态后，又被切换到的前台时回调，该方法后面紧跟着 <code>onStart</code> 回调。</li>
+<li><code>onDestroy()</code> 当Activity 将要被销毁后调用，可能的情况是 <code>finish</code> 方法被调用或者配置改变时(没有配置configChange)时回调，该回调中可以做一些资源回收等操作</li>
+</ol>
+<p>重点</p>
+<ul>
+<li>当 Activity A 启动一个透明的 Activity 或者一个 Dialog 主题的 Activity 时，A 的 onStop 不会调用，因为其还可见。</li>
+<li>当 Activity A 开启一个 Dialog，不会调用 A 的任何生命周期方法。</li>
+<li>当 Activity A 开启 Activity B 会调用 A.onPause - B.onCreate - B.onStart - B.Resume - A.onStop （视情况，当A完全不可见时会调用）。</li>
+<li>当 Activity A 启动 Activity B 然后点击 back 键会回调 B.onPause - （如果 A 处于 stop 状态还有 A.onRestart - A.start）A.onResume - B.onStop - B.onDestroy。</li>
+<li>当 Activity A 失去焦点后，当内存不足时系统可能会将 A 杀死，当点击回退后会调用A的 onCreate - onStart - onResume 进行重建。</li>
+</ul>
+<h2 id="Fragment-的生命周期与-Activity-的关系"><a href="#Fragment-的生命周期与-Activity-的关系" class="headerlink" title="Fragment 的生命周期与 Activity 的关系"></a>Fragment 的生命周期与 Activity 的关系</h2><p>首先来看看Fragment的生命周期</p>
+<ol>
+<li><code>onAttach(Activity)</code> 当 Fragment 与 Activity 建立联系时调用。</li>
+<li><code>onCreate(Bundle)</code> 当初始化创建 Fragment 的时候回调。</li>
+<li><code>onCreateView(LayoutInflate, ViewGroup, Bundle)</code> 创建和返回 Fragment 显示的根 View。</li>
+<li><code>onViewCreated(View)</code> 在 onCreateView 执行完毕后就调用。 </li>
+<li><code>onActivityCreated(Bundle)</code> 当与 Fragment 相联系的 Activity 完成了 onCreate 回调。</li>
+<li><code>onStart()</code> 当 Fragment 可见时回调。</li>
+<li><code>onResume()</code> 当 Fragment 获取焦点时回调。</li>
+<li><code>onPause()</code> 当 Fragment 失去焦点时回调。</li>
+<li><code>onStop()</code> 当 Fragment 不再可见时回调。</li>
+<li><code>onDestoryView()</code> 用于清除与 Fragment 相关联 View 的资源。</li>
+<li><code>onDestory()</code> 当 Fragment 将要被销毁时调用。</li>
+<li><code>onDetach()</code> 当调用该方法后 Fragment 就与 Activity 失去联系了。</li>
+</ol>
+<p>假设有 Activity A 在 onCreate 通过 replace 方法显示了 Fragment F，生命周期调用顺序为 A.onCreate - A.onStart - F.onAttach - F.onCreate - F.onCreateView - F.onViewCreated - F.onActivityCreated - F.onStart - A.onResume - F.onResume。</p>
+<h2 id="Activity-与-menu-创建先后顺序"><a href="#Activity-与-menu-创建先后顺序" class="headerlink" title="Activity 与 menu 创建先后顺序"></a>Activity 与 menu 创建先后顺序</h2><p>在 Activity 的  <code>onResume</code>  调用完后会回调  <code>onCreateOptionMenu</code>  来创建 Menu。</p>
+<h2 id="onSavedInstanceState-和-onRestoreInstanceState"><a href="#onSavedInstanceState-和-onRestoreInstanceState" class="headerlink" title="onSavedInstanceState() 和 onRestoreInstanceState()"></a>onSavedInstanceState() 和 onRestoreInstanceState()</h2><ul>
+<li><p><code>onSavedInstanceState</code>  当 Activity 被意外的杀死或者是当配置方式改变后会回调 onSavedInstanceState 在 <strong>API28 及以上</strong>其调用时机在 onStop 之后，在 API28 之前调用时机 onStop 之前与 onPause 无时序关系。</p>
+</li>
+<li><p><code>onRestoreInstanceState</code> 再次启动后我们可以在 onRestoreInstanceState 中恢复 onSavedInstanceState 保存的数据。</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/02/Android%20%E5%BA%94%E7%94%A8%E5%90%AF%E5%8A%A8%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="next" title="Android 应用启动源码分析">
+                <i class="fa fa-chevron-left"></i> Android 应用启动源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/11/Android%20%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6%E4%B9%8B%20Activity%20%E7%AF%87/Android%20%E5%90%AF%E5%8A%A8%E6%A8%A1%E5%BC%8F/" rel="prev" title="Android 启动模式">
+                Android 启动模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生命周期"><span class="nav-number">2.</span> <span class="nav-text">生命周期</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Fragment-的生命周期与-Activity-的关系"><span class="nav-number">3.</span> <span class="nav-text">Fragment 的生命周期与 Activity 的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Activity-与-menu-创建先后顺序"><span class="nav-number">4.</span> <span class="nav-text">Activity 与 menu 创建先后顺序</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#onSavedInstanceState-和-onRestoreInstanceState"><span class="nav-number">5.</span> <span class="nav-text">onSavedInstanceState() 和 onRestoreInstanceState()</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

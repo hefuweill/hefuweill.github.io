@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本篇文章主要是复习总结算法四讲解的7种基本排序方法，包括：冒泡排序、选择排序、插入排序、希尔排序、归并排序、快速排序、堆排序。注：统一按照升序进行排序。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="七种常见的排序算法">
+<meta property="og:url" content="http://yoursite.com/2018/01/20/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言本篇文章主要是复习总结算法四讲解的7种基本排序方法，包括：冒泡排序、选择排序、插入排序、希尔排序、归并排序、快速排序、堆排序。注：统一按照升序进行排序。">
+<meta property="article:published_time" content="2018-01-20T07:37:14.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:29:22.775Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/01/20/排序算法/"/>
+
+
+
+
+
+  <title>七种常见的排序算法 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-数据结构与算法" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/01/20/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">七种常见的排序算法</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-01-20T15:37:14+08:00">
+                2018-01-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本篇文章主要是复习总结算法四讲解的7种基本排序方法，包括：冒泡排序、选择排序、插入排序、希尔排序、归并排序、快速排序、堆排序。注：统一按照升序进行排序。<a id="more"></a> </p>
+<h2 id="通用接口及方法"><a href="#通用接口及方法" class="headerlink" title="通用接口及方法"></a>通用接口及方法</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将数组进行排序，内部会修改数组元素顺序</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array 待排序数组</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SortUtils</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 交换数组中两个位置的元素</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array 待交换的数组</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> first 第一个位置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> second 第二个位置</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">void</span> <span class="title">exch</span><span class="params">(T[] array, <span class="keyword">int</span> first, <span class="keyword">int</span> second)</span> </span>&#123;</span><br><span class="line">        T temp = array[first];</span><br><span class="line">        array[first] = array[second];</span><br><span class="line">        array[second] = temp;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 判断第一个位置的元素是否小于第二个位置元素</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array 待测试数组</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> first 第一个位置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> second 第二个位置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否小于</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">boolean</span> <span class="title">less</span><span class="params">(T[] array, <span class="keyword">int</span> first, <span class="keyword">int</span> second)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> array[first].compareTo(array[second]) &lt; <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 判断第一个位置的元素是否小于第二个位置元素</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array 待测试数组</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> first 第一个位置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> second 第二个位置</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> comparator 比较器</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否小于</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function"><span class="keyword">boolean</span> <span class="title">less</span><span class="params">(T[] array, <span class="keyword">int</span> first, <span class="keyword">int</span> second, Comparator&lt;T&gt; comparator)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> comparator.compare(array[first], array[second]) &lt; <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建一个T[]</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> size 待创建的数组大小</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 创建后的数组</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@SuppressWarnings</span>(<span class="string">"unchecked cast"</span>)</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Comparable&lt;T&gt;&gt; T[] createArray(<span class="keyword">int</span> size) &#123;</span><br><span class="line">        <span class="keyword">return</span> (T[]) <span class="keyword">new</span> Comparable[size];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 测试数组是否有序，所有元素都相同也会被认为有序</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> array 待测试数组</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 是否有序</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">boolean</span> <span class="title">test</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; array.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (less(array, i+<span class="number">1</span>, i)) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="各种排序方式"><a href="#各种排序方式" class="headerlink" title="各种排序方式"></a>各种排序方式</h2><h3 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h3><h4 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Bubble</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; array.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; array.length - i - <span class="number">1</span>; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (less(array, j+<span class="number">1</span>, j)) &#123;</span><br><span class="line">                    exch(array, j+<span class="number">1</span>, j);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明"><a href="#代码说明" class="headerlink" title="代码说明"></a>代码说明</h4><p>外层循环表示一共需要冒出 N-1 个元素，内层循环将元素两两进行比较如果前面的元素大于后面的元素，就进行交换，一次循环后<strong>索引为 N-i-1 的元素</strong>就是剩余元素的最大值。</p>
+<h3 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h3><h4 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Selection</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; array.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">            <span class="keyword">int</span> minIndex = i;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i + <span class="number">1</span>; j &lt; array.length; j++) &#123;</span><br><span class="line">                <span class="keyword">if</span> (less(array, j, minIndex)) &#123;</span><br><span class="line">                    minIndex = j;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            exch(array, i, minIndex);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-1"><a href="#代码说明-1" class="headerlink" title="代码说明"></a>代码说明</h4><p>外层循环表示一共需要选择 N-1 个元素，内层循环找出所有剩余元素中最小值所在的索引，然后将其与i进行交换，一次循环后<strong>索引为i的元素</strong>就是剩余元素的最小值。</p>
+<p><strong>与冒泡排序的比较：</strong></p>
+<p>这两种排序方式其实比较类似，主要有两点差异：</p>
+<ol>
+<li><p>冒泡排序数组尾端是有序的（最大的在最后），而选择排序数组前端是有序的（最小的在最前）。</p>
+</li>
+<li><p>冒泡排序是通过不停的交换元素来选择出数组中的最大值，而选择排序是通过记录最小元素索引来选择的，这一点冒泡排序性能就稍差了。</p>
+</li>
+</ol>
+<h3 id="插入排序"><a href="#插入排序" class="headerlink" title="插入排序"></a>插入排序</h3><h4 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Insertion</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j &gt; <span class="number">0</span>; j--) &#123;</span><br><span class="line">                <span class="keyword">if</span> (less(array, j, j - <span class="number">1</span>)) &#123;</span><br><span class="line">                    exch(array, j, j - <span class="number">1</span>);</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-2"><a href="#代码说明-2" class="headerlink" title="代码说明"></a>代码说明</h4><p>外层循环表示每次要插入的元素，<strong>索引 [0, i-1] 表示已经有序的元素</strong>，i 从1开始，因为索引为0的一个元素可以认为已经有序，内层循环将待插入元素与前面有序的最大值进行比较，如果比原先最大值要小，那么交换，继续比较。这里有一个<strong>性能优化点</strong>，每次不交换元素而是拷贝 j-1 索引的元素到 j 索引，最后在插入点替换待插入元素即可，可以省去很多交换时间。</p>
+<h4 id="优化代码实现"><a href="#优化代码实现" class="headerlink" title="优化代码实现"></a>优化代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">InsertionOptimized</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; array.length; i++) &#123;</span><br><span class="line">            T target = array[i];</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            <span class="keyword">for</span> (j = i; j &gt; <span class="number">0</span>; j--) &#123;</span><br><span class="line">                <span class="keyword">if</span> (target.compareTo(array[j-<span class="number">1</span>]) &lt; <span class="number">0</span>) &#123;</span><br><span class="line">                    array[j] = array[j-<span class="number">1</span>];</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            array[j] = target;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h3><h4 id="代码实现-3"><a href="#代码实现-3" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Shell</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> gap = <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (gap &lt; array.length / <span class="number">3</span>) &#123;</span><br><span class="line">            gap = <span class="number">3</span> * gap + <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">while</span> (gap &gt;= <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = gap; i &lt; array.length; i++) &#123;</span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = i; j &gt;= gap; j--) &#123;</span><br><span class="line">                    <span class="keyword">if</span> (less(array, j, j-gap)) &#123;</span><br><span class="line">                        exch(array, j, j-gap);</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            gap /= <span class="number">3</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-3"><a href="#代码说明-3" class="headerlink" title="代码说明"></a>代码说明</h4><p>首先是 gap（间隔）的选择，这个就按书上好了，没必要研究，接着就是典型的插入排序了，不过原先的插入排序间隔为1，现在为gap，插入排序后缩小 gap，再次进行进行插入排序，直到 gap 为1排序完毕。</p>
+<h3 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h3><h4 id="代码实现-4"><a href="#代码实现-4" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Merge</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        T[] auxArray = createArray(array.length);</span><br><span class="line">        sort(array, auxArray, <span class="number">0</span>, array.length - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array, T[] auxArray, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (low == high) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> middle = (low + high) / <span class="number">2</span>;</span><br><span class="line">        sort(array, auxArray, low, middle);</span><br><span class="line">        sort(array, auxArray, middle + <span class="number">1</span>, high);</span><br><span class="line">        merge(array, auxArray, low, high);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">merge</span><span class="params">(T[] array, T[] auxArray, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">        System.arraycopy(array, low, auxArray, low, high - low + <span class="number">1</span>);</span><br><span class="line">        <span class="keyword">int</span> middle = (low + high) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> left = low;</span><br><span class="line">        <span class="keyword">int</span> right = middle + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = low; i &lt;= high; i++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (left &gt; middle) &#123;</span><br><span class="line">                array[i] = auxArray[right++];</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (right &gt; high) &#123;</span><br><span class="line">                array[i] = auxArray[left++];</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (less(auxArray, left, right)) &#123;</span><br><span class="line">                array[i] = auxArray[left++];</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                array[i] = auxArray[right++];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-4"><a href="#代码说明-4" class="headerlink" title="代码说明"></a>代码说明</h4><p>首先创建了一个辅助数组，接着递归将数组进行拆分，直到只有一个元素，然后将两个有序子数组进行合并（首次合并两个子数组里面其实各就一个元素），合并过程由于目标数组既要读取元素又要写入元素，因此合并前先把 low-high 中的元素拷贝入辅助数组，这使得后续目标数组只需要写入就行，最后根据左右指针判断选择左数组还是右数组。</p>
+<h4 id="代码分析"><a href="#代码分析" class="headerlink" title="代码分析"></a>代码分析</h4><p>假设一共有8个元素，分别位于索引为 [0, 7] ，执行过程如下：</p>
+<ol>
+<li>首先会将该数组拆分成 [0, 3] 、[4, 7] 两个子数组。</li>
+<li>接着将 [0, 3] 数组再次拆分成 [0, 1] 、[2, 3] 两个子数组。</li>
+<li>然后再将 [0, 1] 数组拆分成 [0] 、[1] 两个子数组。</li>
+<li>由于两个子数组都只有一个元素，可以认为有序，将 [0]、[1] 两个子数组进行合并，合并后 [0, 1] 子数组有序。</li>
+<li>接着再将 [2, 3] 数组拆分成 [2]、 [3]两个子数组。</li>
+<li>由于两个子数组都只有一个元素，可以认为有序，将 [2]、[3] 两个子数组进行合并，合并后 [2, 3] 子数组有序。</li>
+<li>两个子数组 [0, 1]、[2, 3] 都已经有序，将两个子数组进行合并，合并后 [0, 3] 子数组有序。</li>
+<li>接着再将 [4, 7] 数组再次拆分成 [4, 5] 、[6, 7] 两个子数组。</li>
+<li>然后再将 [4, 5] 数组拆分成 [4]、[5] 两个子数组。</li>
+<li>由于两个子数组都只有一个元素，可以认为有序，将 [4]、[5] 两个子数组进行合并，合并后 [4, 5] 子数组有序。</li>
+<li>接着再将 [6, 7] 数组拆分成 [6]、[7] 两个子数组。</li>
+<li>由于两个子数组都只有一个元素，可以认为有序，将 [6]、[7] 两个子数组进行合并，合并后 [6, 7] 子数组有序。</li>
+<li>两个子数组 [4, 5]、[6, 7] 都已经有序，将其进行合并，合并后 [4, 7] 子数组有序。</li>
+<li>两个子数组 [0, 3]、[4, 7] 都已经有序，将其进行合并，合并后 [0, 7] 子数组有序。</li>
+</ol>
+<h3 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h3><h4 id="代码实现-5"><a href="#代码实现-5" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Quick</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        sort(array, <span class="number">0</span>, array.length - <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (low &gt;= high) &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> pivotIndex = partition(array, low, high);</span><br><span class="line">        sort(array, low, pivotIndex);</span><br><span class="line">        sort(array, pivotIndex + <span class="number">1</span>, high);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">int</span> <span class="title">partition</span><span class="params">(T[] array, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> left = low;</span><br><span class="line">        <span class="keyword">int</span> right = high + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span> (less(array, ++left, low)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (left == high) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">while</span> (less(array, low, --right)) &#123;</span><br><span class="line">                <span class="keyword">if</span> (right == low) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (left &gt;= right) &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                exch(array, left, right);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        exch(array, low, right);</span><br><span class="line">        <span class="keyword">return</span> right;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-5"><a href="#代码说明-5" class="headerlink" title="代码说明"></a>代码说明</h4><p>首先取数组首个元素为中心点，<strong>将其放置于数组的某个索引使得该索引前的元素都小于等于它，该索引后的元素都大于等于它</strong>，这通过 left、right 指针实现，left 指针首先遍历 [low+1, high] 索引位置的元素，当发现一个元素大于等于中心点时停止，right指针接着遍历 [high, <strong>low</strong>] 索引位置的元素，当发现一个元素小于等于中心点时停止。这时如果发现 left、right还没相遇（left &lt; right）那么交换下两者的元素，继续遍历。如果发现两者相遇（left &gt;= right）<strong>注意</strong>这里大于等于都需要考虑（大于的情况为：left 在遍历过程中遇到一个大于中心点的值，那么 right 会停留在该值左边的索引。等于的情况为：left 在遍历过程中遇到一个等于中心点的值，那么 right 也会停留在改值索引处。）那么将 low、right 索引元素互换即可。这里再解释下为什么 right 不能到 low+1 就停止，原因是如果 low+1 索引位置的元素还是大于中心点，那么 right 必须到low，与中心点交换后才能保证结果正确。当放置中心点完毕后将数组划分为 [0, pivotIndex]、[pivotIndex+1, high] 两个子数组递归进行前面的操作，每次执行sort方法都会将一个元素放置到有序数组的合适位置。</p>
+<h4 id="代码分析-1"><a href="#代码分析-1" class="headerlink" title="代码分析"></a>代码分析</h4><p>假设一共有8个元素：4，1，7，6，0，3，2，5，分别位于索引为 [0, 7]，执行过程如下：</p>
+<ol>
+<li>选取第一个索引（0）为基准点，left 指针停在索引2位置，right 指针停在索引6位置，由于 left&lt;right，交换索引2、6元素，数组改为：4，1，2，6，0，3，7，5。</li>
+<li>继续遍历，left 指针停在了索引3位置，right 指针停在了索引5位置，由于 left&lt;right，交换索引3、5元素，数组改为：4，1，2，3，0，6，7，5。</li>
+<li>继续遍历，left 指针停在了索引5位置，right 指针停在了索引4位置，由于 left&gt;right，交换第一个索引（0）与索引4元素，<strong>元素4的索引就被确定了，索引为4</strong>，数组改为：0，1，2，3，<strong>4</strong>，6，7，5。</li>
+<li>执行子数组索引 [0, 3] 排序。</li>
+<li>选取第一个索引（0）为基准点，left 指针停在索引1位置，right 指针停在索引0位置，由于 left&gt;right，交换第一个索引（0）与索引0元素，<strong>元素0的索引就被确定了，索引为0</strong>，数组改为：<strong>0</strong>，1，2，3，<strong>4</strong>，6，7，5。这一轮相当于没有交换元素因为索引0元素正好是最小的。</li>
+<li>执行子数组 [0, 0] 排序，由于只有一个元素直接返回。</li>
+<li>执行子数组 [1, 3] 排序。</li>
+<li>选取第一个索引（1）为基准点，left 指针停在了索引2位置，right 指针停在索引1位置，由于 left&gt;right，交换索引（1）与索引1元素，<strong>元素1的索引就被确定了，索引为1</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，2，3，<strong>4</strong>，6，7，5。这一轮相当于没有交换元素因为索引1元素正好是最小的。</li>
+<li>执行子数组 [2, 3] 排序。</li>
+<li>选取第一个索引（2）为基准点，left 指针停在了索引3位置，right 指针停在索引2位置，由于 left&gt;right，交换索引（2）与索引2元素，<strong>元素2的索引就被确定了，索引为2</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，3，<strong>4</strong>，6，7，5。这一轮相当于没有交换元素因为索引2元素正好是最小的。</li>
+<li>执行子数组 [2, 2] 排序，由于只有一个元素直接返回。</li>
+<li>执行子数组 [3, 3] 排序，由于只有一个元素直接返回。因此<strong>元素3的索引就被确定了，索引为3</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，<strong>3</strong>，<strong>4</strong>，6，7，5</li>
+<li>执行子数组 [5, 7] 排序。</li>
+<li>选取第一个索引（5）为基准点，left 指针停在索引6位置，right 指针停在索引7位置，由于 left&lt;right，交换索引6、7元素，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，<strong>3</strong>，<strong>4</strong>，6，5，7</li>
+<li>继续遍历，left 指针停在索引7位置，right 指针停在索引6位置，由于 left&gt;right，交换索引（5）与索引6元素，<strong>元素6的索引就被确定了，索引为6</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，<strong>3</strong>，<strong>4</strong>，5，<strong>6</strong>，7。</li>
+<li>执行子数组 [5, 5] 排序，由于只有一个元素直接返回。因此<strong>元素5的索引就被确定了，索引为5</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，<strong>3</strong>，<strong>4</strong>，<strong>5</strong>，<strong>6</strong>，7。</li>
+<li>执行子数组 [7, 7] 排序，由于只有一个元素直接返回。因此<strong>元素7的索引就被确定了，索引为7</strong>，数组改为：<strong>0</strong>，<strong>1</strong>，<strong>2</strong>，<strong>3</strong>，<strong>4</strong>，<strong>5</strong>，<strong>6</strong>，<strong>7</strong>。</li>
+</ol>
+<h4 id="问题与优化方式"><a href="#问题与优化方式" class="headerlink" title="问题与优化方式"></a>问题与优化方式</h4><p>上面代码为二路快排，注意需要<strong>打乱元素顺序</strong>，原因是如果不打乱顺序可能会导致元素分割不均匀影响执行效率。试想对于一个本来就基本有序的数组，每次选取第一个元素当做基准点，那么几乎每次分割都会将数组分成 [low]、[low + 1, high] 两半，这样快排就退化成了 O(n^2) 的算法了。</p>
+<p>还有另一个问题，二路快排对于重复元素多的数组执行效率并不高，因为其会导致若干不需要的比较，试想对于数组：5，5，3，6 ，使用二路快排首次排序数组会变成：3，5，5，6，于是会继续执行 [0, 0]、[2, 3] 两个子数组排序，其实对于索引2是不需要再次排序的因为其与基准值一样，要解决这个问题需要使用三路快排。</p>
+<h4 id="优化代码"><a href="#优化代码" class="headerlink" title="优化代码"></a>优化代码</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array, <span class="keyword">int</span> low, <span class="keyword">int</span> high)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (low &gt;= high) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> lt = low;</span><br><span class="line">    <span class="keyword">int</span> gt = high;</span><br><span class="line">    <span class="keyword">int</span> index = low + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">while</span> (index &lt;= gt) &#123;</span><br><span class="line">        <span class="keyword">if</span> (less(array, index, lt)) &#123;</span><br><span class="line">            exch(array, index++, lt++);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (less(array, low, index)) &#123;</span><br><span class="line">            exch(array, index, gt--);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            index++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    sort(array, low, lt - <span class="number">1</span>);</span><br><span class="line">    sort(array, gt + <span class="number">1</span>, high);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-6"><a href="#代码说明-6" class="headerlink" title="代码说明"></a>代码说明</h4><p>这段代码并不难，记住目标是将数组划分为 low ~ lt - 1、lt ~ gt、gt + 1 ~ high 三部分分别对应小于基准值，等于基准值，大于基准值。注意：由于 gt + 1开始都是大于基准值的，因此 index 只需遍历到 gt 即可，此外当遇到比基准值大的元素，与 gt 索引处的元素进行交换，不需要自增 index，由于交换过来的元素还不确定其大小。</p>
+<h3 id="堆排序"><a href="#堆排序" class="headerlink" title="堆排序"></a>堆排序</h3><h4 id="代码实现-6"><a href="#代码实现-6" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Heap</span> <span class="keyword">implements</span> <span class="title">Sortable</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = array.length / <span class="number">2</span> - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--) &#123;</span><br><span class="line">            sink(array, i, array.length - <span class="number">1</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">int</span> i = array.length - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">while</span> (i &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            exch(array, <span class="number">0</span>, i);</span><br><span class="line">            sink(array, <span class="number">0</span>, --i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sink</span><span class="params">(T[] array, <span class="keyword">int</span> index, <span class="keyword">int</span> lastIndex)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="number">2</span> * index + <span class="number">1</span> &lt;= lastIndex) &#123;</span><br><span class="line">            <span class="keyword">int</span> j = <span class="number">2</span> * index + <span class="number">1</span>;</span><br><span class="line">            <span class="keyword">if</span> (j &lt; lastIndex &amp;&amp; less(array, j, j + <span class="number">1</span>)) &#123;</span><br><span class="line">                j++;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (less(array, index, j)) &#123;</span><br><span class="line">                exch(array, index, j);</span><br><span class="line">            &#125;</span><br><span class="line">            index = j;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="代码说明-7"><a href="#代码说明-7" class="headerlink" title="代码说明"></a>代码说明</h4><p>首先构造堆，采用从最后一个非叶子节点依次下沉的方式，这样比从一个节点依次上浮效率要高，注意：最后一个非叶子节点索引为 N / 2 - 1。构造堆完毕后，将索引0（0 ~ i的最大值）与 i 进行交换，就跟冒泡排序一样将剩余元素最大值放到了数组末端，接着再执行索引0元素的下沉以维持堆定义，最后 i–（表示索引 [i+1, array.length - 1] 已经排好序，不再将其当做堆的一部分），依次循环。</p>
+<h2 id="复杂度比较"><a href="#复杂度比较" class="headerlink" title="复杂度比较"></a>复杂度比较</h2><table>
+<thead>
+<tr>
+<th>排序方法</th>
+<th>平均时间复杂度</th>
+<th>最好情况时间复杂度</th>
+<th>最坏情况时间复杂度</th>
+<th>空间复杂度</th>
+<th>稳定性</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>冒泡排序</td>
+<td>O(n^2)</td>
+<td>O(n)</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>选择排序</td>
+<td>O(n^2)</td>
+<td>O(n^2)</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>插入排序</td>
+<td>O(n^2)</td>
+<td>O(n)</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>希尔排序</td>
+<td>O(n^(1.3~2))</td>
+<td>O(n)</td>
+<td>O(n^2)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>归并排序</td>
+<td>O(nlogn)</td>
+<td>O(nlogn)</td>
+<td>O(nlogn)</td>
+<td>O(n)</td>
+<td>稳定</td>
+</tr>
+<tr>
+<td>快速排序</td>
+<td>O(nlogn)</td>
+<td>O(nlogn)</td>
+<td>O(n^2)</td>
+<td>O(logn)</td>
+<td>不稳定</td>
+</tr>
+<tr>
+<td>堆排序</td>
+<td>O(nlogn)</td>
+<td>O(nlogn)</td>
+<td>O(nlogn)</td>
+<td>O(1)</td>
+<td>不稳定</td>
+</tr>
+</tbody></table>
+<p>注意点：</p>
+<ol>
+<li><p>排序的稳定序指的是数组中的重复元素，排序前后相对位置是否会发生变化。比如：2，3，1（第一个），1（第二个）如果排序后一定为1（第一个），1（第二个），2，3那么表示该算法稳定，否则不稳定。</p>
+</li>
+<li><p>关于稳定性的一个典型应用场景，当需要将一个对象数组按照字段A、B进行排序，其中字段B的优先级高，一种方法是使用字段B先对数组进行排序，然后再对每个子数组按照字段A进行排序，这种做法当然可以但是相对比较麻烦，另一种方法是使用字段 A 先对数组进行排序，然后再对数组按照字段 B 进行排序，这时候需要注意如果排序算法是不稳定的那么将会出错。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Country[] countries = <span class="keyword">new</span> Country[<span class="number">6</span>];</span><br><span class="line">    countries[<span class="number">0</span>] = <span class="keyword">new</span> Country(<span class="string">"China"</span>, <span class="string">"08:00"</span>);</span><br><span class="line">    countries[<span class="number">1</span>] = <span class="keyword">new</span> Country(<span class="string">"England"</span>, <span class="string">"07:00"</span>);</span><br><span class="line">    countries[<span class="number">2</span>] = <span class="keyword">new</span> Country(<span class="string">"America"</span>, <span class="string">"09:00"</span>);</span><br><span class="line">    countries[<span class="number">3</span>] = <span class="keyword">new</span> Country(<span class="string">"America"</span>, <span class="string">"06:00"</span>);</span><br><span class="line">    countries[<span class="number">4</span>] = <span class="keyword">new</span> Country(<span class="string">"China"</span>, <span class="string">"03:00"</span>);</span><br><span class="line">    countries[<span class="number">5</span>] = <span class="keyword">new</span> Country(<span class="string">"England"</span>, <span class="string">"09:20"</span>);</span><br><span class="line">    Bubble sortable = <span class="keyword">new</span> Bubble();</span><br><span class="line">  	<span class="comment">// Selection sortable = new Selection();</span></span><br><span class="line">    sortable.sort(countries, <span class="keyword">new</span> CountryTimeComparator());</span><br><span class="line">    sortable.sort(countries, <span class="keyword">new</span> CountryNameComparator());</span><br><span class="line">    System.out.println(Arrays.toString(countries));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Bubble outputs: [Country&#123;name='America', time='06:00'&#125;, Country&#123;name='America', time='09:00'&#125;, Country&#123;name='China', time='03:00'&#125;, Country&#123;name='China', time='08:00'&#125;, Country&#123;name='England', time='07:00'&#125;, Country&#123;name='England', time='09:20'&#125;</span></span><br><span class="line"><span class="comment">// Selection outputs: [Country&#123;name='America', time='06:00'&#125;, Country&#123;name='America', time='09:00'&#125;, Country&#123;name='China', time='08:00'&#125;, Country&#123;name='China', time='03:00'&#125;, Country&#123;name='England', time='07:00'&#125;, Country&#123;name='England', time='09:20'&#125;]</span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码对Countries数组进行了两次排序，首先使用time字段排序，接着使用name字段排序，注意这里使用了冒泡排序其是稳定的，因此结果正确，而采用选择排序因为其实不稳定的，结果很有可能是错误的。</p>
+</li>
+<li><p>上面写的冒泡排序就算是 <strong>最好情况时间复杂度也是 O(n^2)</strong>，不过可以进行改进，使得最好情况时间复杂度为 O(n)。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;T extends Comparable&lt;T&gt;&gt; <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(T[] array)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; array.length - <span class="number">1</span>; i++) &#123;</span><br><span class="line">          <span class="keyword">boolean</span> didSwap = <span class="keyword">false</span>;</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; array.length - i - <span class="number">1</span>; j++) &#123;</span><br><span class="line">              <span class="keyword">if</span> (!less(array, j, j+<span class="number">1</span>)) &#123;</span><br><span class="line">                  exch(array, j, j+<span class="number">1</span>);</span><br><span class="line">                  didSwap = <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">if</span> (!didSwap) &#123;</span><br><span class="line">              <span class="keyword">return</span>;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过添加标记 didSwap，如果冒泡过程一次都没进行交换，那么说明数组已经有序了，就可以直接结束。当数组本来就是有序时时间复杂度就变成了 O(n)。</p>
+</li>
+<li><p>希尔排序的最好情况时间复杂度为 O(n)，原因与插入排序一致，当数组本来就是有序的时候不需要插入。</p>
+</li>
+<li><p>二路快速排序的最佳时间复杂度与平均时间复杂度一致都是 O(nlogn)，三路快排的最佳时间复杂度为 O(n) （当所有元素都相同时，不需要再分子数组），平均时间复杂度为 O(nlogn)。快排的最坏情况时间复杂度为 O(n^2)（每次只能分成一个子数组时），由于需要进行递归因此其需要额外空间，一般空间复杂度为 O(logn)，最坏空间复杂度为 O(n)。</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/12/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="next" title="计算机网络">
+                <i class="fa fa-chevron-left"></i> 计算机网络
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/21/Thinking%20in%20Java%20%E6%80%BB%E7%BB%93/" rel="prev" title="Thinking in Java 总结">
+                Thinking in Java 总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通用接口及方法"><span class="nav-number">2.</span> <span class="nav-text">通用接口及方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#各种排序方式"><span class="nav-number">3.</span> <span class="nav-text">各种排序方式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#冒泡排序"><span class="nav-number">3.1.</span> <span class="nav-text">冒泡排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现"><span class="nav-number">3.1.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明"><span class="nav-number">3.1.2.</span> <span class="nav-text">代码说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#选择排序"><span class="nav-number">3.2.</span> <span class="nav-text">选择排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-1"><span class="nav-number">3.2.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-1"><span class="nav-number">3.2.2.</span> <span class="nav-text">代码说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插入排序"><span class="nav-number">3.3.</span> <span class="nav-text">插入排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-2"><span class="nav-number">3.3.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-2"><span class="nav-number">3.3.2.</span> <span class="nav-text">代码说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化代码实现"><span class="nav-number">3.3.3.</span> <span class="nav-text">优化代码实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#希尔排序"><span class="nav-number">3.4.</span> <span class="nav-text">希尔排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-3"><span class="nav-number">3.4.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-3"><span class="nav-number">3.4.2.</span> <span class="nav-text">代码说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#归并排序"><span class="nav-number">3.5.</span> <span class="nav-text">归并排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-4"><span class="nav-number">3.5.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-4"><span class="nav-number">3.5.2.</span> <span class="nav-text">代码说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码分析"><span class="nav-number">3.5.3.</span> <span class="nav-text">代码分析</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#快速排序"><span class="nav-number">3.6.</span> <span class="nav-text">快速排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-5"><span class="nav-number">3.6.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-5"><span class="nav-number">3.6.2.</span> <span class="nav-text">代码说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码分析-1"><span class="nav-number">3.6.3.</span> <span class="nav-text">代码分析</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题与优化方式"><span class="nav-number">3.6.4.</span> <span class="nav-text">问题与优化方式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#优化代码"><span class="nav-number">3.6.5.</span> <span class="nav-text">优化代码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-6"><span class="nav-number">3.6.6.</span> <span class="nav-text">代码说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#堆排序"><span class="nav-number">3.7.</span> <span class="nav-text">堆排序</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-6"><span class="nav-number">3.7.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码说明-7"><span class="nav-number">3.7.2.</span> <span class="nav-text">代码说明</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#复杂度比较"><span class="nav-number">4.</span> <span class="nav-text">复杂度比较</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

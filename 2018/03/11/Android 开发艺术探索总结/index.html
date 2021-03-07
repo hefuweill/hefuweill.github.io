@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言前几天读完了 Android 开发艺术探索，这篇文章主要是记录下其中每个章节的重点，便于以后复习。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 开发艺术探索总结">
+<meta property="og:url" content="http://yoursite.com/2018/03/11/Android%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言前几天读完了 Android 开发艺术探索，这篇文章主要是记录下其中每个章节的重点，便于以后复习。">
+<meta property="article:published_time" content="2018-03-11T10:24:39.000Z">
+<meta property="article:modified_time" content="2020-04-30T14:36:06.848Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/11/Android 开发艺术探索总结/"/>
+
+
+
+
+
+  <title>Android 开发艺术探索总结 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/11/Android%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 开发艺术探索总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-11T18:24:39+08:00">
+                2018-03-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>前几天读完了 Android 开发艺术探索，这篇文章主要是记录下其中每个章节的重点，便于以后复习。<a id="more"></a> </p>
+<h3 id="Activity-的生命周期与启动模式"><a href="#Activity-的生命周期与启动模式" class="headerlink" title="Activity 的生命周期与启动模式"></a>Activity 的生命周期与启动模式</h3><ul>
+<li><p>Activity A 启动 Activity B，生命周期调用顺序为 A.onPause -&gt; B.onCreate -&gt; B.onStart -&gt; B.onResume -&gt; A.onStop 因此不能在 onPause 里面做耗时任务，这会导致新 Activity 延迟显示。</p>
+</li>
+<li><p>onStart 调用完后 Activity 就可见了，onResume 调用完后 Activity 就可以与用户交互了，但是注意由于 View 的三大流程是在 onResume 回调完毕后才进行的，因此 onResume 调用完了，View 也是不会显示的，此时获取宽高都是 0。</p>
+</li>
+<li><p>Activity 被意外杀死或者当配置发生改变后，系统会调用 onSaveInstanceState（API 28 后在 onStop 后调用，API 28以下在 onStop 前调用），这里可以保存下信息，然后在 onRestoreInstance 中恢复。</p>
+</li>
+<li><p>Activity 的 onCreate 方法参数 bundle 可能为 null ，但是 onRestoreInstance 方法参数 bundle 一定不为空。</p>
+</li>
+<li><p>Activity A 启动 Activity B (standard 模式)，会将 Activity B 放入 Activity A 所在的栈中，因此使用 Application.startActivity 需要添加 flag ，因为系统不知道将其放入哪个栈中。</p>
+</li>
+<li><p>Luncher 应用程序在开启一个应用时，会对 Intent 设置 Intent.ACTIVITY_NEW_TASK ，所以其它应用程序不会和 Luncher 运行在一个任务栈中。</p>
+</li>
+<li><p>SingleTask 启动模式，表示整个系统只能有该 Activity 的一个实例，并且启动它的时候附带清除 Top 的效果，比如当前栈中存在 ABCD 四个 Activity，这时候启动 B，栈中就变成了 AB，CD被清除了，并且还会调用 B.onNewIntent ，该启动模式的 Activity 始终运行在 taskAffinity 所指定的栈中。</p>
+</li>
+<li><p>SingleInstance 启动模式，表示整个系统只能有该 Activity 的一个实例，启动它的时候会新开一个任务栈，该栈中只会存在它这么一个 Activity，再次启动它如果该栈没有销毁会调用其 onNewIntent 方法。</p>
+</li>
+<li><p>隐式启动的 Activity 必须加上默认的 category，因为当调用 startActivity、startActivityForResult  时系统会验证是否含有默认的 category，如果不加 Activity 就无法启动了(也就是说至少要有一个默认的 category, 入口 Activity 是特例不需要默认 category )</p>
+</li>
+<li><p>可以通过以下 adb 指令查看当前所有的任务栈：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">adb shell dumpsys activity activities</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<h3 id="IPC-机制"><a href="#IPC-机制" class="headerlink" title="IPC 机制"></a>IPC 机制</h3><ul>
+<li><p>每个 Android 进程都含有一个虚拟机实例，而每个虚拟机加载同一个类时都会新建一个 Class 实例，因此进程一修改了 A 类中静态值，但是进程二获取的还是原来的值。</p>
+</li>
+<li><p>开启多个进程会导致 Application 被创建多个，由于每次启动组件时，系统都会判断 Application 对象是否存在，而显然非主进程的 Application 对象不存在，因此会创建。</p>
+</li>
+<li><p>Android 进程间通信的方式主要有以下几种：</p>
+<ol>
+<li>使用 Intent 传递数据。</li>
+<li>使用共享文件和 SharedPreference。</li>
+<li>使用 AIDL 、Messenger、ContentProvider，基于 Binder。</li>
+<li>使用 Socket 。</li>
+</ol>
+</li>
+<li><p>将对象序列化保存到文件中，要求该类必须实现 serializable 接口，然后使用 ObjectInputSteam 写入，使用 ObjectOutputSteam 读取。</p>
+</li>
+<li><p>实现了 serializable 接口的类最好指定 serialVersionUID，若不指定编译器就会根据当前类自动加上该字段,当类字段发生变化时就会反序列化失败，因为序列化时的 UID 与当前类的UID不同，手动指定就不会导致该问题.当然类结构比如变量类型发生变化反序列化也会失败。</p>
+</li>
+<li><p>序列化的时候不会把静态变量和 transient (作用就是不参与序列化)标记的成员变量序列化，因为静态变量属于类而不属于对象。</p>
+</li>
+<li><p>实现了 parcelable 接口的类 writeToParcel 和 createFromParcel 的读写顺序必须要一致，不然会出错，parcelable 原理是使用共享内存，当使用内存序列化时使用 Parcelable，其他情况使用 Serialable，毕竟 Serialable 使用简单，但是开销大。</p>
+</li>
+<li><p>Binder 对于 framework 来说是用于连接各种 Manger(ActivityManager、WindowManager) 和相应的 ServiceManager(AMS、WMS) 的桥梁,其跨进程传递的数据只能是 Parcelable 以及基本数据类型。</p>
+</li>
+<li><p>Intent 能传输的数据类型包括 Serialable、Parcelable、CharSequence 以及基本数据类型。</p>
+</li>
+<li><p>API 21 及以上要求 bindService、startService 需要调用 intent.setPackage（目标 Service 包名），因为 ContextImpl 中做了判断：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">validateServiceIntent</span><span class="params">(Intent service)</span> </span>&#123;</span><br><span class="line">	 <span class="keyword">if</span> (service.getComponent() == <span class="keyword">null</span> &amp;&amp; service.getPackage() == <span class="keyword">null</span>) &#123;</span><br><span class="line">	    <span class="keyword">if</span> (getApplicationInfo().targetSdkVersion &gt;= Build.VERSION_CODES.LOLLIPOP) &#123;</span><br><span class="line">	        IllegalArgumentException ex = <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">	                <span class="string">"Service Intent must be explicit: "</span> + service);</span><br><span class="line">	        <span class="keyword">throw</span> ex;</span><br><span class="line">	    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">	        Log.w(TAG, <span class="string">"Implicit intents with startService are not safe: "</span> + service</span><br><span class="line">	                + <span class="string">" "</span> + Debug.getCallers(<span class="number">2</span>, <span class="number">3</span>));</span><br><span class="line">	    &#125;</span><br><span class="line">	 &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>AS 使用 aidl 遇到的坑 <a href="https://www.cnblogs.com/rookiechen/p/5352053.html，要使用自定义的类必须让该类实现" target="_blank" rel="noopener">https://www.cnblogs.com/rookiechen/p/5352053.html，要使用自定义的类必须让该类实现</a> Parcelable 接口并且创建同名 .aidl 文件声明自己，最后在主 aidl 中引用。除此之外除基本数据类型，其他类型类型都得标上方向: in、out、或者 inout，并且 aidl 里面不能声明静态变量。</p>
+</li>
+<li><p>AIDL 服务端程序验证客户端程序，可以通过自定义权限或者调用 getCallingUid 获取包名。</p>
+</li>
+<li><p>AIDL 跨进程注册监听，需要了查看 <a href="https://blog.csdn.net/HJXASLZYY/article/details/52204379。" target="_blank" rel="noopener">https://blog.csdn.net/HJXASLZYY/article/details/52204379。</a></p>
+</li>
+<li><p>AIDL 编译后生成的类如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br></pre></td><td class="code"><pre><span class="line">  <span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">IBookManager</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">IInterface</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Stub</span> <span class="keyword">extends</span> <span class="title">android</span>.<span class="title">os</span>.<span class="title">Binder</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">hfw</span>.<span class="title">androidtest</span>.<span class="title">IBookManager</span> </span>&#123;</span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> java.lang.String DESCRIPTOR = <span class="string">"com.hfw.androidtest.IBookManager"</span>;</span><br><span class="line">    </span><br><span class="line">      <span class="comment">// 1</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="title">Stub</span><span class="params">()</span> </span>&#123;</span><br><span class="line">          <span class="keyword">this</span>.attachInterface(<span class="keyword">this</span>, DESCRIPTOR);</span><br><span class="line">      &#125;</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">public</span> <span class="keyword">static</span> com.hfw.androidtest.<span class="function">IBookManager <span class="title">asInterface</span><span class="params">(android.os.IBinder obj)</span> </span>&#123;</span><br><span class="line">          <span class="keyword">if</span> ((obj == <span class="keyword">null</span>)) &#123;</span><br><span class="line">              <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="comment">// 2</span></span><br><span class="line">          android.os.IInterface iin = obj.queryLocalInterface(DESCRIPTOR);</span><br><span class="line">          <span class="keyword">if</span> (((iin != <span class="keyword">null</span>) &amp;&amp; (iin <span class="keyword">instanceof</span> com.hfw.androidtest.IBookManager))) &#123;</span><br><span class="line">              <span class="keyword">return</span> ((com.hfw.androidtest.IBookManager) iin);</span><br><span class="line">          &#125;</span><br><span class="line">        	<span class="comment">// 3</span></span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">new</span> com.hfw.androidtest.IBookManager.Stub.Proxy(obj);</span><br><span class="line">      &#125;</span><br><span class="line">  </span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">      &#125;</span><br><span class="line">  </span><br><span class="line">      <span class="meta">@Override</span></span><br><span class="line">      <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTransact</span><span class="params">(<span class="keyword">int</span> code, android.os.Parcel data, android.os.Parcel reply, <span class="keyword">int</span> flags)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</span><br><span class="line">          <span class="keyword">switch</span> (code) &#123;</span><br><span class="line">              <span class="keyword">case</span> INTERFACE_TRANSACTION: &#123;</span><br><span class="line">                  reply.writeString(DESCRIPTOR);</span><br><span class="line">                  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">case</span> TRANSACTION_getBookList: &#123;</span><br><span class="line">                  data.enforceInterface(DESCRIPTOR);</span><br><span class="line">                  java.util.List&lt;com.hfw.androidtest.Book&gt; _result = <span class="keyword">this</span>.getBookList();</span><br><span class="line">                  reply.writeNoException();</span><br><span class="line">                  reply.writeTypedList(_result);</span><br><span class="line">                  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">case</span> TRANSACTION_addBook: &#123;</span><br><span class="line">                	<span class="comment">// 4</span></span><br><span class="line">                  data.enforceInterface(DESCRIPTOR);</span><br><span class="line">                  com.hfw.androidtest.Book _arg0;</span><br><span class="line">                  <span class="keyword">if</span> ((<span class="number">0</span> != data.readInt())) &#123;</span><br><span class="line">                      _arg0 = com.hfw.androidtest.Book.CREATOR.createFromParcel(data);</span><br><span class="line">                  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                      _arg0 = <span class="keyword">null</span>;</span><br><span class="line">                  &#125;</span><br><span class="line">                  <span class="keyword">this</span>.addBook(_arg0);</span><br><span class="line">                  reply.writeNoException();</span><br><span class="line">                  <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">return</span> <span class="keyword">super</span>.onTransact(code, data, reply, flags);</span><br><span class="line">      &#125;</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Proxy</span> <span class="keyword">implements</span> <span class="title">com</span>.<span class="title">hfw</span>.<span class="title">androidtest</span>.<span class="title">IBookManager</span> </span>&#123;</span><br><span class="line">          <span class="keyword">private</span> android.os.IBinder mRemote;</span><br><span class="line">  </span><br><span class="line">          Proxy(android.os.IBinder remote) &#123;</span><br><span class="line">              mRemote = remote;</span><br><span class="line">          &#125;</span><br><span class="line">  </span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">          <span class="keyword">public</span> android.os.<span class="function">IBinder <span class="title">asBinder</span><span class="params">()</span> </span>&#123;</span><br><span class="line">              <span class="keyword">return</span> mRemote;</span><br><span class="line">          &#125;</span><br><span class="line">  </span><br><span class="line">          <span class="keyword">public</span> java.lang.<span class="function">String <span class="title">getInterfaceDescriptor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">              <span class="keyword">return</span> DESCRIPTOR;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">          <span class="keyword">public</span> java.util.List&lt;com.hfw.androidtest.Book&gt; getBookList() <span class="keyword">throws</span> android.os.RemoteException &#123;</span><br><span class="line">              android.os.Parcel _data = android.os.Parcel.obtain();</span><br><span class="line">              android.os.Parcel _reply = android.os.Parcel.obtain();</span><br><span class="line">              java.util.List&lt;com.hfw.androidtest.Book&gt; _result;</span><br><span class="line">              <span class="keyword">try</span> &#123;</span><br><span class="line">                  _data.writeInterfaceToken(DESCRIPTOR);</span><br><span class="line">                  mRemote.transact(Stub.TRANSACTION_getBookList, _data, _reply, <span class="number">0</span>);</span><br><span class="line">                  _reply.readException();</span><br><span class="line">                  _result = _reply.createTypedArrayList(com.hfw.androidtest.Book.CREATOR);</span><br><span class="line">              &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                  _reply.recycle();</span><br><span class="line">                  _data.recycle();</span><br><span class="line">              &#125;</span><br><span class="line">              <span class="keyword">return</span> _result;</span><br><span class="line">          &#125;</span><br><span class="line">  </span><br><span class="line">          <span class="meta">@Override</span></span><br><span class="line">          <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addBook</span><span class="params">(com.hfw.androidtest.Book book)</span> <span class="keyword">throws</span> android.os.RemoteException </span>&#123;</span><br><span class="line">              android.os.Parcel _data = android.os.Parcel.obtain();</span><br><span class="line">              android.os.Parcel _reply = android.os.Parcel.obtain();</span><br><span class="line">              <span class="keyword">try</span> &#123;</span><br><span class="line">                  _data.writeInterfaceToken(DESCRIPTOR);</span><br><span class="line">                  <span class="keyword">if</span> ((book != <span class="keyword">null</span>)) &#123;</span><br><span class="line">                      _data.writeInt(<span class="number">1</span>);</span><br><span class="line">                      book.writeToParcel(_data, <span class="number">0</span>);</span><br><span class="line">                  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                      _data.writeInt(<span class="number">0</span>);</span><br><span class="line">                  &#125;</span><br><span class="line">                  mRemote.transact(Stub.TRANSACTION_addBook, _data, _reply, <span class="number">0</span>);</span><br><span class="line">                  _reply.readException();</span><br><span class="line">              &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                  _reply.recycle();</span><br><span class="line">                  _data.recycle();</span><br><span class="line">              &#125;</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  </span><br><span class="line">      <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_getBookList = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">0</span>);</span><br><span class="line">      <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> TRANSACTION_addBook = (android.os.IBinder.FIRST_CALL_TRANSACTION + <span class="number">1</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  	<span class="keyword">public</span> java.util.List&lt;com.hfw.androidtest.Book&gt; getBookList() <span class="keyword">throws</span> android.os.RemoteException;</span><br><span class="line"></span><br><span class="line">  	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addBook</span><span class="params">(com.hfw.androidtest.Book book)</span> <span class="keyword">throws</span> android.os.RemoteException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要调用流程为：</p>
+<ol>
+<li>服务端先调用 Binder binder = new IBookManager.Stub()  实现 getBookList、addBook，接着在 onBind 方法中返回 binder 。</li>
+<li>客户端在 onServiceConnected 回调中拿到 IBinder 对象，调用 IBookManager.Stub.asInterface，拿到 IBookManager 实例。内部原理是，如果是同一个进程那么直接把服务端返回的 binder 返回，这点可以根据代码 1、2 看出，如果不是同一个进程那么根据代码 3 新建一个 Proxy 对象并返回。</li>
+<li>客户端调用 binder.addBook，如果是同一个进程相当于普通的方法调用，如果不是同一个进程则执行到 Proxy.addBook，首先获取两个 Parcel 对象 _data、_reply 其中前者用来传递参数，后者用于接收参数，接着写入 1，表示一个参数，再将 book 实例写入 _data，然后调用 mRemote.transact 传入调用的方法索引，以及两个 Parcel 对象，注意这个的 mRemote 为 onServiceConnected 返回的 BinderProxy 对象。</li>
+<li>调用 transact 方法后会挂起当前线程，接着会在服务端调用 binder.onTransact 方法，根据传入的方法索引，执行代码 4，从 Parcel 对象 data 中取出参数 Book 实例，执行服务端实现的 addBook 方法，由于这个方法无返回值所以不需要写入返回值到 reply 对象，接着客户端线程停止挂起继续执行。</li>
+</ol>
+</li>
+</ul>
+<h3 id="View-的事件体系"><a href="#View-的事件体系" class="headerlink" title="View 的事件体系"></a>View 的事件体系</h3><ul>
+<li><p>当两次滑动距离小于该值时系统不认为滑动，可以通过以下代码获取：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ViewConfiguration.get(getContext()).getScaledTouchSlop();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>VelocityTracker 用于获取水平或垂直的速度典型代码如下所示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">onTouchEvent</span><span class="params">(MotionEvent event)</span> </span>&#123;</span><br><span class="line">    VelocityTracker velocityTracker = VelocityTracker.obtain();</span><br><span class="line">    velocityTracker.addMovement(event);</span><br><span class="line">    velocityTracker.computeCurrentVelocity(<span class="number">1000</span>);</span><br><span class="line">    Log.d(TAG, <span class="string">"onTouchEvent: x="</span>+velocityTracker.getXVelocity()+<span class="string">";y="</span>+velocityTracker.getYVelocity());</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">super</span>.onTouchEvent(event);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>实现 View 移动可以使用以下几种方法：</p>
+<ol>
+<li>scrollTo、scrollBy。</li>
+<li>修改 View 的 layoutParams。</li>
+<li>修改 View 的 transactionX、transactionY。</li>
+<li>offsetLeftAndRight、offsetTopAndBottom。</li>
+</ol>
+</li>
+<li><p>scrollTo 与scrollBy 这两个方法都是移动 View 内的内容比如调用 Linearlayout.scrollTo 是将 Linearlayout 内部的内容移动，当调用 TextView.scrollTo 时是将其上的文字移动 TextView 本身不移动，同时参数 x 为正时向左移动，y 为正时向上移动。两者的区别时前者是相对于初始位置，连续调用同样参数无效，后者相对于当前位置可以重复执行(内部也是调用前者只是 x, y 每次都改变)。</p>
+</li>
+<li><p>使用 View 动画不会改变 View 的真实位置，只是用户看起来改变了而已，对于系统来说 View 的位置是没有改变的，并且如果不设置 setFillAfter(true) 在动画结束后又会回到原位置，因此 button 在动画结束的位置触发不了单击事件，而在初始位置可以触发。</p>
+</li>
+<li><p>当改变了一个 View 的 layoutParams 时有两种方法可以生效，一种是再设置回去 View.setLayoutParams ，另一种是调用 View.requestLayout。</p>
+</li>
+<li><p>实现 View 弹性滑动的方式有 Scroller、ObjectAnimator、延迟策略（滑动以下睡眠一下）。</p>
+</li>
+<li><p>Scroller 原理是 startScroll 以后会调用 invalidate ，然后会再调用 View.onDraw ，onDraw 里面会再调用computeScroll 该方法在 View 内是空方法。</p>
+</li>
+<li><p>View 的 clickable 或 longclickable 有一个为 true 就会消耗点击事件，setClickListener 会把 clickable 设置为true，setLongClickListener 同理。</p>
+</li>
+</ul>
+<h3 id="View-的工作原理"><a href="#View-的工作原理" class="headerlink" title="View 的工作原理"></a>View 的工作原理</h3><ul>
+<li><p>ViewRoot 的作用主要是与 WMS 通信绘制 GUI 和给 DecorView 分发用户事件。</p>
+</li>
+<li><p>invalidate 会调用onDraw，requestLayout 会调用 onMeasure 、onLayout() 不调用 onDraw。</p>
+</li>
+<li><p>MeasureSpec 分为以下三种：</p>
+<ol>
+<li>UNSPECIFIED 容器不对 View 的大小做任何限制，子 View 要多大给多大，一般用于系统内部，比如ScrollView 对子 View 的高度。</li>
+<li>EXACTLY 确定值，父容器已经检测出当前 View 所需的大小，对应于 LayoutParams 里面的 match_parent 以及确定值。</li>
+<li>AT_MOST 父容器指定了一个大小，子 View 不能超过这个大小对应于 layoutParams 里面的wrap_content。</li>
+</ol>
+</li>
+<li><p>onMeasure 执行完后 getMeasuredWidth、getMeasureHeight 才能取到，其值大部分情况下等于getWidth、getHeight、最好是在 onLayout 后去获取最终高度。</p>
+</li>
+<li><p>View 真正进行 measure layout draw 是在 Activity 的 onResume 执行完后,因此 onResume 时布局并不可见。</p>
+</li>
+<li><p>View 的宽高在 onCreate、onStart、onResume 里面都无法获取到，可以通过以下几种方式获得：</p>
+<ol>
+<li>在 Activty、View 的 onWindowFocusChanged 里面获取。</li>
+<li>添加 ViewTreeObserver。</li>
+<li>View.post。</li>
+<li>View.measure。</li>
+</ol>
+</li>
+<li><p>直接继承自 View 的自定义 View 需要注意解决 wrap_content 情况因为如果不做处理 wrap_content 将于match_parent 效果一致，详见 View.getDefaultSize，此外还必须处理 padding (不需要处理 margin，margin 由父控件处理)处理方法就是在 onDraw 里面考虑内边界。</p>
+</li>
+<li><p>View 被从 Window 中移除时会调用 View.onDetachedFromWindow 该方法内部可以做一些资源回收，停止线程的操作。</p>
+</li>
+<li><p>RemoteViews 用于 Notification 中的自定义 View 以及 Widget，而其归根到底其实都是在 SystemServer 进程里面加载的，所以是跨进程的。</p>
+</li>
+<li><p>创建 Widget 步骤：</p>
+<ol>
+<li><p>新建一个布局文件比如 a.xml。</p>
+</li>
+<li><p>在res里面新建文件夹 xml，再在该文件夹下面新建一个布局比如 b.xml 里面代码如下所示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">appwidget-provider</span> <span class="attr">xmlns:android</span>=<span class="string">"http://schemas.android.com/apk/res/android"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:initialLayout</span>=<span class="string">"@layout/a"</span> </span></span><br><span class="line"><span class="tag">    <span class="attr">android:minHeight</span>=<span class="string">"84dp"</span> <span class="attr">android:minWidth</span>=<span class="string">"84dp"</span></span></span><br><span class="line"><span class="tag">    <span class="attr">android:updatePeriodMillis</span>=<span class="string">"5000000"</span>&gt;</span><span class="comment">&lt;!--自动更新时间--&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">appwidget-provider</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+<li><p>新建一个类继承自 AppWidgetProvider，小组件的点击事件在 onUpdate 里面进行设置，该方法会在每个小组件添加时就自动调用一次。</p>
+</li>
+<li><p>在Manifast文件中进行注册如下所示：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">receiver</span> <span class="attr">android:name</span>=<span class="string">".MyAppWidget"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">meta-data</span> <span class="attr">android:name</span>=<span class="string">"android.appwidget.provider"</span></span></span><br><span class="line"><span class="tag">             <span class="attr">android:resource</span>=<span class="string">"@xml/app"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"anniu"</span> /&gt;</span> <span class="comment">&lt;!--下行必须加不然小组件将无法显示--&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.appwidget.action.APPWIDGET_UPDATE"</span>/&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.DEFAULT"</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">receiver</span>&gt;</span></span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+</li>
+<li><p>RemoteViews 里面只能使用一些系统内置的控件，其子控件及自定义控件都无法使用。</p>
+</li>
+<li><p>RemoteViews 的原理,当我们调用 RemoteViews.setXXX 时系统都会创建一个 Action，并将其放入一个ArrayList 中进行保存,只有调用对应 manager 中的更新方法时才会调用 RemoteViews 里面的 apply 方法,该方法里面再一一执行 action 的 apply 方法，这样就能避免多次 IPC 请求。</p>
+</li>
+<li><p>获取本应用中的资源文件可以通过 getResource().getIdentifer(“布局文件名字”, “layout”, getPackageName()) 获取。</p>
+</li>
+</ul>
+<h3 id="Android-Drawable"><a href="#Android-Drawable" class="headerlink" title="Android Drawable"></a>Android Drawable</h3><ul>
+<li>selector 文件系统是根据从上到下的顺序来匹配 drawable 的所以必须把默认图案的 drawable 放到最下面，不然将一直显示默认图片。</li>
+</ul>
+<h3 id="Android-动画深入分析"><a href="#Android-动画深入分析" class="headerlink" title="Android 动画深入分析"></a>Android 动画深入分析</h3><ul>
+<li><p>Android的动画分为三种：View动画、帧动画、属性动画。View 动画既可以是单种动画,也可以是四种动画组合。组合动画所对应的类是 AnimationSet类，推荐在xml里面定义动画。</p>
+</li>
+<li><p>帧动画在 res/drawable 目录下创建一个 xml 文件根节点为 animation-list 然后在代码中View.setBackgroundResource()，然后再View.getBackground().start()。</p>
+</li>
+<li><p>LayoutAnimation 的使用先在 anim 目录下新建一个以 layoutAnimation 为根节点的 xml 文件,其中有个属性animation 需要依赖一个其他的 animation,然后在布局文件中为 ViewGroup 设置 layoutAnimation 就行了(案例是给 ListView 设置，会出现刚刚载入布局时每个 item 有序的从右到左从完全透明到完全不透明的动画)。</p>
+</li>
+<li><p>Activity 的切换动画 使用 overridePendingTransition 指定开启动画以及暂停动画，该方法必须紧挨startActivity 或 finish 后面否则将不起作用，其中 exitAnim 动画是给需要消失的 Activity 使用的。</p>
+</li>
+<li><p>ObjectAnimator 继承自 ValueAnimator，AnimatorSet 代表动画集合。ObjectAnimator 用于改变一个对象的属性并且赋予动画，ValueAnimator需要自己设置监听自己更改，可以通过 xxxAnimator.ofXXX 获取， AnimatorSet 使用 playTogether(ValueAnimator…) 或者 playSequentially()，如果要对 Color 使用属性动画要设置：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setEvaluator(<span class="keyword">new</span> ArgbEvaluator());</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>ObjectAnimator 要求对象必须要有 setXXX 的方法，因为原理就是根据时间来生成一个值然后一个个通过反射调用 setXXX 方法设置，并且如果 value 可变参数只指定一个那么该对象就必须要有 getXXX 方法因为当属性动画开始时系统会通过反射调用该方法,如果找不到该方法,程序会直接崩溃。</p>
+</li>
+<li><p>ValueAnimator 设置 AnimatorListener 时如果不需要实现所有的回调应该使用 AnimatorListenerAdapter。</p>
+</li>
+<li><p>当属性动画显示出的效果不如预期，得先看看是否该对象的 set 和 get 方法在操作同一个属性，如果不是可以通过包装类进行实现。</p>
+</li>
+</ul>
+<h3 id="理解-Window-和-WindowManager"><a href="#理解-Window-和-WindowManager" class="headerlink" title="理解 Window 和 WindowManager"></a>理解 Window 和 WindowManager</h3><ul>
+<li><p>Activity 内可以直接调用 getWindowManager 获取 WindowManager 实例。</p>
+</li>
+<li><p>Activity 其实也是通过调用 WindowManager.addView 添加的(在 ActivityThread.handleResumeActivity 里面。</p>
+</li>
+<li><p>通过 WindowManager 显示一个全局的悬浮窗代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Build.VERSION.SDK_INT &gt;= <span class="number">23</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (Settings.canDrawOverlays(<span class="keyword">this</span>)) &#123;</span><br><span class="line">       showWindow();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="comment">//打开设置去授权悬浮框权限</span></span><br><span class="line">        Intent intent = <span class="keyword">new</span> Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION);</span><br><span class="line">        startActivityForResult(intent,<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    showWindow();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">showWindow</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Button bt_window = <span class="keyword">new</span> Button(<span class="keyword">this</span>);</span><br><span class="line">    bt_window.setText(<span class="string">"我是悬浮"</span>);</span><br><span class="line">    WindowManager wm = (WindowManager) getSystemService(Service.WINDOW_SERVICE);</span><br><span class="line">    WindowManager.LayoutParams params = <span class="keyword">new</span> WindowManager.LayoutParams(-<span class="number">2</span>,-<span class="number">2</span>,<span class="number">0</span>,<span class="number">0</span>, PixelFormat.TRANSPARENT);</span><br><span class="line">    params.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |<span class="comment">//表示自己不需要获取焦点,事件向下传递,同时拥有下面的flag特性</span></span><br><span class="line">    WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |<span class="comment">//表示范围内的事件接受范围外不接受</span></span><br><span class="line">    WindowManager.LayoutParams.FLAG_TOUCHABLE_WHEN_WAKING;<span class="comment">//已经过时</span></span><br><span class="line">    params.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;<span class="comment">//type必须设置,并且该type需要加上权限 system_alert_window</span></span><br><span class="line">    <span class="keyword">if</span> (wm != <span class="keyword">null</span>) &#123;</span><br><span class="line">        wm.addView(bt_window,params);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onActivityResult</span><span class="params">(<span class="keyword">int</span> requestCode, <span class="keyword">int</span> resultCode, Intent data)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.onActivityResult(requestCode, resultCode, data);</span><br><span class="line">    <span class="keyword">if</span>(requestCode == <span class="number">1</span>)&#123;</span><br><span class="line">        <span class="keyword">if</span>(Build.VERSION.SDK_INT &gt;= <span class="number">23</span>)&#123;</span><br><span class="line">            <span class="keyword">if</span>(Settings.canDrawOverlays(<span class="keyword">this</span>))&#123;</span><br><span class="line">                showWindow();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li><p>WindowManager 主要有三个重要方法 addView、removeView、updateViewLayout 其中 addView 通过IPC调用 WMS.addView ，removeView 分为两个方法 removeView、removeImmediate 前者只是发了一个消息就返回了，不一定立马执行，后者直接执行，建议使用前者。</p>
+</li>
+<li><p>PhoneWindow 里面维护了一个 DecorView 对象，可以设置 Callback (比如 Activity.attach 就设置了，回调中包括触摸事件等)。</p>
+</li>
+<li><p>Toast 对 NMS发出请求，NMS 在能弹出的时候通过 IPC 回调 Tn.show，方法运行在 binder 线程池中需要通过 Handler 转到原来的线程，因为 Handler 需要 Looper，所以 Toast 无法在没 Looper 的线程中使用。</p>
+</li>
+</ul>
+<h3 id="四大组件的工作过程"><a href="#四大组件的工作过程" class="headerlink" title="四大组件的工作过程"></a>四大组件的工作过程</h3><ul>
+<li>当程序中使用 startActivity、startService、bindService 时会通过 IPC 调用 AMS 里面的对应的方法后经过一系列流程通过调用 ApplicationThread 里面的方法,最后调到 H 类里面对应的方法。</li>
+<li>Service 的 start 过程，ComtextImpl.startService -&gt; 验证Intent内是否包含了包名 -&gt; AMS.startService -&gt; 经过一系列操作后发送一个 message 让目标应用程序的 ActivityThread 创建 Service 对象，并且调用 Service.onCreate() -&gt; 目标应用程序告诉 AMS 已经执行完毕 -&gt; AMS 再给 ActivityThread 发送消息调用 Service.onStartCommand()。</li>
+<li>Service 的 bind 过程，ComtextImpl.bindService -&gt; 验证Intent内是否包含了包名 -&gt; 将 ServiceConnection对象进行包装成 Binder对象 -&gt; AMS.bindService -&gt; 经过一系列操作后发送一个 message 让目标应用程序的 ActivityThread 创建 Service 对象 并且调用 Service.onCreate -&gt; 目标应用程序告诉 AMS 已经执行完毕 -&gt; AMS 给 client 发送消息调用 Service.onBind -&gt; client 告诉 AMS 执行完毕并且把 onBind 返回的对象传递给 AMS -&gt; AMS通过IPC调用 ServiceConnection.connected。</li>
+</ul>
+<h3 id="Android-的消息机制"><a href="#Android-的消息机制" class="headerlink" title="Android 的消息机制"></a>Android 的消息机制</h3><ul>
+<li>Handler 作用就是把当前线程切换到 Handler 里面的 Looper 所在的线程,比如在主线程创建 Handler，在子线程获取数据再通过 Handler 切换到主线程执行，要使用 Handler 当前线程必须要先含有 Looper。</li>
+<li>ThreadLocal.get 可以取出当前线程中所 set 的值,在 android 消息机制中用于保存每个线程的 Looper。</li>
+<li>Looper.loop 死循环唯一跳出这个循环的条件是 messageQuene.next 返回null (只有调用了 Looper.quit 方法才能退出循环)，当取出消息后,会进行 dispatch 然后再调用 meassageQuene.next 再阻塞。</li>
+<li>使用 Handler 时如果不想创建其子类的实例可以使用 handler.post(Runnable)，或者在创建 Handler 对象时传入一个 Callback 对象。</li>
+</ul>
+<h3 id="Android-的线程和线程池"><a href="#Android-的线程和线程池" class="headerlink" title="Android 的线程和线程池"></a>Android 的线程和线程池</h3><ul>
+<li><p>IntentService 处理逻辑一般在 onHandleIntent 中处理，该方法是在子线程中运行的，当该方法运行完并且没有再次 startService 会自动销毁该 service，多次 startService 会多次调用 onHandleIntent 。</p>
+</li>
+<li><p>AsyncTask 的使用方式</p>
+  <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyUpdateTask</span> <span class="keyword">extends</span> <span class="title">AsyncTask</span>&lt;<span class="title">Void</span>,<span class="title">Integer</span>,<span class="title">Void</span>&gt;</span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPreExecute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onPreExecute();<span class="comment">//主线程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Void <span class="title">doInBackground</span><span class="params">(Void... voids)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; <span class="number">100</span>; i++)&#123;</span><br><span class="line">            SystemClock.sleep(<span class="number">100</span>);<span class="comment">// 该方法运行于子线程</span></span><br><span class="line">            publishProgress(i);<span class="comment">// 该方法会进行进程切换调用主线程的 onProgressUpdate()</span></span><br><span class="line">            <span class="keyword">if</span>(isCanceled())&#123;</span><br><span class="line">                <span class="keyword">break</span>; <span class="comment">//取消了把线程结束</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;<span class="comment">//返回值作为onPostExecute()的参数</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onPostExecute</span><span class="params">(Void result)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onPostExecute(result)<span class="comment">//主线程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onProgressUpdate</span><span class="params">(Integer... values)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onProgressUpdate(values);</span><br><span class="line">        pb.setProgress(values[<span class="number">0</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+<ul>
+<li>AsyncTask 的注意点<ol>
+<li>AsuncTask 对象必须在主线程中创建，API 21 以下如果不在主线程创建会崩溃。</li>
+<li>AsyncTask.execute 也必须在主线程中调用。</li>
+<li>AsyncTask.execute 只能调用一次，再次调用会报异常，因为会在调用 execute 时检查当前的状态。</li>
+<li>AsyncTask.execute()是串行执行的当一个任务执行完,才会执行下一个任务,如果需要并行执行可以调用AsyncTask.executeOnExecutor。</li>
+<li>不要在程序中显示的调用上面 4 个方法。</li>
+</ol>
+</li>
+</ul>
+<h3 id="Bitmap-的加载和缓存"><a href="#Bitmap-的加载和缓存" class="headerlink" title="Bitmap 的加载和缓存"></a>Bitmap 的加载和缓存</h3><ul>
+<li><p>Bitmap 加载前需要进行缩放，因为一般 ImageView 的大小都比图片的小，可以使用 BitmapFactory.options里面的 inSampleSize，当该参数 &lt;= 1 时不缩放，为2时宽高都为原来的 1/2 ,占用空间变为原来的 1/4。</p>
+</li>
+<li><p>Bitmap 压缩加载防止 OOM 的步骤如下：</p>
+<ol>
+<li><p>BitmapFactory.Options.inJustDecodeBounds 设置为 true 去加载图片，该参数作用是不把图片加载进内存，但可以获取其宽高。</p>
+</li>
+<li><p>BitmapFactory.Options 中取出图片的原始宽高信息使用 outWidth、outHeight.</p>
+</li>
+<li><p>根据 ImageView 大小以及原图大小计算出 inSampleSize。</p>
+</li>
+<li><p>将 inJustDecodeBounds 设置为 false，然后重新加载图片。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Bitmap <span class="title">decodeSampledBitmapFromResource</span><span class="params">(Resources resources,<span class="keyword">int</span> resId, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHieght)</span></span>&#123;</span><br><span class="line">    BitmapFactory.Options options = <span class="keyword">new</span> BitmapFactory.Options();</span><br><span class="line">    options.inJustDecodeBounds = <span class="keyword">true</span>;</span><br><span class="line">    BitmapFactory.decodeResource(resources, resId, options); <span class="comment">//为了获取原始图片的宽高</span></span><br><span class="line">    options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHieght);</span><br><span class="line">    options.inJustDecodeBounds = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">return</span> BitmapFactory.decodeResource(resources, resId, options);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">calculateInSampleSize</span><span class="params">(BitmapFactory.Options options, <span class="keyword">int</span> reqWidth, <span class="keyword">int</span> reqHieght)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> height = options.outHeight;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> width = options.outWidth;</span><br><span class="line">    <span class="keyword">int</span> inSampleSize = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">if</span>(height &gt; reqHieght || width &gt; reqWidth)&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> halfHeight = height / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> halfWidth = width / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">while</span>((halfHeight / inSampleSize) &gt;= reqHieght &amp;&amp; (halfWidth / inSampleSize) &gt;= reqWidth)&#123;</span><br><span class="line">            inSampleSize *= <span class="number">2</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> inSampleSize;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ol>
+</li>
+</ul>
+<h3 id="综合技术"><a href="#综合技术" class="headerlink" title="综合技术"></a>综合技术</h3><ul>
+<li><p>捕获全局异常可以通过创建一个实现 UncaughtExceptionHandler 的类，然后调用Thread.setDefaultUncaughtException 来捕获全局崩溃信息。</p>
+</li>
+<li><p>一个 dex 文件的方法数量最多为 65536 个，当超过后需要进行如下设置。</p>
+<ol>
+<li>defaultConfig 中加入 multiDexEnabled = true。</li>
+<li>dependencies 中加入依赖 compile ‘com.android.support:multidex:1.0.0’。</li>
+<li>应用的 Application 使用 MultiDexApplication 或其子类。</li>
+</ol>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/21/Thinking%20in%20Java%20%E6%80%BB%E7%BB%93/" rel="next" title="Thinking in Java 总结">
+                <i class="fa fa-chevron-left"></i> Thinking in Java 总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/" rel="prev" title="Android 开发快捷键与工具">
+                Android 开发快捷键与工具 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Activity-的生命周期与启动模式"><span class="nav-number">2.</span> <span class="nav-text">Activity 的生命周期与启动模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IPC-机制"><span class="nav-number">3.</span> <span class="nav-text">IPC 机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View-的事件体系"><span class="nav-number">4.</span> <span class="nav-text">View 的事件体系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#View-的工作原理"><span class="nav-number">5.</span> <span class="nav-text">View 的工作原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-Drawable"><span class="nav-number">6.</span> <span class="nav-text">Android Drawable</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-动画深入分析"><span class="nav-number">7.</span> <span class="nav-text">Android 动画深入分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#理解-Window-和-WindowManager"><span class="nav-number">8.</span> <span class="nav-text">理解 Window 和 WindowManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#四大组件的工作过程"><span class="nav-number">9.</span> <span class="nav-text">四大组件的工作过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-的消息机制"><span class="nav-number">10.</span> <span class="nav-text">Android 的消息机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-的线程和线程池"><span class="nav-number">11.</span> <span class="nav-text">Android 的线程和线程池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bitmap-的加载和缓存"><span class="nav-number">12.</span> <span class="nav-text">Bitmap 的加载和缓存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#综合技术"><span class="nav-number">13.</span> <span class="nav-text">综合技术</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

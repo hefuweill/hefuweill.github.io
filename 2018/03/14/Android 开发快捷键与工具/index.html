@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本文主要是参考自 《Android 群英传：神兵利器》，总结对 Android 开发有用的开发快捷键及工具。所有快捷键全部基于 mac 操作系统。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 开发快捷键与工具">
+<meta property="og:url" content="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言本文主要是参考自 《Android 群英传：神兵利器》，总结对 Android 开发有用的开发快捷键及工具。所有快捷键全部基于 mac 操作系统。">
+<meta property="og:image" content="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E6%9D%A1%E4%BB%B6%E6%96%AD%E7%82%B9.png">
+<meta property="og:image" content="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E5%BC%82%E5%B8%B8%E6%96%AD%E7%82%B9.png">
+<meta property="og:image" content="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E6%97%A5%E5%BF%97%E6%96%AD%E7%82%B9.png">
+<meta property="article:published_time" content="2018-03-14T05:11:26.000Z">
+<meta property="article:modified_time" content="2020-05-10T08:33:58.455Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E6%9D%A1%E4%BB%B6%E6%96%AD%E7%82%B9.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/03/14/Android 开发快捷键与工具/"/>
+
+
+
+
+
+  <title>Android 开发快捷键与工具 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 开发快捷键与工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-03-14T13:11:26+08:00">
+                2018-03-14
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>本文主要是参考自 《Android 群英传：神兵利器》，总结对 Android 开发有用的开发快捷键及工具。所有快捷键全部基于 mac 操作系统。<a id="more"></a> </p>
+<h3 id="窗口切换"><a href="#窗口切换" class="headerlink" title="窗口切换"></a>窗口切换</h3><ul>
+<li>command + ~ 可以在一个应用程序中切换窗口（切换多个 Android Studio 窗口、终端，对 Chrome 浏览器无效）。</li>
+<li>command + w 关闭一个窗口（比如关闭一个浏览器项或者关闭 Android Studio 中一个打开的文件）。</li>
+<li>command + q 退出应用程序 (关闭Android Studio等等)。</li>
+<li>command + option + esc 强制退出应用程序，在 ANR 时使用。</li>
+<li>command + n 新建一个窗口（再打开一个浏览器窗口、终端窗口）。</li>
+</ul>
+<h3 id="截图"><a href="#截图" class="headerlink" title="截图"></a>截图</h3><ul>
+<li>command + shift + 4 类似 QQ 的截图。</li>
+<li>command + shift + 4 + space 截取当前屏幕。</li>
+</ul>
+<h3 id="编辑"><a href="#编辑" class="headerlink" title="编辑"></a>编辑</h3><ul>
+<li>command + ← / →  可以使光标移动到行首/行尾。</li>
+<li>option + ← / →  可以使光标在行内按单词移动。</li>
+<li>command + ↑ / ↓ 可以把光标定位到首部/尾部（ Chorme 可以，Android Studio 中用于选择文件）。</li>
+<li>command + delete 删除一行。</li>
+</ul>
+<h3 id="终端"><a href="#终端" class="headerlink" title="终端"></a>终端</h3><ul>
+<li>control + a 终端中将光标移动到文本的首部。</li>
+<li>control + e 终端中将光标移动到文本的尾部。</li>
+<li>open . 可以在 finder 中打开该目录。</li>
+<li>&gt; filename 可以把输出内容写到该文件中，创建文本文件也可以通过这个方式。</li>
+</ul>
+<h3 id="Git"><a href="#Git" class="headerlink" title="Git"></a>Git</h3><ul>
+<li>在多人开发中当想要 push 代码时发现别人已经有了提交，Git 会提示使用 git pull，如果这样操作会留下一个 mergeHistory，使用 git pull –rebase 可以避免这种情况。</li>
+<li>当一个分支中有内容修改并没有提交，是无法切换分支的，这时候可以使用 git stash 保存，待下次处理完后再回来 git stash pop。</li>
+<li>git commit -am 添加并且提交。</li>
+<li>git pull == git fetch + merge local。</li>
+</ul>
+<h3 id="Android-Studio"><a href="#Android-Studio" class="headerlink" title="Android Studio"></a>Android Studio</h3><ul>
+<li>option + shift 可以实现选中多个代码块，会产生多个光标，可以同时进行输入、删除。</li>
+<li>command + shift + a 可以快速打开 Android Studio 的功能，比如输入 Preferences 可以打开Android Studio 的偏好设置。</li>
+<li>command + e 可以显示最近打开的文件。</li>
+<li>command + y 可以显示出方法的定义信息。</li>
+<li>command + shift + e 可以显示最近编辑过的文件。会和搜狗输入法切换 English 输入模式冲突。</li>
+<li><strong>command + shift + u 大小写切换。</strong></li>
+<li>command + option + f 提取局部变量到成员变量。</li>
+<li><strong>command + f12 可以显示出代码的大纲，可以输入关键字进行搜索。</strong></li>
+<li>command + - / + 可以对代码进行折叠、展开。</li>
+<li><strong>command + b 等同于 command + 鼠标左键 可以快速进入该方法源码实现。</strong></li>
+<li>command + p 可以查看方法的参数类型。</li>
+<li>F1 显示参数类型及注释比上面那个详细。</li>
+<li><strong>control + tab 可以用于切换 tab，在开发中操作多个类时进行切换。</strong></li>
+<li><strong>option / command + shift + ↑ / ↓ 可以向上/向下移动整行代码。</strong></li>
+<li>option + F7 可以查看当前方法在那被调用。</li>
+<li><strong>F3 可以给当前代码添加书签或者删除书签，然后通过 command + F3  可以调出书签进行查看，该方法可以用于记录代码中的关键点，查阅源码时挺有用。</strong></li>
+<li>View - Appearance - Enter Presentation 打开演示模式，该模式可以把当前屏幕的几乎所有空间都用来显示代码，代码大小会变大好多。</li>
+</ul>
+<h3 id="断点调试"><a href="#断点调试" class="headerlink" title="断点调试"></a>断点调试</h3><ul>
+<li><p>条件断点，打了断点以后点击右键在弹出的窗口进行设置。</p>
+<p>  <img src="/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E6%9D%A1%E4%BB%B6%E6%96%AD%E7%82%B9.png" alt="条件断点"></p>
+</li>
+<li><p>异常断点，打了断点以后运行过程中出现指定异常就会停止，同时也可以设置条件，以及从哪个断点开始检测，进入方式为 run - View Breakpoints。</p>
+<p>  <img src="/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E5%BC%82%E5%B8%B8%E6%96%AD%E7%82%B9.png" alt="异常断点"></p>
+</li>
+<li><p>日志断点，可在不重新运行代码的情况下输出日志。</p>
+<p>  <img src="/2018/03/14/Android%20%E5%BC%80%E5%8F%91%E5%BF%AB%E6%8D%B7%E9%94%AE%E4%B8%8E%E5%B7%A5%E5%85%B7/%E6%97%A5%E5%BF%97%E6%96%AD%E7%82%B9.png" alt="日志断点"></p>
+</li>
+<li><p>临时断点，断点执行一次后就自动移除，勾选上面界面的 Remove once hit，或者使用快捷键 command + option + shift + F8 一点都不快捷！难按。</p>
+</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/03/11/Android%20%E5%BC%80%E5%8F%91%E8%89%BA%E6%9C%AF%E6%8E%A2%E7%B4%A2%E6%80%BB%E7%BB%93/" rel="next" title="Android 开发艺术探索总结">
+                <i class="fa fa-chevron-left"></i> Android 开发艺术探索总结
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/04/02/Android%20%E5%BA%94%E7%94%A8%E5%90%AF%E5%8A%A8%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="prev" title="Android 应用启动源码分析">
+                Android 应用启动源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#窗口切换"><span class="nav-number">2.</span> <span class="nav-text">窗口切换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#截图"><span class="nav-number">3.</span> <span class="nav-text">截图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编辑"><span class="nav-number">4.</span> <span class="nav-text">编辑</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#终端"><span class="nav-number">5.</span> <span class="nav-text">终端</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Git"><span class="nav-number">6.</span> <span class="nav-text">Git</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Android-Studio"><span class="nav-number">7.</span> <span class="nav-text">Android Studio</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#断点调试"><span class="nav-number">8.</span> <span class="nav-text">断点调试</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言上篇文章分析了 LeakSentry 的源码，本文在此基础上来分析下 LeakCanary 的核心库——Leakcanary-android的源码。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LeakCanary2-Android 源码分析">
+<meta property="og:url" content="http://yoursite.com/2019/06/25/LeakCanary2-Android%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言上篇文章分析了 LeakSentry 的源码，本文在此基础上来分析下 LeakCanary 的核心库——Leakcanary-android的源码。">
+<meta property="article:published_time" content="2019-06-25T03:08:12.000Z">
+<meta property="article:modified_time" content="2020-05-11T14:30:20.886Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/06/25/LeakCanary2-Android 源码分析/"/>
+
+
+
+
+
+  <title>LeakCanary2-Android 源码分析 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/25/LeakCanary2-Android%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">LeakCanary2-Android 源码分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-25T11:08:12+08:00">
+                2019-06-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上篇文章分析了 LeakSentry 的源码，本文在此基础上来分析下 LeakCanary 的核心库——Leakcanary-android的源码。<a id="more"></a></p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>LeakCanary 的原理为当 Activity、Fragment 销毁的时候会调用 RefWatcher.watch 来观察这些对象，如果这些对象得不到释放那么就会一直保存在 retainedReferences 中，当 App 切到后台一定时间后或者保留的引用超过了临界值，那么就会手动的触发一个 GC，如果触发后条件仍然满足，那么就会去生成内存堆转储快照，然后开启服务去分析该文件，找出泄露的对象，并给出引用链。</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><p>首先根据上篇文章我们知道在 InternalLeakSentry.init 代码块中会将 InternalLeakCanary 实例作为 LeakSentry 的监听器，在 InternalLeakSentry.install 的最后回调了InternalLeakCanary.onLeakSentryInstalled。</p>
+<h3 id="InternalLeakCanary-onLeakSentryInstalled"><a href="#InternalLeakCanary-onLeakSentryInstalled" class="headerlink" title="InternalLeakCanary.onLeakSentryInstalled"></a>InternalLeakCanary.onLeakSentryInstalled</h3><p>代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onLeakSentryInstalled</span><span class="params">(application: <span class="type">Application</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">this</span>.application = application</span><br><span class="line">    <span class="keyword">val</span> heapDumper = AndroidHeapDumper(application, leakDirectoryProvider)</span><br><span class="line">    <span class="comment">// GC触发器</span></span><br><span class="line">    <span class="keyword">val</span> gcTrigger = GcTrigger.Default</span><br><span class="line">    <span class="keyword">val</span> configProvider = &#123; LeakCanary.config &#125;</span><br><span class="line">    <span class="keyword">val</span> handlerThread = HandlerThread(HeapDumpTrigger.LEAK_CANARY_THREAD_NAME)</span><br><span class="line">    handlerThread.start()</span><br><span class="line">    <span class="keyword">val</span> backgroundHandler = Handler(handlerThread.looper)</span><br><span class="line">    heapDumpTrigger = HeapDumpTrigger(</span><br><span class="line">            application, backgroundHandler, LeakSentry.refWatcher, gcTrigger, heapDumper, configProvider</span><br><span class="line">    )</span><br><span class="line">    application.registerVisibilityListener &#123; applicationVisible -&gt;</span><br><span class="line">        <span class="keyword">this</span>.applicationVisible = applicationVisible</span><br><span class="line">        heapDumpTrigger.onApplicationVisibilityChanged(applicationVisible)</span><br><span class="line">    &#125;</span><br><span class="line">    addDynamicShortcut(application)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部主要构造了一个 HeapDumpTrigger 实例，然后调用了 registerVisibilityListener 这个扩展方法。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">fun</span> Application.<span class="title">registerVisibilityListener</span><span class="params">(listener: (<span class="type">Boolean</span>) -&gt; <span class="type">Unit</span>)</span></span> &#123;</span><br><span class="line">    registerActivityLifecycleCallbacks(VisibilityTracker(listener))</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">internal</span> <span class="class"><span class="keyword">class</span> <span class="title">VisibilityTracker</span></span>(<span class="keyword">private</span> <span class="keyword">val</span> listener: (<span class="built_in">Boolean</span>) -&gt; <span class="built_in">Unit</span>) :</span><br><span class="line">        ActivityLifecycleCallbacksAdapter() &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> startedActivityCount = <span class="number">0</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">var</span> hasVisibleActivities: <span class="built_in">Boolean</span> = <span class="literal">false</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onActivityStarted</span><span class="params">(activity: <span class="type">Activity</span>)</span></span> &#123;</span><br><span class="line">        startedActivityCount++</span><br><span class="line">        <span class="keyword">if</span> (!hasVisibleActivities &amp;&amp; startedActivityCount == <span class="number">1</span>) &#123;</span><br><span class="line">            hasVisibleActivities = <span class="literal">true</span></span><br><span class="line">            listener.invoke(<span class="literal">true</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onActivityStopped</span><span class="params">(activity: <span class="type">Activity</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (startedActivityCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">            startedActivityCount--</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (hasVisibleActivities &amp;&amp; startedActivityCount == <span class="number">0</span> &amp;&amp; !activity.isChangingConfigurations) &#123;</span><br><span class="line">            hasVisibleActivities = <span class="literal">false</span></span><br><span class="line">            listener.invoke(<span class="literal">false</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部通过监听 Activity 声明周期，每次 onStart 的时候将可见 Activity 数量加1，如果可见数量为 1，并且原来是不可见的，那么就认为 App 从不可见转变到了可见。每次 onStop 的时候将可见 Activity 数量减1，如果可见数量变成了 0，并且原来是可见的，并且不是因为配置改变导致的(配置改变会立马又再次启动该 Activity)，那么就认为 App 从可见转变到了不可见。再看 onLeakSentryInstalled，在可见状态发生变化后会调用 onApplicationVisibilityChanged。</p>
+<h3 id="heapDumpTrigger-onApplicationVisibilityChanged"><a href="#heapDumpTrigger-onApplicationVisibilityChanged" class="headerlink" title="heapDumpTrigger.onApplicationVisibilityChanged"></a>heapDumpTrigger.onApplicationVisibilityChanged</h3><p>代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">onApplicationVisibilityChanged</span><span class="params">(applicationVisible: <span class="type">Boolean</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (applicationVisible) &#123;</span><br><span class="line">        applicationInvisibleAt = -<span class="number">1L</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        applicationInvisibleAt = SystemClock.uptimeMillis()</span><br><span class="line">        scheduleRetainedInstanceCheck(<span class="string">"app became invisible"</span>, LeakSentry.config.watchDurationMillis)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要看看从可见变成不可见时的情况(App被切换到后台)，记录下应用程序开始不可见的时间。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">scheduleRetainedInstanceCheck</span><span class="params">(reason: <span class="type">String</span>, delayMillis: <span class="type">Long</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (checkScheduled) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    checkScheduled = <span class="literal">true</span></span><br><span class="line">    backgroundHandler.postDelayed(&#123;</span><br><span class="line">        checkScheduled = <span class="literal">false</span></span><br><span class="line">        checkRetainedInstances(reason)</span><br><span class="line">    &#125;, delayMillis)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在5秒(默认)后，会在子线程中执行 checkRetainedInstances 。</p>
+<h3 id="heapDumpTrigger-checkRetainedInstances"><a href="#heapDumpTrigger-checkRetainedInstances" class="headerlink" title="heapDumpTrigger.checkRetainedInstances"></a>heapDumpTrigger.checkRetainedInstances</h3><p>代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">checkRetainedInstances</span><span class="params">(reason: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> config = configProvider()</span><br><span class="line">    <span class="comment">// 如果不需要分析堆转储文件就直接返回</span></span><br><span class="line">    <span class="keyword">if</span> (!config.dumpHeap) &#123;</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 获取到还没被释放的被观察者对象数量</span></span><br><span class="line">    <span class="keyword">var</span> retainedKeys = refWatcher.retainedKeys</span><br><span class="line">    <span class="comment">// 如果保留的对象数量等于0，或者保留的对象数量小于临界值并且App可见或者不可见但是不可见时间少于5秒就返回true，</span></span><br><span class="line">    <span class="comment">// 否则(保留对象数量大于临界值，或者不可见时间超过了5秒)就返回false</span></span><br><span class="line">    <span class="keyword">if</span> (checkRetainedCount(retainedKeys, config.retainedVisibleThreshold)) <span class="keyword">return</span></span><br><span class="line">    <span class="comment">// 如果配置了在debug时不转储堆文件，但是现在正在debug，那么显示一个通知，然后等20秒再试</span></span><br><span class="line">    <span class="keyword">if</span> (!config.dumpHeapWhenDebugging &amp;&amp; DebuggerControl.isDebuggerAttached) &#123;</span><br><span class="line">        showRetainedCountWithDebuggerAttached(retainedKeys.size)</span><br><span class="line">        scheduleRetainedInstanceCheck(<span class="string">"debugger was attached"</span>, WAIT_FOR_DEBUG_MILLIS)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 运行一下GC，将那些只有弱引用引用着的对象回收</span></span><br><span class="line">    gcTrigger.runGc()</span><br><span class="line">    <span class="comment">// 运行GC后，还保留的对象数量(这些对象极有可能发生泄漏)</span></span><br><span class="line">    retainedKeys = refWatcher.retainedKeys</span><br><span class="line">    <span class="comment">// 如果不可见超过5秒还是会继续执行，否则运行了GC后发现保留对象数量已经少于临界值了那么就直接返回</span></span><br><span class="line">    <span class="keyword">if</span> (checkRetainedCount(retainedKeys, config.retainedVisibleThreshold)) <span class="keyword">return</span></span><br><span class="line">    <span class="comment">// 保存下retainedKeys，便于与后续进行比对</span></span><br><span class="line">    HeapDumpMemoryStore.setRetainedKeysForHeapDump(retainedKeys)</span><br><span class="line">    HeapDumpMemoryStore.heapDumpUptimeMillis = SystemClock.uptimeMillis()</span><br><span class="line">    dismissNotification()</span><br><span class="line">    <span class="comment">// 生成堆转储快照</span></span><br><span class="line">    <span class="keyword">val</span> heapDumpFile = heapDumper.dumpHeap()</span><br><span class="line">    <span class="keyword">if</span> (heapDumpFile == <span class="literal">null</span>) &#123;</span><br><span class="line">        scheduleRetainedInstanceCheck(<span class="string">"failed to dump heap"</span>, WAIT_AFTER_DUMP_FAILED_MILLIS)</span><br><span class="line">        showRetainedCountWithHeapDumpFailed(retainedKeys.size)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    refWatcher.removeRetainedKeys(retainedKeys)</span><br><span class="line">    <span class="comment">// 开启服务分析堆转储文件</span></span><br><span class="line">    HeapAnalyzerService.runAnalysis(application, heapDumpFile)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要来看下 heapDumper.dumpHeap 和 HeapAnalyzerService.runAnalysis，heapDumper 是一个AndroidHeapDumper 实例。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">dumpHeap</span><span class="params">()</span></span>: File? &#123;</span><br><span class="line">    <span class="comment">// 内部就是创建了一个File并且保证.hprof文件不超过7个</span></span><br><span class="line">    <span class="keyword">val</span> heapDumpFile = leakDirectoryProvider.newHeapDumpFile() ?: <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">    <span class="keyword">val</span> waitingForToast = FutureResult&lt;Toast?&gt;()</span><br><span class="line">    <span class="comment">// 展示一个toast表示正在生成堆转储文件</span></span><br><span class="line">    showToast(waitingForToast)</span><br><span class="line">    <span class="keyword">if</span> (!waitingForToast.wait(<span class="number">5</span>, SECONDS)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> notificationManager =</span><br><span class="line">            context.getSystemService(Context.NOTIFICATION_SERVICE) <span class="keyword">as</span> NotificationManager</span><br><span class="line">    <span class="keyword">if</span> (Notifications.canShowNotification) &#123;</span><br><span class="line">        <span class="keyword">val</span> dumpingHeap = context.getString(R.string.leak_canary_notification_dumping)</span><br><span class="line">        <span class="keyword">val</span> builder = Notification.Builder(context)</span><br><span class="line">                .setContentTitle(dumpingHeap)</span><br><span class="line">        <span class="keyword">val</span> notification = Notifications.buildNotification(context, builder, LEAKCANARY_LOW)</span><br><span class="line">        notificationManager.notify(R.id.leak_canary_notification_dumping_heap, notification)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> toast = waitingForToast.<span class="keyword">get</span>()</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 获取堆转储快照写入heapDumpFile</span></span><br><span class="line">        Debug.dumpHprofData(heapDumpFile.absolutePath)</span><br><span class="line">        <span class="keyword">if</span> (heapDumpFile.length() == <span class="number">0L</span>) &#123;</span><br><span class="line">            CanaryLog.d(<span class="string">"Dumped heap file is 0 byte length"</span>)</span><br><span class="line">            <span class="literal">null</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            heapDumpFile</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">        <span class="literal">null</span></span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        cancelToast(toast)</span><br><span class="line">        notificationManager.cancel(R.id.leak_canary_notification_dumping_heap)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>成功生成堆转储文件后会调用 HeapAnalyzerService.runAnalysis 进行分析</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="class"><span class="keyword">class</span> <span class="title">HeapAnalyzerService</span> : <span class="type">ForegroundService</span></span>(...), AnalyzerProgressListener &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onHandleIntentInForeground</span><span class="params">(intent: <span class="type">Intent</span>?)</span></span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (intent == <span class="literal">null</span>) &#123;</span><br><span class="line">            CanaryLog.d(<span class="string">"HeapAnalyzerService received a null intent, ignoring."</span>)</span><br><span class="line">            <span class="keyword">return</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 因为与应用进程运行在一起所以为了不影响App需要降低该子线程优先级</span></span><br><span class="line">        Process.setThreadPriority(Process.THREAD_PRIORITY_BACKGROUND)</span><br><span class="line">        <span class="keyword">val</span> heapDumpFile = intent.getSerializableExtra(HEAPDUMP_FILE_EXTRA) <span class="keyword">as</span> File</span><br><span class="line">        <span class="keyword">val</span> heapAnalyzer = HeapAnalyzer(<span class="keyword">this</span>)</span><br><span class="line">        <span class="keyword">val</span> config = LeakCanary.config</span><br><span class="line">        <span class="keyword">val</span> heapAnalysis =</span><br><span class="line">                heapAnalyzer.checkForLeaks(</span><br><span class="line">                        heapDumpFile, config.exclusionsFactory, config.computeRetainedHeapSize,</span><br><span class="line">                        config.leakInspectors, config.labelers)</span><br><span class="line">        <span class="comment">// 分析完后，回调下，并且将堆转储文件删除</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            config.analysisResultListener(application, heapAnalysis)</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            heapAnalysis.heapDumpFile.delete()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 整个分析过程有15步之多，每走一步都会计算百分比更新下通知</span></span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onProgressUpdate</span><span class="params">(step: <span class="type">AnalyzerProgressListener</span>.<span class="type">Step</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> percent = (<span class="number">100f</span> * step.ordinal / AnalyzerProgressListener.Step.values().size).toInt()</span><br><span class="line">        <span class="keyword">val</span> lowercase = step.name.replace(<span class="string">"_"</span>, <span class="string">" "</span>)</span><br><span class="line">                .toLowerCase()</span><br><span class="line">        <span class="keyword">val</span> message = lowercase.substring(<span class="number">0</span>, <span class="number">1</span>).toUpperCase() + lowercase.substring(<span class="number">1</span>)</span><br><span class="line">        showForegroundNotification(<span class="number">100</span>, percent, <span class="literal">false</span>, message)</span><br><span class="line">    &#125;</span><br><span class="line">     <span class="keyword">companion</span> <span class="keyword">object</span> &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">const</span> <span class="keyword">val</span> HEAPDUMP_FILE_EXTRA = <span class="string">"HEAPDUMP_FILE_EXTRA"</span></span><br><span class="line">        <span class="function"><span class="keyword">fun</span> <span class="title">runAnalysis</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">                context: <span class="type">Context</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">                heapDumpFile: <span class="type">File</span>)</span></span> &#123;</span><br><span class="line">            <span class="keyword">val</span> intent = Intent(context, HeapAnalyzerService::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">            intent.putExtra(HEAPDUMP_FILE_EXTRA, heapDumpFile)</span><br><span class="line">            ContextCompat.startForegroundService(context, intent)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到主要的逻辑都在 heapAnalyzer.checkForLeaks 中了。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">checkForLeaks</span><span class="params">(*)</span></span>: HeapAnalysis &#123;</span><br><span class="line">    <span class="keyword">val</span> analysisStartNanoTime = System.nanoTime()</span><br><span class="line">    listener.onProgressUpdate(READING_HEAP_DUMP_FILE)</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        HprofParser.<span class="keyword">open</span>(heapDumpFile)</span><br><span class="line">                .use &#123; parser -&gt;</span><br><span class="line">                    listener.onProgressUpdate(SCANNING_HEAP_DUMP)</span><br><span class="line">                    <span class="comment">// 找出所有的keyedWeakReference引用</span></span><br><span class="line">                    <span class="keyword">val</span> (gcRootIds, keyedWeakReferenceInstances, cleaners) = scan(</span><br><span class="line">                            parser, computeRetainedHeapSize</span><br><span class="line">                    )</span><br><span class="line">                    <span class="keyword">val</span> analysisResults = mutableMapOf&lt;String, RetainedInstance&gt;()</span><br><span class="line">                    listener.onProgressUpdate(FINDING_WATCHED_REFERENCES)</span><br><span class="line">                    <span class="comment">// 获取在堆转储文件生成前保存在store里面的内容，为什么不直接调用?</span></span><br><span class="line">                    <span class="comment">// 可能考虑现在时刻数据已经发生变化</span></span><br><span class="line">                    <span class="keyword">val</span> (retainedKeys, heapDumpUptimeMillis) = readHeapDumpMemoryStore(parser)</span><br><span class="line">                    <span class="comment">// 找出发生泄露的引用</span></span><br><span class="line">                    <span class="keyword">val</span> leakingWeakRefs =</span><br><span class="line">                            findLeakingReferences(</span><br><span class="line">                                    parser, retainedKeys, analysisResults, keyedWeakReferenceInstances,</span><br><span class="line">                                    heapDumpUptimeMillis</span><br><span class="line">                            )</span><br><span class="line">                     <span class="comment">// 找出泄露引用的最短引用链</span></span><br><span class="line">                    <span class="keyword">val</span> (pathResults, dominatedInstances) =</span><br><span class="line">                            findShortestPaths(</span><br><span class="line">                                    parser, exclusionsFactory, leakingWeakRefs, gcRootIds,</span><br><span class="line">                                    computeRetainedHeapSize</span><br><span class="line">                            )</span><br><span class="line">                    <span class="comment">// 计算该泄露引用的大小 </span></span><br><span class="line">                    <span class="keyword">val</span> retainedSizes = <span class="keyword">if</span> (computeRetainedHeapSize) &#123;</span><br><span class="line">                        computeRetainedSizes(parser, pathResults, dominatedInstances, cleaners)</span><br><span class="line">                    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                        <span class="literal">null</span></span><br><span class="line">                    &#125;</span><br><span class="line">                    buildLeakTraces(</span><br><span class="line">                            reachabilityInspectors, labelers, pathResults, parser,</span><br><span class="line">                            leakingWeakRefs, analysisResults, retainedSizes</span><br><span class="line">                    )</span><br><span class="line">                    addRemainingInstancesWithNoPath(parser, leakingWeakRefs, analysisResults)</span><br><span class="line">                    <span class="keyword">return</span> HeapAnalysisSuccess(</span><br><span class="line">                            heapDumpFile, System.currentTimeMillis(), since(analysisStartNanoTime),</span><br><span class="line">                            analysisResults.values.toList()</span><br><span class="line">                    )</span><br><span class="line">                &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (exception: Throwable) &#123;</span><br><span class="line">        <span class="keyword">return</span> HeapAnalysisFailure(</span><br><span class="line">                heapDumpFile, System.currentTimeMillis(), since(analysisStartNanoTime),</span><br><span class="line">                HeapAnalysisException(exception)</span><br><span class="line">        )</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当分析堆转储文件完毕后会回到 onHandleIntentInForeground 继续执行 analysisResultListener。</p>
+<h3 id="LeakCanary-config-analysisResultListener"><a href="#LeakCanary-config-analysisResultListener" class="headerlink" title="LeakCanary.config.analysisResultListener"></a>LeakCanary.config.analysisResultListener</h3><p>代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">object</span> DefaultAnalysisResultListener : AnalysisResultListener &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">invoke</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            application: <span class="type">Application</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">            heapAnalysis: <span class="type">HeapAnalysis</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> movedHeapDump = renameHeapdump(heapAnalysis.heapDumpFile)</span><br><span class="line">    <span class="keyword">val</span> updatedHeapAnalysis = <span class="keyword">when</span> (heapAnalysis) &#123;</span><br><span class="line">        <span class="keyword">is</span> HeapAnalysisFailure -&gt; heapAnalysis.copy(heapDumpFile = movedHeapDump)</span><br><span class="line">        <span class="keyword">is</span> HeapAnalysisSuccess -&gt; heapAnalysis.copy(heapDumpFile = movedHeapDump)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> (id, groupProjections) = LeaksDbHelper(application)</span><br><span class="line">            .writableDatabase.use &#123; db -&gt;</span><br><span class="line">        <span class="keyword">val</span> id = HeapAnalysisTable.insert(db, updatedHeapAnalysis)</span><br><span class="line">        id to LeakingInstanceTable.retrieveAllByHeapAnalysisId(db, id)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> (contentTitle, screenToShow) = ...</span><br><span class="line">    <span class="keyword">val</span> pendingIntent = LeakActivity.createPendingIntent(</span><br><span class="line">            application, arrayListOf(GroupListScreen(), HeapAnalysisListScreen(), screenToShow)</span><br><span class="line">    )</span><br><span class="line">    <span class="keyword">val</span> contentText = application.getString(R.string.leak_canary_notification_message)</span><br><span class="line">    Notifications.showNotification(</span><br><span class="line">            application, contentTitle, contentText, pendingIntent,</span><br><span class="line">            R.id.leak_canary_notification_analysis_result,</span><br><span class="line">            LEAKCANARY_RESULT</span><br><span class="line">    )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部主要就是保存数据到数据库，显示一个 Notification，点击后跳转到 LeakActivity 显示 Screens 的内容。接着上篇文章最后还说到了当 RefWatcher 内部往 retainedReferences 内部添加一个对象时都会回调 onReferenceRetained，这做的事情跟可见度从可见变成不可见的事情一样。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>LeakSentry 默认使用 RefWatcher 观察将要被销毁的 Activity、Fragment(用户也可自定义观察对象)，在被观察5秒后如果对象还没被回收，并且保留的对象数量大于临界值或者应用不可见超过5秒那么就会手动运行一下 GC，运行后如果还满足那么会生成内存堆转储快照，然后开启一个前台服务( IntentService )去解析该快照，然后将解析结果与原先被观察但还没回收的对象进行对比，找出真正泄露的对象，比给出最短引用链，当 App 从可见到不可见时也同样会触发该逻辑。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/18/LeakCanary2-LeakSentry%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="next" title="LeakCanary2-LeakSentry 源码分析">
+                <i class="fa fa-chevron-left"></i> LeakCanary2-LeakSentry 源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#原理"><span class="nav-number">2.</span> <span class="nav-text">原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">3.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#InternalLeakCanary-onLeakSentryInstalled"><span class="nav-number">3.1.</span> <span class="nav-text">InternalLeakCanary.onLeakSentryInstalled</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#heapDumpTrigger-onApplicationVisibilityChanged"><span class="nav-number">3.2.</span> <span class="nav-text">heapDumpTrigger.onApplicationVisibilityChanged</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#heapDumpTrigger-checkRetainedInstances"><span class="nav-number">3.3.</span> <span class="nav-text">heapDumpTrigger.checkRetainedInstances</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LeakCanary-config-analysisResultListener"><span class="nav-number">3.4.</span> <span class="nav-text">LeakCanary.config.analysisResultListener</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

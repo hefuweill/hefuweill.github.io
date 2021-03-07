@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言RxJava 的一个重要优点就在于可以方便的切换线程，所以就想从源码的角度探索下其切换线程的原理。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RxJava2 线程切换原理">
+<meta property="og:url" content="http://yoursite.com/2019/05/15/RxJava2%20%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2%E5%8E%9F%E7%90%86/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言RxJava 的一个重要优点就在于可以方便的切换线程，所以就想从源码的角度探索下其切换线程的原理。">
+<meta property="article:published_time" content="2019-05-15T04:35:32.000Z">
+<meta property="article:modified_time" content="2020-05-11T07:07:04.341Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/05/15/RxJava2 线程切换原理/"/>
+
+
+
+
+
+  <title>RxJava2 线程切换原理 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/15/RxJava2%20%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2%E5%8E%9F%E7%90%86/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">RxJava2 线程切换原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-15T12:35:32+08:00">
+                2019-05-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>RxJava 的一个重要优点就在于可以方便的切换线程，所以就想从源码的角度探索下其切换线程的原理。<a id="more"></a></p>
+<h2 id="ObserveOn"><a href="#ObserveOn" class="headerlink" title="ObserveOn"></a>ObserveOn</h2><p>ObserveOn 用于切换下游执行线程，可以多次调用，每调用一次会切换一次，先来看一个例子。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">fun <span class="title">threadName</span><span class="params">(desc: String)</span> </span>&#123;</span><br><span class="line">    println(<span class="string">"$desc $&#123;Thread.currentThread().name&#125;"</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">fun <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Observable.create&lt;Int&gt; &#123;</span><br><span class="line">        threadName(<span class="string">"subscribe"</span>)</span><br><span class="line">        it.onNext(<span class="number">1</span>)</span><br><span class="line">        it.onNext(<span class="number">2</span>)</span><br><span class="line">        it.onComplete()</span><br><span class="line">    &#125;.observeOn(Schedulers.io())</span><br><span class="line">        .subscribe(object : Observer&lt;Int&gt; &#123;</span><br><span class="line">            <span class="function">override fun <span class="title">onComplete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                threadName(<span class="string">"onComplete"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="function">override fun <span class="title">onSubscribe</span><span class="params">(d: Disposable)</span> </span>&#123;</span><br><span class="line">                threadName(<span class="string">"onSubscribe"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="function">override fun <span class="title">onError</span><span class="params">(e: Throwable)</span> </span>&#123;</span><br><span class="line">                threadName(<span class="string">"onError"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="function">override fun <span class="title">onNext</span><span class="params">(t: Int)</span> </span>&#123;</span><br><span class="line">                threadName(<span class="string">"onNext"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">onSubscribe main</span><br><span class="line">subscribe main</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">onComplete RxCachedThreadScheduler-1</span><br></pre></td></tr></table></figure>
+
+<p>说好的 <code>observeOn</code> 切换下游执行线程，怎么 <code>onSubscribe</code> 方法会在主线程中调用？原因是 <code>observeOn</code> 方法生成的 ObserveOnObserver 实例并不会对 <code>onSubscribe</code> 事件做切换线程的操作，这个等下看了源码就理解了。那么 <code>observeOn</code> 是怎么把下游的 <code>onNext</code>、<code>onComplete</code>切换到子线程执行的呢？来看看 <code>observeOn</code> 的源码实现。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Observable.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">observeOn</span><span class="params">(Scheduler scheduler, <span class="keyword">boolean</span> delayError)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> observeOn(scheduler, delayError, bufferSize());</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">observeOn</span><span class="params">(Scheduler scheduler, <span class="keyword">boolean</span> delayError, <span class="keyword">int</span> bufferSize)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableObserveOn&lt;T&gt;(<span class="keyword">this</span>, scheduler, delayError, bufferSize));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>observeOn</code>方法调用后会返回一个 ObservableObserveOn 实例，经过上篇文章的分析主要关注其  <code>subscribeActual</code> 方法就行。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">subscribeActual</span><span class="params">(Observer&lt;? <span class="keyword">super</span> T&gt; observer)</span> </span>&#123;</span><br><span class="line">    Scheduler.Worker w = scheduler.createWorker();</span><br><span class="line">    source.subscribe(<span class="keyword">new</span> ObserveOnObserver&lt;T&gt;(observer, w, delayError, bufferSize));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>包装了一下下游 Observer，可以猜测这个 Observer 内部会将 <code>onNext</code> 等事件转到其它线程进行执行。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSubscribe</span><span class="params">(Disposable d)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    downstream.onSubscribe(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onNext</span><span class="params">(T t)</span> </span>&#123;</span><br><span class="line">    queue.offer(t);</span><br><span class="line">    schedule();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onError</span><span class="params">(Throwable t)</span> </span>&#123;</span><br><span class="line">    error = t;</span><br><span class="line">    schedule();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onComplete</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    schedule();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">schedule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    worker.schedule(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到 <code>onSubscribe</code> 直接在当前线程执行了没有进行线程切换，<code>onNext</code>、<code>onError</code>、<code>onComplete</code> 则是都调用了 <code>schedule</code> 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable run)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> schedule(run, <span class="number">0L</span>, TimeUnit.NANOSECONDS);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable run, <span class="keyword">long</span> delay, @NonNull TimeUnit unit)</span></span>;</span><br><span class="line"><span class="comment">// EventLoopWorker.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable action, <span class="keyword">long</span> delayTime, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> threadWorker.scheduleActual(action, delayTime, unit, tasks);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// NewThreadWorker.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> ScheduledRunnable <span class="title">scheduleActual</span><span class="params">(<span class="keyword">final</span> Runnable run, <span class="keyword">long</span> delayTime, @NonNull TimeUnit unit, @Nullable DisposableContainer parent)</span> </span>&#123;</span><br><span class="line">    Runnable decoratedRun = RxJavaPlugins.onSchedule(run);</span><br><span class="line">    ScheduledRunnable sr = <span class="keyword">new</span> ScheduledRunnable(decoratedRun, parent);</span><br><span class="line">    Future&lt;?&gt; f;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (delayTime &lt;= <span class="number">0</span>) &#123;</span><br><span class="line">            f = executor.submit((Callable&lt;Object&gt;)sr);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            f = executor.schedule((Callable&lt;Object&gt;)sr, delayTime, unit);</span><br><span class="line">        &#125;</span><br><span class="line">        sr.setFuture(f);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (RejectedExecutionException ex) &#123;</span><br><span class="line">        <span class="keyword">if</span> (parent != <span class="keyword">null</span>) &#123;</span><br><span class="line">            parent.remove(sr);</span><br><span class="line">        &#125;</span><br><span class="line">        RxJavaPlugins.onError(ex);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> sr;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>executor 是一个 SchedulerThreadPoolExecutor 实例，最终都会在线程池中运行那个 Runnable 实例也就是ObserveOnObserver 实例，所以就看看其 <code>run</code> 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (outputFused) &#123;</span><br><span class="line">        drainFused();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        drainNormal();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drainNormal</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                v = q.poll();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (Throwable ex) &#123;</span><br><span class="line">                a.onError(ex);</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            a.onNext(v);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">drainFused</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">        <span class="keyword">if</span> (d) &#123;</span><br><span class="line">            disposed = <span class="keyword">true</span>;</span><br><span class="line">            ex = error;</span><br><span class="line">            <span class="keyword">if</span> (ex != <span class="keyword">null</span>) &#123;</span><br><span class="line">                downstream.onError(ex);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                downstream.onComplete();</span><br><span class="line">            &#125;</span><br><span class="line">            worker.dispose();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到 <code>onNext</code>、<code>onError</code>、<code>onComplete</code>都在这个方法里面调用，因此这些方法就运行在了线程池中了，这样就成功的切换了线程，那么多次调用 observeOn 有效果吗？多次调用其实就是在一个线程池中的某个线程中再次开启了一个线程，所以是有效果的。接着看看 <code>subscribeOn</code> 这个方法。</p>
+<h2 id="subscribeOn"><a href="#subscribeOn" class="headerlink" title="subscribeOn"></a>subscribeOn</h2><p>subscribeOn 用于上游执行线程，并且多次调用只有第一次会生效，先来看一个例子。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    Observable.create&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">        threadName(<span class="string">"subscribe"</span>)</span><br><span class="line">        it.onNext(<span class="number">1</span>)</span><br><span class="line">        it.onNext(<span class="number">2</span>)</span><br><span class="line">        it.onComplete()</span><br><span class="line">    &#125;.subscribeOn(Schedulers.io())</span><br><span class="line">    .subscribe(<span class="keyword">object</span> : Observer&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onComplete</span><span class="params">()</span></span> &#123;</span><br><span class="line">            threadName(<span class="string">"onComplete"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSubscribe</span><span class="params">(d: <span class="type">Disposable</span>)</span></span> &#123;</span><br><span class="line">            threadName(<span class="string">"onSubscribe"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(e: <span class="type">Throwable</span>)</span></span> &#123;</span><br><span class="line">            threadName(<span class="string">"onError"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNext</span><span class="params">(t: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">            threadName(<span class="string">"onNext"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">onSubscribe main</span><br><span class="line">subscribe RxCachedThreadScheduler-1</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">onComplete RxCachedThreadScheduler-1</span><br></pre></td></tr></table></figure>
+
+<p>咦！不是说 subscribeOn 切换的只是上游的执行线程，为什么 <code>onNext</code>、<code>onComplete</code>也会在子线程中执行？其实答案很简单该段代码中没有调用 observeOn 所以下游执行线程并没有发生改变，因此上游在子线程中发送一个 <code>onNext</code> 事件过来，下游的 <code>onNext</code> 方法自然也会在子线程中执行，那么 <code>subscribeOn</code> 内部到底做了什么才会导致上游会在子线程中执行呢，来看看其源码实现。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Observable&lt;T&gt; <span class="title">subscribeOn</span><span class="params">(Scheduler scheduler)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> RxJavaPlugins.onAssembly(<span class="keyword">new</span> ObservableSubscribeOn&lt;T&gt;(<span class="keyword">this</span>, scheduler));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>创建了一个 <code>ObservableSubscribeOn</code> 实例并将 <code>Scheduler</code> 实例传入，接着看看其 <code>subscribeActual</code> 实现。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ObservableSubscribeOn.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">subscribeActual</span><span class="params">(<span class="keyword">final</span> Observer&lt;? <span class="keyword">super</span> T&gt; observer)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> SubscribeOnObserver&lt;T&gt; parent = <span class="keyword">new</span> SubscribeOnObserver&lt;T&gt;(observer);</span><br><span class="line">    observer.onSubscribe(parent);</span><br><span class="line">    parent.setDisposable(scheduler.scheduleDirect(<span class="keyword">new</span> SubscribeTask(parent)));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里直接回调了下游 <code>Observer</code> 实例的 <code>onSubscribe</code> 方法，接着执行 <code>scheduleDirect</code>，继续跟进。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Schedule.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(@NonNull Runnable run)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> scheduleDirect(run, <span class="number">0L</span>, TimeUnit.NANOSECONDS);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">scheduleDirect</span><span class="params">(@NonNull Runnable run, <span class="keyword">long</span> delay, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// createWorker是抽象方法，IoScheduler会返回一个EventLoopWorker实例</span></span><br><span class="line">    <span class="keyword">final</span> Worker w = createWorker();</span><br><span class="line">    DisposeTask task = <span class="keyword">new</span> DisposeTask(decoratedRun, w);</span><br><span class="line">    w.schedule(task, delay, unit);</span><br><span class="line">    <span class="keyword">return</span> task;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> Disposable <span class="title">schedule</span><span class="params">(@NonNull Runnable action, <span class="keyword">long</span> delayTime, @NonNull TimeUnit unit)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> threadWorker.scheduleActual(action, delayTime, unit, tasks);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>调用到了 <code>scheduleActual</code> 方法，这个方法上面在分析 <code>observeOn</code> 时已经分析过，内部会在线程池中执行 <code>action</code> 这个 <code>Runnable</code> 实例，那么主要看看 <code>SubscribeTask</code>的<code>run</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// SubscribeTask.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    source.subscribe(parent);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>里面的逻辑很简单就是在线程池中执行上游的 <code>subscribe</code> 方法，因此上游的所有事件都将在该线程池中执行。那么为什么说 <code>subscribeOn</code> 只能生效一次呢？其实真正的来说 <code>subscribeOn</code> 也可以生效多次，只不过最上游发送事件的线程是由第一次 <code>subscribeOn</code> 调用时确定的，举个例子。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    Observable.create&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">        threadName(<span class="string">"subscribe"</span>)</span><br><span class="line">        it.onNext(<span class="number">1</span>)</span><br><span class="line">        it.onNext(<span class="number">2</span>)</span><br><span class="line">        it.onComplete()</span><br><span class="line">    &#125;.subscribeOn(Schedulers.io())</span><br><span class="line">        .map &#123; threadName(<span class="string">"map"</span>); it + <span class="number">1</span> &#125;</span><br><span class="line">        .subscribeOn(Schedulers.computation())</span><br><span class="line">        .subscribe(<span class="keyword">object</span> : Observer&lt;<span class="built_in">Int</span>&gt; &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onComplete</span><span class="params">()</span></span> &#123;</span><br><span class="line">                threadName(<span class="string">"onComplete"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSubscribe</span><span class="params">(d: <span class="type">Disposable</span>)</span></span> &#123;</span><br><span class="line">                threadName(<span class="string">"onSubscribe"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(e: <span class="type">Throwable</span>)</span></span> &#123;</span><br><span class="line">                threadName(<span class="string">"onError"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNext</span><span class="params">(t: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">                threadName(<span class="string">"onNext"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    <span class="comment">// 主线程睡眠下，防止RxJava生成的daemon线程自动退出</span></span><br><span class="line">    Thread.sleep(<span class="number">200</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">onSubscribe main</span><br><span class="line">subscribe RxCachedThreadScheduler-1</span><br><span class="line">map RxCachedThreadScheduler-1</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">map RxCachedThreadScheduler-1</span><br><span class="line">onNext RxCachedThreadScheduler-1</span><br><span class="line">onComplete RxCachedThreadScheduler-1</span><br></pre></td></tr></table></figure>
+
+<p>在这里例子中调用了两次 <code>subscribeOn</code> 但是看起来只有第一次才生效，其实 <code>map</code> 方法生成的 <code>ObservableMap</code> 实例的 <code>subscribe</code> 方法是在计算线程池中执行的，下面来看一下 <code>observeOn</code> 和 <code>subscribeOn</code> 进行组合的情况。</p>
+<h2 id="observeOn、subscribeOn-组合"><a href="#observeOn、subscribeOn-组合" class="headerlink" title="observeOn、subscribeOn 组合"></a>observeOn、subscribeOn 组合</h2><p>假设有这么一个需求: 先注册然后登录，需要满足：1. 注册成功后要能更新UI，2. 注册失败将不再进行登录，3. 登录成功或者失败也需要更新UI。由于网络请求不能在主线程执行，因此我们就需要用到线程切换，下面是示例代码。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">var</span> disposable: Disposable? = <span class="literal">null</span></span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">registerAndLogin</span><span class="params">(listener: <span class="type">Listener</span>)</span></span> &#123;</span><br><span class="line">    getRegisterObservable()</span><br><span class="line">            .subscribeOn(Schedulers.io())</span><br><span class="line">            .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">            .doOnNext &#123;</span><br><span class="line">                threadName(<span class="string">"doOnNext"</span>)</span><br><span class="line">                <span class="keyword">if</span> (!it.success) &#123;</span><br><span class="line">                    listener.registerFail()</span><br><span class="line">                    disposable?.dispose()</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    listener.registerSuccess()</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            .observeOn(Schedulers.io())</span><br><span class="line">            .flatMap &#123;</span><br><span class="line">                getLoginObservable()</span><br><span class="line">            &#125;</span><br><span class="line">            .observeOn(AndroidSchedulers.mainThread())</span><br><span class="line">            .subscribe(<span class="keyword">object</span> : Observer&lt;LoginModel&gt; &#123;</span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onComplete</span><span class="params">()</span></span> &#123;</span><br><span class="line">                    threadName(<span class="string">"onComplete"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onSubscribe</span><span class="params">(d: <span class="type">Disposable</span>)</span></span> &#123;</span><br><span class="line">                    disposable = d</span><br><span class="line">                    threadName(<span class="string">"onSubscribe"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onNext</span><span class="params">(model: <span class="type">LoginModel</span>)</span></span> &#123;</span><br><span class="line">                    <span class="keyword">if</span> (model.success) listener.loginSuccess(model.token)</span><br><span class="line">                    <span class="keyword">else</span> listener.loginFail()</span><br><span class="line">                    threadName(<span class="string">"onNext"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onError</span><span class="params">(e: <span class="type">Throwable</span>)</span></span> &#123;&#125;</span><br><span class="line">            &#125;)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getRegisterObservable</span><span class="params">()</span></span>: Observable&lt;RegisterModel&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> Observable.create &#123;</span><br><span class="line">        <span class="comment">// 模拟网络耗时</span></span><br><span class="line">        Thread.sleep(<span class="number">500</span>)</span><br><span class="line">        threadName(<span class="string">"register"</span>)</span><br><span class="line">        it.onNext(RegisterModel(<span class="literal">true</span>))</span><br><span class="line">        it.onComplete()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getLoginObservable</span><span class="params">()</span></span>: Observable&lt;LoginModel&gt; &#123;</span><br><span class="line">    <span class="keyword">return</span> Observable.create &#123;</span><br><span class="line">        <span class="comment">// 模拟网络耗时</span></span><br><span class="line">        Thread.sleep(<span class="number">500</span>)</span><br><span class="line">        threadName(<span class="string">"login"</span>)</span><br><span class="line">        it.onNext(LoginModel(<span class="literal">true</span>, <span class="string">"token"</span>))</span><br><span class="line">        it.onComplete()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">RegisterModel</span></span>(<span class="keyword">val</span> success: <span class="built_in">Boolean</span>)</span><br><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">LoginModel</span></span>(<span class="keyword">val</span> success: <span class="built_in">Boolean</span>, <span class="keyword">val</span> token: String)</span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Listener</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">registerSuccess</span><span class="params">()</span></span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">registerFail</span><span class="params">()</span></span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loginSuccess</span><span class="params">(token: <span class="type">String</span>)</span></span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loginFail</span><span class="params">()</span></span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">threadName</span><span class="params">(desc: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    Log.d(<span class="string">"Thread"</span>, <span class="string">"<span class="variable">$desc</span> <span class="subst">$&#123;Thread.currentThread().name&#125;</span>"</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>输出结果如下</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">onSubscribe main</span><br><span class="line">register RxCachedThreadScheduler-1</span><br><span class="line">doOnNext main</span><br><span class="line">login RxCachedThreadScheduler-2</span><br><span class="line">onNext main</span><br><span class="line">onComplete main</span><br></pre></td></tr></table></figure>
+
+<p>这个输出完全满足了我们的需求，网络请求在子线程，UI更新在主线程，现在来分析下为什么会是这个结果。</p>
+<ul>
+<li>首先 <code>subscribeOn</code> 这个方法在这条链上哪个地方调用都没关系其并不会影响结果，因为其只是决定了注册操作所在的线程。</li>
+<li>第一次更新UI是在 <code>doOnNext</code> 中，我们知道注册操作是在子线程，所以我们这里要使用 <code>observeOn</code> 将线程切换到主线程。</li>
+<li>当UI更新完毕后我们要进行登录操作，网络操作需要在子线程，所以我们这里要使用 <code>observeOn</code> 将线程再次切换到子线程。</li>
+<li>当登录完成后我们又需要更新UI，所以我们这里要使用 <code>observeOn</code> 将线程切换到主线程。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/14/RxJava2%20%E6%BA%90%E7%A0%81%E5%88%9D%E6%8E%A2/" rel="next" title="RxJava2 源码初探">
+                <i class="fa fa-chevron-left"></i> RxJava2 源码初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/18/LeakCanary2-LeakSentry%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="prev" title="LeakCanary2-LeakSentry 源码分析">
+                LeakCanary2-LeakSentry 源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ObserveOn"><span class="nav-number">2.</span> <span class="nav-text">ObserveOn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#subscribeOn"><span class="nav-number">3.</span> <span class="nav-text">subscribeOn</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#observeOn、subscribeOn-组合"><span class="nav-number">4.</span> <span class="nav-text">observeOn、subscribeOn 组合</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
