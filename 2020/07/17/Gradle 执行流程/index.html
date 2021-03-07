@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本文主要梳理下 Gradle 的执行顺序及实现原理，加深对 Gradle 的理解。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle 执行流程">
+<meta property="og:url" content="http://yoursite.com/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言本文主要梳理下 Gradle 的执行顺序及实现原理，加深对 Gradle 的理解。">
+<meta property="og:image" content="http://yoursite.com/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/gradle.png">
+<meta property="article:published_time" content="2020-07-17T10:32:12.000Z">
+<meta property="article:modified_time" content="2021-02-12T18:49:25.327Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/gradle.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/17/Gradle 执行流程/"/>
+
+
+
+
+
+  <title>Gradle 执行流程 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gradle 执行流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-17T18:32:12+08:00">
+                2020-07-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%89%93%E5%8C%85%E6%9E%84%E5%BB%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">打包构建</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要梳理下 Gradle 的执行顺序及实现原理，加深对 Gradle 的理解。<a id="more"></a></p>
+<h2 id="开始"><a href="#开始" class="headerlink" title="开始"></a>开始</h2><p>从常用命令着手，一般命令行构建打包 App 都会执行以下命令：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">./gradlew app:assembleDebug</span><br></pre></td></tr></table></figure>
+
+<p>那么具体是怎么执行的呢？查看下 gradlew 的源码，发现其中包含以下代码。</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">CLASSPATH=<span class="variable">$APP_HOME</span>/gradle/wrapper/gradle-wrapper.jar</span><br><span class="line"><span class="built_in">exec</span> <span class="string">"<span class="variable">$JAVACMD</span>"</span> <span class="string">"<span class="variable">$&#123;JVM_OPTS[@]&#125;</span>"</span> -classpath <span class="string">"<span class="variable">$CLASSPATH</span>"</span> org.gradle.wrapper.GradleWrapperMain <span class="string">"<span class="variable">$@</span>"</span></span><br></pre></td></tr></table></figure>
+
+<p>其实就是执行 gradle-wrapper.jar 中的 GradleWrapperMain#main。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// GradleWrapperMain</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    WrapperExecutor.forWrapperPropertiesFile(propertiesFile).execute(</span><br><span class="line">            args,</span><br><span class="line">            <span class="keyword">new</span> Install(logger, <span class="keyword">new</span> Download(logger, <span class="string">"gradlew"</span>, wrapperVersion()), <span class="keyword">new</span> PathAssembler(gradleUserHome)),</span><br><span class="line">            <span class="keyword">new</span> BootstrapMainStarter());</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(String[] args, Install install, BootstrapMainStarter bootstrapMainStarter)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    bootstrapMainStarter.start(args, install.createDist(<span class="keyword">this</span>.config));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先执行 install.createDist 方法读取 gradle/wrapper/gradle-wrapper.properties 中相关配置，检查本地是否已经存在对应版本 Gradle 的 zip 包，如不存在则下载，然后进行解压；</p>
+<figure class="highlight properties"><table><tr><td class="code"><pre><span class="line"><span class="comment"># gradle-wrapper.properties</span></span><br><span class="line"><span class="comment"># 解压后根目录</span></span><br><span class="line"><span class="attr">distributionBase</span>=<span class="string">GRADLE_USER_HOME</span></span><br><span class="line"><span class="comment"># 下载地址</span></span><br><span class="line"><span class="attr">distributionUrl</span>=<span class="string">https\://services.gradle.org/distributions/gradle-5.6.4-all.zip</span></span><br><span class="line"><span class="comment"># 解压后子目录</span></span><br><span class="line"><span class="attr">distributionPath</span>=<span class="string">wrapper/dists</span></span><br><span class="line"><span class="comment"># 下载 zip 包存放子目录</span></span><br><span class="line"><span class="attr">zipStorePath</span>=<span class="string">wrapper/dists</span></span><br><span class="line"><span class="comment"># 下载 zip 包存放根目录</span></span><br><span class="line"><span class="attr">zipStoreBase</span>=<span class="string">GRADLE_USER_HOME</span></span><br></pre></td></tr></table></figure>
+
+<p>注：<strong>根目录如果是 GRADLE_USER_HOME 那么实际使用的为 ~/.gradle ，因此下载的 Gradle 一般保存在 ~/.gradle/wrapper/dists/ 下。<img src="gradle.png" alt="截屏2021-02-11 下午2.37.10"></strong></p>
+<p>当确认本地存在 Gradle 以后就可以调用 bootstrapMainStarter.start 执行 Gradle 构建流程。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// BootstrapMainStarter</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(String[] args, File gradleHome)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    URLClassLoader contextClassLoader = <span class="keyword">new</span> URLClassLoader(<span class="keyword">new</span> URL[]&#123;findLauncherJar(gradleHome).toURI().toURL()&#125;, ClassLoader.getSystemClassLoader().getParent());</span><br><span class="line">    Thread.currentThread().setContextClassLoader(contextClassLoader);</span><br><span class="line">    contextClassLoader.loadClass("org.gradle.launcher.GradleMain").getMethod("main", new Class[]&#123;String[].class&#125;).invoke((Object) null, new Object[]&#123;args&#125;);</span><br><span class="line">    <span class="keyword">if</span> (contextClassLoader <span class="keyword">instanceof</span> Closeable) &#123;</span><br><span class="line">        contextClassLoader.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过自定义 ClassLoader 加载 gradle-launcher-5.6.4.jar 中的 GradleMain 类，并反射调用其 main 方法。后续就是开启 Deamon 进程，然后通过 Socket 进行连接，并提交构建请求，这块就不展开了，最终会调用 DefaultGradleLauncher 的 <strong>executeTasks</strong> 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> GradleInternal <span class="title">executeTasks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    doBuildStages(Stage.RunTasks);</span><br><span class="line">    <span class="keyword">return</span> gradle;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doBuildStages</span><span class="params">(Stage upTo)</span> </span>&#123;</span><br><span class="line">    doClassicBuildStages(upTo);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doClassicBuildStages</span><span class="params">(Stage upTo)</span> </span>&#123;</span><br><span class="line">    prepareSettings();</span><br><span class="line">    prepareProjects();</span><br><span class="line">    prepareTaskExecution();</span><br><span class="line">    instantExecution.saveTaskGraph();</span><br><span class="line">    runWork();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很明显构建项目一共需要进行以下五个步骤</p>
+<ol>
+<li>prepareSettings。</li>
+<li>prepareProjects。</li>
+<li>prepareTaskExecution。</li>
+<li>runWork。</li>
+</ol>
+<p>下面一个个进行分析</p>
+<h2 id="prepareSettings"><a href="#prepareSettings" class="headerlink" title="prepareSettings"></a>prepareSettings</h2><p>在这一阶段，主要工作为</p>
+<ol>
+<li>寻找编译执行 init 脚本。</li>
+<li>寻找 settings 脚本。</li>
+<li>编译 buildSrc 模块。</li>
+<li>解析 gradle.properties。</li>
+<li>编译执行 settings.gradle。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">prepareSettings</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (stage == <span class="keyword">null</span>) &#123;</span><br><span class="line">        buildListener.buildStarted(gradle);</span><br><span class="line">        settingsPreparer.prepareSettings(gradle);</span><br><span class="line">        stage = Stage.LoadSettings;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="buildListener-buildStarted"><a href="#buildListener-buildStarted" class="headerlink" title="buildListener.buildStarted"></a>buildListener.buildStarted</h3><p>用于通知外界构建开始，不过这时候外界不可能设置 buildListener，所以外界是无法接收到该事件的。</p>
+<h3 id="settingsPreparer-prepareSettings"><a href="#settingsPreparer-prepareSettings" class="headerlink" title="settingsPreparer.prepareSettings"></a>settingsPreparer.prepareSettings</h3><p>注：settingPreparer 为 DefaultSettingPreparer 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareSettings</span><span class="params">(GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    initScriptHandler.executeScripts(gradle);</span><br><span class="line">    SettingsLoader settingsLoader = gradle.getParent() != <span class="keyword">null</span> ? settingsLoaderFactory.forNestedBuild() : settingsLoaderFactory.forTopLevelBuild();</span><br><span class="line">    settingsLoader.findAndLoadSettings(gradle);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="initScriptHandler-executeScripts"><a href="#initScriptHandler-executeScripts" class="headerlink" title="initScriptHandler.executeScripts"></a>initScriptHandler.executeScripts</h4><p>注：initScriptHandler 为 InitScriptHandler 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">executeScripts</span><span class="params">(<span class="keyword">final</span> GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> List&lt;File&gt; initScripts = gradle.getStartParameter().getAllInitScripts();</span><br><span class="line">    <span class="keyword">if</span> (initScripts.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    buildOperationExecutor.run(<span class="keyword">new</span> RunnableBuildOperation() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(BuildOperationContext context)</span> </span>&#123;</span><br><span class="line">            BasicTextResourceLoader resourceLoader = <span class="keyword">new</span> BasicTextResourceLoader();</span><br><span class="line">            <span class="keyword">for</span> (File script : initScripts) &#123;</span><br><span class="line">                TextResource resource = resourceLoader.loadFile(<span class="string">"initialization script"</span>, script);</span><br><span class="line">                processor.process(<span class="keyword">new</span> TextResourceScriptSource(resource), gradle);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">public</span> BuildOperationDescriptor.<span class="function">Builder <span class="title">description</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> BuildOperationDescriptor.displayName(<span class="string">"Run init scripts"</span>).progressDisplayName(<span class="string">"Running init scripts"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部首先寻找到所有配置的 init 脚本，接着对其进行编译并执行。</p>
+<p>init 脚本存放位置为以下几个地方：</p>
+<ol>
+<li><p>~/.gradle/init.gradle 或者 ~/.gradle/init.gradle.kts 文件。</p>
+</li>
+<li><p>~/gradle/init.d/ 目录下所有后缀为 gradle 或者 gradle.kts 的文件。</p>
+</li>
+<li><p>{gradleHome}/init.d/ 目录下所有后缀为 gradle 或者 gradle.kts 的文件。</p>
+</li>
+<li><p>命令行带 –init-script 明确指定。</p>
+</li>
+<li><p>调用 gradle.startParameter.addInitScript 进行指定。</p>
+</li>
+</ol>
+<p>注：gradleHome 为 Gradle 执行路径，在我电脑上为 </p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">/Users/hefuwei/.gradle/wrapper/dists/gradle-5.6.4-all/ankdp27end7byghfw1q2sw75f/gradle-5.6.4</span><br></pre></td></tr></table></figure>
+
+<p>至于如何编译执行 init 脚本暂时先忽略，<strong>我们可以自己编写 init 脚本，在每次构建前做一些初始化操作，可做的内容可以参考<a href="https://www.cnblogs.com/duex/p/9205155.html" target="_blank" rel="noopener">这篇文章</a>。</strong></p>
+<h4 id="settingsLoader-findAndLoadSettings"><a href="#settingsLoader-findAndLoadSettings" class="headerlink" title="settingsLoader.findAndLoadSettings"></a>settingsLoader.findAndLoadSettings</h4><p>方法内部主要工作为：</p>
+<ol>
+<li>寻找 settings 脚本。</li>
+<li>构建 buildSrc 模块。</li>
+<li>解析 gradle.properties 文件。</li>
+<li>编译执行 settings 脚本。</li>
+</ol>
+<h5 id="寻找-settings-脚本"><a href="#寻找-settings-脚本" class="headerlink" title="寻找 settings 脚本"></a>寻找 settings 脚本</h5><p>方法调用链</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">CompositeBuildSettingsLoader.findAndLoadSettings -&gt; ChildBuildRegisteringSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">CommandLineIncludedBuildSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">SettingsAttachingSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findSettingsAndLoadIfAppropriate -&gt;</span><br><span class="line">DefaultSettingsFinder.find -&gt;</span><br><span class="line">BuildLayoutFactory.getLayoutFor</span><br></pre></td></tr></table></figure>
+
+<p>最终调用到 BuildLayoutFactory.getLayoutFor 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> BuildLayout <span class="title">getLayoutFor</span><span class="params">(BuildLayoutConfiguration configuration)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (configuration.isUseEmptySettings()) &#123;</span><br><span class="line">        <span class="keyword">return</span> buildLayoutFrom(configuration, <span class="keyword">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    File explicitSettingsFile = configuration.getSettingsFile();</span><br><span class="line">    <span class="keyword">if</span> (explicitSettingsFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!explicitSettingsFile.isFile()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> MissingResourceException(explicitSettingsFile.toURI(), String.format(<span class="string">"Could not read settings file '%s' as it does not exist."</span>, explicitSettingsFile.getAbsolutePath()));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> buildLayoutFrom(configuration, explicitSettingsFile);</span><br><span class="line">    &#125;</span><br><span class="line">    File currentDir = configuration.getCurrentDir();</span><br><span class="line">    <span class="keyword">boolean</span> searchUpwards = configuration.isSearchUpwards();</span><br><span class="line">    <span class="keyword">return</span> getLayoutFor(currentDir, searchUpwards ? <span class="keyword">null</span> : currentDir.getParentFile());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>寻找 settings 脚本逻辑如下</p>
+<ul>
+<li>如果明确指定了 settings 脚本，那么就使用该脚本（命令行带 –settings-file 明确指定，或者调用 gradle.startParameter.setSettingsFile 进行指定）。</li>
+<li>在当前目录（项目目录）下查找 settings 脚本，如果存在就使用该脚本。</li>
+<li>当前目录不存在，并且允许向上搜索（默认允许），那么在其父目录下搜索，如存在就使用该脚本。</li>
+<li>父目录下还是不存在，那么继续向上直到根目录。</li>
+<li>如果上述都不存在，那么还是取当前目录下的 settings 脚本（虽然不存在）。</li>
+</ul>
+<p>settings 脚本寻找结束后，<strong>并没有立即进行编译执行</strong>。</p>
+<h5 id="构建-buildSrc-模块"><a href="#构建-buildSrc-模块" class="headerlink" title="构建 buildSrc 模块"></a>构建 buildSrc 模块</h5><p>调用链</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">CompositeBuildSettingsLoader.findAndLoadSettings -&gt; ChildBuildRegisteringSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">CommandLineIncludedBuildSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">SettingsAttachingSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findSettingsAndLoadIfAppropriate</span><br></pre></td></tr></table></figure>
+
+<p>在 settings 脚本寻找到后会继续执行 DefaultSettingsLoader.findSettingsAndLoadIfAppropriate 方法</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> SettingsInternal <span class="title">findSettingsAndLoadIfAppropriate</span><span class="params">(GradleInternal gradle,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                          StartParameter startParameter)</span> </span>&#123;</span><br><span class="line">    SettingsLocation settingsLocation = findSettings(startParameter);</span><br><span class="line">    <span class="comment">// We found the desired settings file, now build the associated buildSrc before loading settings.  This allows</span></span><br><span class="line">    <span class="comment">// the settings script to reference classes in the buildSrc.</span></span><br><span class="line">    ClassLoaderScope buildSourceClassLoaderScope = buildSourceBuilder.buildAndCreateClassLoader(settingsLocation.getSettingsDir(), startParameter);</span><br><span class="line">    <span class="keyword">return</span> settingsProcessor.process(gradle, settingsLocation, buildSourceClassLoaderScope, startParameter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码中注释也说了，查找到 setting 脚本后会在其编译执行前先去编译 buildSrc 模块），这么做的目的是为了在 settings 脚本中可以引用 buildSrc 中的内容。</p>
+<h5 id="解析-gradle-properties-文件"><a href="#解析-gradle-properties-文件" class="headerlink" title="解析 gradle.properties 文件"></a>解析 gradle.properties 文件</h5><p>调用链</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">CompositeBuildSettingsLoader.findAndLoadSettings -&gt; ChildBuildRegisteringSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">CommandLineIncludedBuildSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">SettingsAttachingSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findSettingsAndLoadIfAppropriate -&gt; BuildOperationSettingsProcessor.process -&gt; RootBuildCacheControllerSettingsProcessor.process -&gt; PropertiesLoadingSettingsProcessor.process</span><br></pre></td></tr></table></figure>
+
+<p>最终会调用到 PropertiesLoadingSettingsProcessor.process 来解析 gradle.properties。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> SettingsInternal <span class="title">process</span><span class="params">(GradleInternal gradle,</span></span></span><br><span class="line"><span class="function"><span class="params">                                SettingsLocation settingsLocation,</span></span></span><br><span class="line"><span class="function"><span class="params">                                ClassLoaderScope buildRootClassLoaderScope,</span></span></span><br><span class="line"><span class="function"><span class="params">                                StartParameter startParameter)</span> </span>&#123;</span><br><span class="line">    propertiesLoader.loadProperties(settingsLocation.getSettingsDir());</span><br><span class="line">    <span class="keyword">return</span> processor.process(gradle, settingsLocation, buildRootClassLoaderScope, startParameter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部会读取 gradle.properties 文件里的配置，系统配置，环境变量，以及命令行传入的配置并存储。</p>
+<p>gradle.properties 存放位置为以下几个地方：</p>
+<ol>
+<li>~/.gradle/gradle.properties。</li>
+<li>{settingsDir}/gradle.properties。</li>
+<li>{gradleHome}/gradle.properties。</li>
+</ol>
+<p>上述三个文件都会进行读取，下面的优先级较高，可以覆盖上面的。</p>
+<h5 id="执行-settings-gradle-文件"><a href="#执行-settings-gradle-文件" class="headerlink" title="执行 settings.gradle 文件"></a>执行 settings.gradle 文件</h5><p>调用链</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">CompositeBuildSettingsLoader.findAndLoadSettings -&gt; ChildBuildRegisteringSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">CommandLineIncludedBuildSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">SettingsAttachingSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findAndLoadSettings -&gt;</span><br><span class="line">DefaultSettingsLoader.findSettingsAndLoadIfAppropriate -&gt; BuildOperationSettingsProcessor.process -&gt; RootBuildCacheControllerSettingsProcessor.process -&gt; PropertiesLoadingSettingsProcessor.process -&gt; ScriptEvaluatingSettingsProcessor.process</span><br></pre></td></tr></table></figure>
+
+<p>最终调用到 ScriptEvaluatingSettingsProcessor.process 来合并参数以及编译执行 settings 脚本。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> SettingsInternal <span class="title">process</span><span class="params">(GradleInternal gradle,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    SettingsLocation settingsLocation,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    ClassLoaderScope buildRootClassLoaderScope,</span></span></span><br><span class="line"><span class="function"><span class="params">                                    StartParameter startParameter)</span> </span>&#123;</span><br><span class="line">    Map&lt;String, String&gt; properties = propertiesLoader.mergeProperties(Collections.&lt;String, String&gt;emptyMap());</span><br><span class="line">    TextResourceScriptSource settingsScript = <span class="keyword">new</span> TextResourceScriptSource(textResourceLoader.loadFile(<span class="string">"settings file"</span>, settingsLocation.getSettingsFile()));</span><br><span class="line">    SettingsInternal settings = settingsFactory.createSettings(gradle, settingsLocation.getSettingsDir(), settingsScript, properties, startParameter, buildRootClassLoaderScope);</span><br><span class="line">    applySettingsScript(settingsScript, settings);</span><br><span class="line">    <span class="keyword">return</span> settings;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>编译执行和 init 脚本一样先忽略。</p>
+<h2 id="prepareProjects"><a href="#prepareProjects" class="headerlink" title="prepareProjects"></a>prepareProjects</h2><p>在这一阶段，主要工作为：</p>
+<ol>
+<li>创建 project 以及 subProject。</li>
+<li>配置每个 project（编译执行 build 脚本）。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">prepareProjects</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (stage == Stage.LoadSettings) &#123;</span><br><span class="line">        projectsPreparer.prepareProjects(gradle);</span><br><span class="line">        stage = Stage.Configure;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareProjects</span><span class="params">(GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    buildOperationExecutor.run(<span class="keyword">new</span> ConfigureBuild(gradle));</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// DefaultProjectsPreparer(间接会被调用)</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareProjects</span><span class="params">(GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    buildLoader.load(gradle.getSettings(), gradle);</span><br><span class="line">    <span class="keyword">if</span> (gradle.getParent() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        buildRegistry.beforeConfigureRootBuild();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (gradle.getStartParameter().isConfigureOnDemand()) &#123;</span><br><span class="line">        projectConfigurer.configure(gradle.getRootProject());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        projectConfigurer.configureHierarchy(gradle.getRootProject());</span><br><span class="line">        <span class="keyword">new</span> ProjectsEvaluatedNotifier(buildOperationExecutor).notify(gradle);</span><br><span class="line">    &#125;</span><br><span class="line">    modelConfigurationListener.onConfigure(gradle);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="buildLoader-load"><a href="#buildLoader-load" class="headerlink" title="buildLoader.load"></a>buildLoader.load</h3><p>注：buildLoader 为 NotifyingBuildLoader 实例。</p>
+<h4 id="创建所有项目"><a href="#创建所有项目" class="headerlink" title="创建所有项目"></a>创建所有项目</h4><p>调用链</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DefaultProjectsPreparer.prepareProjects -&gt; NotifyingBuildLoader.load -&gt; ProjectPropertySettingBuildLoader.load -&gt; InstantiatingBuildLoader.load</span><br></pre></td></tr></table></figure>
+
+<p>最终会调用 InstantiatingBuildLoader.load 来创建 project 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">(SettingsInternal settings, GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    load(settings.getRootProject(), settings.getDefaultProject(), gradle, settings.getRootClassLoaderScope());</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">load</span><span class="params">(ProjectDescriptor rootProjectDescriptor, ProjectDescriptor defaultProject, GradleInternal gradle, ClassLoaderScope buildRootClassLoaderScope)</span> </span>&#123;</span><br><span class="line">    createProjects(rootProjectDescriptor, gradle, buildRootClassLoaderScope);</span><br><span class="line">    attachDefaultProject(defaultProject, gradle);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">createProjects</span><span class="params">(ProjectDescriptor rootProjectDescriptor, GradleInternal gradle, ClassLoaderScope buildRootClassLoaderScope)</span> </span>&#123;</span><br><span class="line">    ProjectInternal rootProject = projectFactory.createProject(rootProjectDescriptor, <span class="keyword">null</span>, gradle, buildRootClassLoaderScope.createChild(<span class="string">"root-project"</span>), buildRootClassLoaderScope);</span><br><span class="line">    gradle.setRootProject(rootProject);</span><br><span class="line">    addProjects(rootProject, rootProjectDescriptor, gradle, buildRootClassLoaderScope);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部首先创建了 rootProject，然后创建相应的 subProject ，那么 Gradle 是如何知道要创建哪些 project 的呢？这是因为前面已经执行过了 settings 脚本，而在其内部会调用 include xxx 来指定哪些模块要参与构建。<strong>因此如果新建一个模块，并且要参与构建，一定要在 settings 脚本中进行指定</strong>。</p>
+<h3 id="projectConfigurer-configureHierarchy"><a href="#projectConfigurer-configureHierarchy" class="headerlink" title="projectConfigurer.configureHierarchy"></a>projectConfigurer.configureHierarchy</h3><p>注：projectConfigurer 为 TaskPathProjectEvaluator 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureHierarchy</span><span class="params">(ProjectInternal project)</span> </span>&#123;</span><br><span class="line">    configure(project);</span><br><span class="line">    <span class="keyword">for</span> (Project sub : project.getSubprojects()) &#123;</span><br><span class="line">        configure((ProjectInternal) sub);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部首先配置根项目然后配置所有的子项目，最终会调用到 EvaluateProject.run 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(<span class="keyword">final</span> BuildOperationContext context)</span> </span>&#123;</span><br><span class="line">    project.getMutationState().withMutableState(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                state.toBeforeEvaluate();</span><br><span class="line">                buildOperationExecutor.run(<span class="keyword">new</span> NotifyBeforeEvaluate(project, state)); <span class="comment">// 1</span></span><br><span class="line">                <span class="keyword">if</span> (!state.hasFailure()) &#123;</span><br><span class="line">                    state.toEvaluate();</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        delegate.evaluate(project, state); <span class="comment">// 2</span></span><br><span class="line">                    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                        addConfigurationFailure(project, state, e, context);</span><br><span class="line">                    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                        state.toAfterEvaluate();</span><br><span class="line">                        buildOperationExecutor.run(<span class="keyword">new</span> NotifyAfterEvaluate(project, state)); <span class="comment">// 3</span></span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (state.hasFailure()) &#123;</span><br><span class="line">                    state.rethrowFailure();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    context.setResult(ConfigureProjectBuildOperationType.RESULT);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                state.configured();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="projectEvaluationListener-beforeEvaluate"><a href="#projectEvaluationListener-beforeEvaluate" class="headerlink" title="projectEvaluationListener.beforeEvaluate"></a>projectEvaluationListener.beforeEvaluate</h4><p>通知外界当前项目配置开始，对应注释一。</p>
+<h4 id="配置当前项目"><a href="#配置当前项目" class="headerlink" title="配置当前项目"></a>配置当前项目</h4><p>开始配置当前项目，对应注释二。</p>
+<p>配置流程为：</p>
+<ol>
+<li>应用 org.gradle.help-tasks 插件。</li>
+<li>应用 org.gradle.build-init 插件。</li>
+<li>应用 org.gradle.wrapper 插件。</li>
+<li>编译执行 build 脚本。</li>
+</ol>
+<h4 id="projectEvaluationListener-afterEvaluate"><a href="#projectEvaluationListener-afterEvaluate" class="headerlink" title="projectEvaluationListener.afterEvaluate"></a>projectEvaluationListener.afterEvaluate</h4><p>通知外界当前项目配置结束，对应注释三。</p>
+<h2 id="prepareTaskExecution"><a href="#prepareTaskExecution" class="headerlink" title="prepareTaskExecution"></a>prepareTaskExecution</h2><p>在这一阶段，主要工作为寻找要执行的 Task 以及处理依赖最终填充 TaskGraph。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">prepareTaskExecution</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (stage == Stage.Configure) &#123;</span><br><span class="line">        taskExecutionPreparer.prepareForTaskExecution(gradle);</span><br><span class="line">        stage = Stage.TaskGraph;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareForTaskExecution</span><span class="params">(GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    buildOperationExecutor.run(<span class="keyword">new</span> CalculateTaskGraph(gradle));</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">(BuildOperationContext buildOperationContext)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> TaskExecutionGraphInternal taskGraph = populateTaskGraph(); <span class="comment">// 1</span></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在注释一处调用了 populateTaskGraph 用于填充 TaskGraph。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">TaskExecutionGraphInternal <span class="title">populateTaskGraph</span><span class="params">()</span> </span>&#123;          </span><br><span class="line">    BuildOperatingFiringTaskExecutionPreparer.<span class="keyword">this</span></span><br><span class="line">        .delegate.prepareForTaskExecution(<span class="keyword">this</span>.gradle);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>.gradle.getTaskGraph();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// DefaultTaskExecutionPreparer</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepareForTaskExecution</span><span class="params">(GradleInternal gradle)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.buildConfigurationActionExecuter.select(gradle); <span class="comment">// 1</span></span><br><span class="line">    TaskExecutionGraphInternal taskGraph = gradle.getTaskGraph();</span><br><span class="line">    taskGraph.populate(); <span class="comment">// 2</span></span><br><span class="line">    <span class="keyword">this</span>.includedBuildControllers.populateTaskGraphs();</span><br><span class="line">    <span class="keyword">if</span> (gradle.getStartParameter().isConfigureOnDemand()) &#123;</span><br><span class="line">        (<span class="keyword">new</span> ProjectsEvaluatedNotifier(<span class="keyword">this</span>.buildOperationExecutor)).notify(gradle);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注释一处会顺序执行 </p>
+<ol>
+<li><p>ExcludedTaskFilteringBuildConfigurationAction.configure 方法。</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(BuildExecutionContext context)</span> </span>&#123;</span><br><span class="line">    GradleInternal gradle = context.getGradle();</span><br><span class="line">    Set&lt;String&gt; excludedTaskNames = gradle.getStartParameter().getExcludedTaskNames();</span><br><span class="line">    <span class="keyword">if</span> (!excludedTaskNames.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">final</span> Set&lt;Spec&lt;Task&gt;&gt; filters = <span class="keyword">new</span> HashSet&lt;Spec&lt;Task&gt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (String taskName : excludedTaskNames) &#123;</span><br><span class="line">            filters.add(taskSelector.getFilter(taskName));</span><br><span class="line">        &#125;</span><br><span class="line">        gradle.getTaskGraph().useFilter(Specs.intersect(filters));</span><br><span class="line">    &#125;</span><br><span class="line">    context.proceed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 方法内部先获取了被排除的 Tasks 名称，并依次把它们放入 filters 中，接着调用 useFilter 通知 TaskGraph 过滤掉这些 Task。<strong><em>在日常开发过程中，我们也可以根据需求适当的过滤掉一些 Task，从而加快构建速度。</em></strong>比如不想执行 lint ，那么就可以在 settings.gradle 中添加以下代码。</p>
+ <figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">gradle.startParameter.excludedTaskNames.add(<span class="string">"lint"</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>DefaultTasksBuildExecutionAction.configure 方法。</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(BuildExecutionContext context)</span> </span>&#123;</span><br><span class="line">    StartParameter startParameter = context.getGradle().getStartParameter();</span><br><span class="line">    <span class="keyword">for</span> (TaskExecutionRequest request : startParameter.getTaskRequests()) &#123;</span><br><span class="line">        <span class="keyword">if</span> (!request.getArgs().isEmpty()) &#123;</span><br><span class="line">            context.proceed();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ProjectInternal project = context.getGradle().getDefaultProject();</span><br><span class="line">    projectConfigurer.configure(project);</span><br><span class="line">    List&lt;String&gt; defaultTasks = project.getDefaultTasks();</span><br><span class="line">    startParameter.setTaskNames(defaultTasks);</span><br><span class="line">    context.proceed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 方法内部先判断了是否明确指定了将要执行的 Task，如果明确指定了那么啥也不干，如果没有指定那么添加默认 Task。</p>
+</li>
+<li><p>TaskNameResolvingBuildConfigurationAction.configure 方法。</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configure</span><span class="params">(BuildExecutionContext context)</span> </span>&#123;</span><br><span class="line">    GradleInternal gradle = context.getGradle();</span><br><span class="line">    TaskExecutionGraphInternal taskGraph = gradle.getTaskGraph();</span><br><span class="line">    List&lt;TaskExecutionRequest&gt; taskParameters = gradle.getStartParameter().getTaskRequests();</span><br><span class="line">    <span class="keyword">for</span> (TaskExecutionRequest taskParameter : taskParameters) &#123;</span><br><span class="line">        List&lt;TaskSelector.TaskSelection&gt; taskSelections = commandLineTaskParser.parseTasks(taskParameter);</span><br><span class="line">        <span class="keyword">for</span> (TaskSelector.TaskSelection taskSelection : taskSelections) &#123;</span><br><span class="line">            taskGraph.addEntryTasks(taskSelection.getTasks());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    context.proceed();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 方法内部会判断是否明确指定了执行哪个项目的 Task，如 :app:assembleDebug ，如果指定了那么就会直接选中该 Task，如果没有指定那么会把所有项目下满足条件的 Task 选出来。然后遍历并添加所有已选择的 Tasks 到 taskGraph 中，内部会处理 dependson finalizedby mustrunafter shouldrunafter 等 Tasks 间的依赖关系，并把信息保存在 TaskInfo 之中。</p>
+</li>
+</ol>
+<p>注释二处调用 TaskGraph.populate 填充 TaskGraph（注释一已经把需要执行的 Task 及相关依赖处理了）。</p>
+<h2 id="runWork"><a href="#runWork" class="headerlink" title="runWork"></a>runWork</h2><p>这一阶段主要工作为执行 Task。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">runWork</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (stage != Stage.TaskGraph) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(<span class="string">"Cannot execute tasks: current stage = "</span> + stage);</span><br><span class="line">    &#125;</span><br><span class="line">    List&lt;Throwable&gt; taskFailures = <span class="keyword">new</span> ArrayList&lt;Throwable&gt;();</span><br><span class="line">    buildExecuter.execute(gradle, taskFailures);</span><br><span class="line">    <span class="keyword">if</span> (!taskFailures.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> MultipleBuildFailures(taskFailures);</span><br><span class="line">    &#125;</span><br><span class="line">    stage = Stage.RunTasks;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着调用 buildExecuter.execute 方法 。注：buildExecuter 为 DefaultBuildWorkExecutor 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(<span class="keyword">final</span> GradleInternal gradle, <span class="keyword">final</span> <span class="keyword">int</span> index, <span class="keyword">final</span> Collection&lt;? <span class="keyword">super</span> Throwable&gt; taskFailures)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (index &gt;= executionActions.size()) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    executionActions.get(index).execute(<span class="keyword">new</span> BuildExecutionContext() &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> GradleInternal <span class="title">getGradle</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> gradle;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">proceed</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            execute(gradle, index + <span class="number">1</span>, taskFailures);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;, taskFailures);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里 executionActions 里面有两项会依次执行：</p>
+<ol>
+<li><p>DryRunBuildExecutionAction.execute。</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(BuildExecutionContext context, Collection&lt;? <span class="keyword">super</span> Throwable&gt; taskFailures)</span> </span>&#123;</span><br><span class="line">    GradleInternal gradle = context.getGradle();</span><br><span class="line">    <span class="keyword">if</span> (gradle.getStartParameter().isDryRun()) &#123;</span><br><span class="line">        <span class="keyword">for</span> (Task task : gradle.getTaskGraph().getAllTasks()) &#123;</span><br><span class="line">            textOutputFactory.create(DryRunBuildExecutionAction<span class="class">.<span class="keyword">class</span>)</span></span><br><span class="line"><span class="class">                .<span class="title">append</span>(((<span class="title">TaskInternal</span>) <span class="title">task</span>).<span class="title">getIdentityPath</span>().<span class="title">getPath</span>())</span></span><br><span class="line">                .append(" ")</span><br><span class="line">                .style(StyledTextOutput.Style.ProgressStatus)</span><br><span class="line">                .append(<span class="string">"SKIPPED"</span>)</span><br><span class="line">                .println();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        context.proceed();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 如果命令行带有 –dry-run 标记，则会跳过所有 Task 执行。如果我们只要看下哪些 Task 会被执行，那么就可以在 settings.gradle 中添加以下代码。</p>
+ <figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">gradle.startParameter.setIsDryRun(<span class="literal">true</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>SelectedTaskExecutionAction.execute。</p>
+ <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(BuildExecutionContext context, Collection&lt;? <span class="keyword">super</span> Throwable&gt; taskFailures)</span> </span>&#123;</span><br><span class="line">    GradleInternal gradle = context.getGradle();</span><br><span class="line">    TaskExecutionGraphInternal taskGraph = gradle.getTaskGraph();</span><br><span class="line">    <span class="keyword">if</span> (gradle.getStartParameter().isContinueOnFailure()) &#123;</span><br><span class="line">        taskGraph.setContinueOnFailure(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    taskGraph.addTaskExecutionGraphListener(<span class="keyword">new</span> BindAllReferencesOfProjectsToExecuteListener());</span><br><span class="line">    taskGraph.execute(taskFailures);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p> 在该方法内部会去真正执行 Task，不过在执行前还会进行校验。比如会跳过无 action 的 Task 以及 update-to-date 的 Task。本质上执行 Task 就是执行其内部的 Action，这可以通过 doFirst、doLast 进行添加。</p>
+</li>
+</ol>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Gradle 完整执行流程如下：</p>
+<ol>
+<li>确保本地存在 Gradle ，如无则进行下载。</li>
+<li>寻找 init 脚本，编译并执行。</li>
+<li>寻找 settings 脚本。</li>
+<li>构建 buildSrc 模块。</li>
+<li>解析 gradle.properties 文件。</li>
+<li>编译并执行 settings 脚本。</li>
+<li>创建 project 以及 subProject。</li>
+<li>编译并执行每个项目下的 build 脚本。</li>
+<li>构建填充 task 有向无环图。</li>
+<li>执行 task。</li>
+</ol>
+<p>参考：</p>
+<ol>
+<li><a href="https://juejin.cn/post/6844903858641043463" target="_blank" rel="noopener">【Android 修炼手册】Gradle 篇 – Gradle 源码分析</a></li>
+<li><a href="http://www.zyiz.net/tech/detail-131526.html" target="_blank" rel="noopener">深度探索 Gradle 自动化构建技术</a></li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/30/WebSocket%20%E8%81%8A%E5%A4%A9/" rel="next" title="WebSocket 聊天">
+                <i class="fa fa-chevron-left"></i> WebSocket 聊天
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/19/Gradle%20%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99/" rel="prev" title="Gradle 插件开发">
+                Gradle 插件开发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开始"><span class="nav-number">2.</span> <span class="nav-text">开始</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prepareSettings"><span class="nav-number">3.</span> <span class="nav-text">prepareSettings</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#buildListener-buildStarted"><span class="nav-number">3.1.</span> <span class="nav-text">buildListener.buildStarted</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#settingsPreparer-prepareSettings"><span class="nav-number">3.2.</span> <span class="nav-text">settingsPreparer.prepareSettings</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#initScriptHandler-executeScripts"><span class="nav-number">3.2.1.</span> <span class="nav-text">initScriptHandler.executeScripts</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#settingsLoader-findAndLoadSettings"><span class="nav-number">3.2.2.</span> <span class="nav-text">settingsLoader.findAndLoadSettings</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#寻找-settings-脚本"><span class="nav-number">3.2.2.1.</span> <span class="nav-text">寻找 settings 脚本</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#构建-buildSrc-模块"><span class="nav-number">3.2.2.2.</span> <span class="nav-text">构建 buildSrc 模块</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#解析-gradle-properties-文件"><span class="nav-number">3.2.2.3.</span> <span class="nav-text">解析 gradle.properties 文件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#执行-settings-gradle-文件"><span class="nav-number">3.2.2.4.</span> <span class="nav-text">执行 settings.gradle 文件</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prepareProjects"><span class="nav-number">4.</span> <span class="nav-text">prepareProjects</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#buildLoader-load"><span class="nav-number">4.1.</span> <span class="nav-text">buildLoader.load</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#创建所有项目"><span class="nav-number">4.1.1.</span> <span class="nav-text">创建所有项目</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#projectConfigurer-configureHierarchy"><span class="nav-number">4.2.</span> <span class="nav-text">projectConfigurer.configureHierarchy</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#projectEvaluationListener-beforeEvaluate"><span class="nav-number">4.2.1.</span> <span class="nav-text">projectEvaluationListener.beforeEvaluate</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#配置当前项目"><span class="nav-number">4.2.2.</span> <span class="nav-text">配置当前项目</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#projectEvaluationListener-afterEvaluate"><span class="nav-number">4.2.3.</span> <span class="nav-text">projectEvaluationListener.afterEvaluate</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#prepareTaskExecution"><span class="nav-number">5.</span> <span class="nav-text">prepareTaskExecution</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#runWork"><span class="nav-number">6.</span> <span class="nav-text">runWork</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">7.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

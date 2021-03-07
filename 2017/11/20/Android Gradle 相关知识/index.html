@@ -406,13 +406,13 @@
 <p>  ![这里写图片描述](自定义 BuildType3.png)</p>
 </li>
 <li><p>签名，首先要生成一个签名文件使用 build-&gt;generate signed apk 生成一个签名文件然后再在 gradle中进行如下配置。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E7%AD%BE%E5%90%8D.png" alt></p>
+<p>  <img src="%E7%AD%BE%E5%90%8D.png" alt=""></p>
 </li>
 <li><p>多渠道打包，现在 android 域中加上图一或者图二的配置，再在 manifest 文件中的 appliation 节点下配置图三的节点，最后在图四配置 flavorDimensions 参数(不配置会报错)，然后进行执行 ./gradlew build 就会生成各渠道的 debug、release 包了。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E6%B8%A0%E9%81%931.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E6%B8%A0%E9%81%932.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E6%B8%A0%E9%81%933.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E6%B8%A0%E9%81%934.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E6%B8%A0%E9%81%931.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E6%B8%A0%E9%81%932.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E6%B8%A0%E9%81%933.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E6%B8%A0%E9%81%934.png" alt="这里写图片描述"></p>
 </li>
 <li><p>Check 任务 ./gradlew check 运行 Link 等等。</p>
 </li>
@@ -421,28 +421,28 @@
 <li><p>Clean 任务 ./gradlew clean 清除 build 过程中的所有中间数据。</p>
 </li>
 <li><p>通过配置 build.gradle 中 android 域可以把资源文件分成好几个文件夹。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B9.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%A4%9A%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B92.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B9.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%A4%9A%E8%B5%84%E6%BA%90%E6%96%87%E4%BB%B6%E5%A4%B92.png" alt="这里写图片描述"></p>
 </li>
 <li><p>可以在项目层的 build.gradle 中的 ext 域配置一些项目中通用的参数类似 java 中的全局静态变量然后 module 层的 build.gradle 中通过 rootProject.ext 进行引用，也可以写在一个 xxx.gradle 文件里面然后在build.gradle 中执行 apply from: ‘xxx.gradle’ 进行引用。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%85%A8%E5%B1%80%E5%B8%B8%E9%87%8F.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%85%A8%E5%B1%80%E5%B8%B8%E9%87%8F2.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%85%A8%E5%B1%80%E5%B8%B8%E9%87%8F.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%85%A8%E5%B1%80%E5%B8%B8%E9%87%8F2.png" alt="这里写图片描述"></p>
 </li>
 <li><p>build.gradle 中可以对某些配置项进行动态赋值，例如 versionCode。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE.png" alt="这里写图片描述"></p>
+<p>  <img src="%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE.png" alt="这里写图片描述"></p>
 </li>
 <li><p>lintOptions(android域下面) 可以配置在编译时 lint 报错后不中断编译。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/LintOptions.png" alt="这里写图片描述"></p>
+<p>  <img src="LintOptions.png" alt="这里写图片描述"></p>
 </li>
 <li><p>compileOptions 编译选项用来配置java版本暂时想不到运用场景，书上说是为了使用指定版本的特性。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/CompileOptions.png" alt="这里写图片描述"></p>
+<p>  <img src="CompileOptions.png" alt="这里写图片描述"></p>
 </li>
 <li><p>minifyEnabled 表示是否开启代码混淆 proguardFiles 用来指定混淆文件，下图中使用的是默认的混淆文件。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E4%BB%A3%E7%A0%81%E6%B7%B7%E6%B7%86.png" alt="这里写图片描述"></p>
+<p>  <img src="%E4%BB%A3%E7%A0%81%E6%B7%B7%E6%B7%86.png" alt="这里写图片描述"></p>
 </li>
 <li><p>配置文件 gradle.properties 可以配置一些参数然后在 build.gradle 中引用，用以下方式配置的参数可以在命令行中进行赋值。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6.png" alt="这里写图片描述"></p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B62.png" alt="这里写图片描述"></p>
+<p>  <img src="%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6.png" alt="这里写图片描述"></p>
+<p>  <img src="%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B62.png" alt="这里写图片描述"></p>
 </li>
 <li><p>gradle 系统参数(直接可以使用)</p>
 <ol>
@@ -457,27 +457,27 @@
 </ol>
 </li>
 <li><p>对每个 buildType 执行不同的逻辑，先在下图中创建 buildConfigField 字段，然后系统会在 build 目录下个各个 buildType 下面生成一个 buildConfig 类，其中就包含 build.gradle 中声明的 buildConfigField 字段，在代码中就可以获取到该值从而执行不同的逻辑。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/BuildConfig.png" alt="这里写图片描述"></p>
+<p>  <img src="BuildConfig.png" alt="这里写图片描述"></p>
 </li>
 <li><p>对每个 buildType 指定不同的 app_name 只需要在各个 buildType 下加入 resValue (该参数可以直接把资源加到 R 文件中，也可写在 defaultConfig 中，一般可用于获取动态字符串比如构建开始时间)，并且删除 value/string.xml 里面的 app_name，如果不删除会报错说重复定义了 app_name。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/ResConfig.png" alt="这里写图片描述"></p>
+<p>  <img src="ResConfig.png" alt="这里写图片描述"></p>
 </li>
 <li><p>当需要为项目添加 jar 包，先放入libs 目录下然后可以选择右键 add as library 也可以直接 sync project，如果 build.gradle 中存在 implementation fileTree(dir: ‘libs’, include: [‘*.jar’]) 则直接加入后就可以使用。</p>
 </li>
 <li><p>使用 Gradle 打 jar 包。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/Jar.png" alt="这里写图片描述"></p>
+<p>  <img src="Jar.png" alt="这里写图片描述"></p>
 </li>
 <li><p>执行 ./gradlew build -profile gradle 会生成构建耗时 html 文件。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/Report.png" alt="这里写图片描述"></p>
+<p>  <img src="Report.png" alt="这里写图片描述"></p>
 </li>
 <li><p>从上一个如果发现 Lint 这个 task 所花的时间很长，通过在命令行中加上参数 -x lint 或者在项目的 build.gradle 中加上如下代码即可不执行 lint 这个 task。</p>
   <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">project.gradle.startParameter.excludedTaskNames.add(&#39;lint&#39;)</span><br></pre></td></tr></table></figure>
 </li>
 <li><p>在 debug 版本中可以加上 aaptOptions 域代码加快 aapt 速度从而加快编译速度，release 版本不要使用。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/AaptOptions.png" alt="这里写图片描述"></p>
+<p>  <img src="AaptOptions.png" alt="这里写图片描述"></p>
 </li>
 <li><p>加快 gradle 编译速度，通过下图中开启增量编译(已废弃)、提高内存、开启守护进程、并行编译、启用新的孵化模式。</p>
-<p>  <img src="/2017/11/20/Android%20Gradle%20%E7%9B%B8%E5%85%B3%E7%9F%A5%E8%AF%86/%E7%BC%96%E8%AF%91%E9%80%9F%E5%BA%A6.png" alt="gradle.properties"></p>
+<p>  <img src="%E7%BC%96%E8%AF%91%E9%80%9F%E5%BA%A6.png" alt="gradle.properties"></p>
 </li>
 </ul>
 
@@ -504,8 +504,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/11/13/JavaScript%20%E5%9F%BA%E7%A1%80/" rel="next" title="JavaScript 基础">
-                <i class="fa fa-chevron-left"></i> JavaScript 基础
+              <a href="/2017/11/15/Java%20%E5%9F%BA%E7%A1%80/" rel="next" title="Java 基础">
+                <i class="fa fa-chevron-left"></i> Java 基础
               </a>
             
           </div>
@@ -597,12 +597,21 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
             
 
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
             
 
             
@@ -654,7 +663,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

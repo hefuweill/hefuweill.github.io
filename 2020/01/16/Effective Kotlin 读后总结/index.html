@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言以前阅读过 Effective Java 感觉很不错，最近看到国外出了本 Effective Kotlin 抱着好奇心买了一本电子书，本文主要记录下，阅读过程中值得注意的地方。参考网址 Medium 。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Effective Kotlin 读后总结">
+<meta property="og:url" content="http://yoursite.com/2020/01/16/Effective%20Kotlin%20%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言以前阅读过 Effective Java 感觉很不错，最近看到国外出了本 Effective Kotlin 抱着好奇心买了一本电子书，本文主要记录下，阅读过程中值得注意的地方。参考网址 Medium 。">
+<meta property="og:image" content="http://yoursite.com/2020/01/16/Effective%20Kotlin%20%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/%E5%AE%B9%E5%99%A8.png">
+<meta property="article:published_time" content="2020-01-16T04:34:53.000Z">
+<meta property="article:modified_time" content="2020-09-30T07:45:08.608Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/01/16/Effective%20Kotlin%20%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/%E5%AE%B9%E5%99%A8.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/01/16/Effective Kotlin 读后总结/"/>
+
+
+
+
+
+  <title>Effective Kotlin 读后总结 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/01/16/Effective%20Kotlin%20%E8%AF%BB%E5%90%8E%E6%80%BB%E7%BB%93/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Effective Kotlin 读后总结</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-01-16T12:34:53+08:00">
+                2020-01-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以前阅读过 Effective Java 感觉很不错，最近看到国外出了本 Effective Kotlin 抱着好奇心买了一本电子书，本文主要记录下，阅读过程中值得注意的地方。参考网址 <a href="https://blog.kotlin-academy.com/@marcinmoskala" target="_blank" rel="noopener">Medium</a> 。<a id="more"></a></p>
+<h2 id="Part-1-Good-code"><a href="#Part-1-Good-code" class="headerlink" title="Part 1: Good code"></a>Part 1: Good code</h2><h3 id="第一章：Safety"><a href="#第一章：Safety" class="headerlink" title="第一章：Safety"></a>第一章：Safety</h3><h4 id="1-限制可变性"><a href="#1-限制可变性" class="headerlink" title="1. 限制可变性"></a>1. 限制可变性</h4><p>Kotlin 对安全所做的支持包括如下几个方面：</p>
+<h5 id="仅读属性-val"><a href="#仅读属性-val" class="headerlink" title="仅读属性 val"></a>仅读属性 val</h5><ol>
+<li>虽然不可变变量默认不可变，但是其可以引用一个可变的对象。</li>
+<li>当其拥有 getter 方法或者属性代理时，其就是可变的了(目的是让 API 变的灵活，后续可以更改)。</li>
+<li>可以通过接口继承将父接口的 val 转变成 var，注意是接口继承，而不是实现。</li>
+<li>不可变 val 编译器会支持智能强转，而可变 val 以及 var 则不支持。</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> name: String? = <span class="string">"Hefuwei"</span></span><br><span class="line"><span class="keyword">val</span> fullName: String?</span><br><span class="line">    <span class="keyword">get</span>() = <span class="string">"Hefuwei"</span></span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (name != <span class="literal">null</span>) &#123;</span><br><span class="line">        println(name.length)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (fullName != <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="comment">// compile error: Smart cast to 'String' is impossible, because 'fullName' is a property that has open or custom getter</span></span><br><span class="line">        println(fullName.length)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：尽管 val 不是一定不可变的，当其拥有 getter 或者代理时就是可变的，通常能使用 val 尽量使用，不能用才考虑使用 var，因为默认 val 不存在线程同步问题。<strong>通过反编译成 Java 如果 val 没有 getter 方法那么就是 final 的，如果有那么就不是 final 的。</strong></p>
+<h5 id="将可变和只可读的容器分开"><a href="#将可变和只可读的容器分开" class="headerlink" title="将可变和只可读的容器分开"></a>将可变和只可读的容器分开</h5><p>Kotlin 中对容器的层次关系进行了重新定义：</p>
+<p><img src="%E5%AE%B9%E5%99%A8.png" alt="image"></p>
+<p>这张图左边的蓝色的表示的是仅读的容器接口，右边的是可变的容器接口，每个可变的容器接口都继承了对应的不可变容器接口，以及继承上级可变容器接口。一共分为三层接口从上到下依次为 Iterable、Collection、List(Set) 等，仅读接口不提供任何修改容器内容的方法，比如 add、clear 等。</p>
+<p>但是并不是 List 类型的对象一定是不可变的，比如 Iterable.map 返回的是 List 类型对象，在  JVM 环境中实际对象是 ArrayList，这么做的原因是考虑到不同平台返回的实现类不同。但是即使我们知道返回的是 ArrayList，但是也不应该向下转型成 ArrayList，因为返回类型在其它平台或者新版本中可能会发生变化。既然方法返回了不可变类型就应该使用该不可变类型，盲目的向下转型可能导致错误。比如以下这个例子：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> list = listOf(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (list <span class="keyword">is</span> MutableList) &#123;</span><br><span class="line">        list.add(<span class="number">3</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 JVM 环境中 listOf 返回的是 Arrays.asList 的结果，Java 中的 List 接口被转换成了 Kotlin 中的 MutableList 接口，但是其不支持 add 等操作，因此抛出不支持异常，所以记住 listOf 返回的是 List 类型，<strong>切记在 Kotlin 中不要将只读容器向下转型为可变容器</strong>。</p>
+<p>如果外界想要使用可变的 List，那么可以使用 toMutableList 将其转换为可变的 List。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> list = listOf(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> mutableList = list.toMutableList()</span><br><span class="line">    mutableList.add(<span class="number">3</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="data-class-的-copy-方法"><a href="#data-class-的-copy-方法" class="headerlink" title="data class 的 copy 方法"></a>data class 的 copy 方法</h5><p>首先说说不可变对象，其优点有很多方面：</p>
+<ol>
+<li>容易推理，因为当它们创建后创建就不发生变化了。</li>
+<li>容易共享给其它模块，因为它们之间不会有冲突。</li>
+<li>可以进行缓存，因为它们不会发生变化，如 Boolean.TRUE，Boolean.FALSE。</li>
+<li>用于可变对象中，不需要对其进行保护性拷贝。</li>
+<li>不可变的对象是构造其他对象的理想材料。</li>
+<li>可以加入到 Set 中或者作为 Map 中的 key (可变对象不要这么干)，因为如果可变对象加入到 Set 中去，可能内部属性发送变化，Map 中就无法找到该 key 对应的 value。</li>
+</ol>
+<p>不可变对象最大的问题是有时候对象内部的数据需要被改变，解决方法是写一个方法产生一个修改数据后的对象。比如 Int 是不可变的，但是其提供了诸如 plus、minus 等方法用于产生一个新的 Int 对象。再比如 Iterable 是只读的，但是标准库中提供了 map、filter 等方法来生成一个新的对象。假设我们需要写一个不可变的 User 类，其支持更改姓名，那么可以这么写：</p>
+ <figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span></span>(<span class="keyword">val</span> surname: String, <span class="keyword">val</span> name: String) &#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">withSurname</span><span class="params">(newSurname: <span class="type">String</span>)</span></span> = User(newSurname, name)</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>但是这种方法存在问题，一旦需要变化的属性很多，那么就要写很多这种方法及其不方便，这时候就可以使用 data class copy 方法通过可选参数支持所有参数更改。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">data</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span></span>(<span class="keyword">val</span> surname: String, <span class="keyword">val</span> name: String)</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> me = User(<span class="string">"何"</span>, <span class="string">"富威"</span>)</span><br><span class="line">    println(me.copy(surname = <span class="string">"王"</span>))</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// outputs: User(surname=王, name=富威)</span></span><br></pre></td></tr></table></figure>
+
+<p>这是一种普遍的将数据类变成不可变的解决方案，确切的说这种方法的效率低于可变对象，但是它拥有上述一系列不可变对象的优点，应该首选这种方式。</p>
+<h5 id="不同种类的可变点"><a href="#不同种类的可变点" class="headerlink" title="不同种类的可变点"></a>不同种类的可变点</h5><p>假设需要一个可变的 List，如下两种方式都可以做到，那么应该选择哪种呢？</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> list1: MutableList&lt;<span class="built_in">Int</span>&gt; = mutableListOf(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="keyword">var</span> list2: List&lt;<span class="built_in">Int</span>&gt; = listOf(<span class="number">2</span>, <span class="number">1</span>)</span><br></pre></td></tr></table></figure>
+
+<p>这两个属性都可以发生变化，使用不同的方式：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    list1.add(<span class="number">3</span>)</span><br><span class="line">    list2 = list2 + <span class="number">3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：+ 号可用原因是 Collection 重载了操作符 plus，方法内部代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">operator</span> <span class="function"><span class="keyword">fun</span> <span class="type">&lt;T&gt;</span> Collection<span class="type">&lt;T&gt;</span>.<span class="title">plus</span><span class="params">(element: <span class="type">T</span>)</span></span>: List&lt;T&gt; &#123;</span><br><span class="line">    <span class="keyword">val</span> result = ArrayList&lt;T&gt;(size + <span class="number">1</span>)</span><br><span class="line">    result.addAll(<span class="keyword">this</span>)</span><br><span class="line">    result.add(element)</span><br><span class="line">    <span class="keyword">return</span> result</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并且上述两者还都可以使用 += 进行添加元素：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    list1 += <span class="number">3</span> <span class="comment">// 转变成 list1.plusAssign(3)</span></span><br><span class="line">    list2 += <span class="number">3</span> <span class="comment">// 转变成 list2 = list2.plus(3)</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述两行代码都是对的，但是两者本质上是不同的，由于 list1 是 MutableList，其重载了操作符 plusAssign，内部就是简简单单往容器中加入一个元素。对于 list2 其是List，只重载了操作符 plus，然后将 plus 调用后的结果再赋值给了 list2。</p>
+<p>第二种方式可以使用属性代理追踪属性的改变，便于调试，并且其还可以限制只能在类内部进行改变(通过私有 setter)：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> names <span class="keyword">by</span> Delegates.observable(listOf&lt;String&gt;()) &#123;</span><br><span class="line">    _, old, new -&gt;</span><br><span class="line">    println(<span class="string">"Names changed from <span class="variable">$old</span> to <span class="variable">$new</span>"</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    names += <span class="string">"Hefuwei"</span></span><br><span class="line">    names += <span class="string">"Wangchunlei"</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* outputs: </span></span><br><span class="line"><span class="comment">Names changed from [] to [Hefuwei]</span></span><br><span class="line"><span class="comment">Names changed from [Hefuwei] to [Hefuwei, Wangchunlei] */</span></span><br></pre></td></tr></table></figure>
+
+<p>简而言之，<strong>使用可变集合是一个稍微快一点的选择，但是使用可变属性可以使我们对对象的更改方式有更多的控制。</strong></p>
+<p>注意：不要既是可变属性又是可变容器，这样会有两个可变点，可变点需要越少越好，同时其不再支持 += 语法，<strong>不要写以下这种代码：</strong></p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">var</span> list3 = mutableListOf(<span class="number">1</span>, <span class="number">2</span>)</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="comment">// error 编译器告知 +、+= 两个扩展方法都支持，没法区分。</span></span><br><span class="line">    list3 += <span class="number">3</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="不要暴露可变点"><a href="#不要暴露可变点" class="headerlink" title="不要暴露可变点"></a>不要暴露可变点</h5><p>设计类时如果需要将内部状态暴露给外部使用，要留个心眼，因为外界可能会误更改状态从而导致错误如：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRepository</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> storedUsers: MutableMap&lt;<span class="built_in">Int</span>, String&gt; = mutableMapOf()</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loadAll</span><span class="params">()</span></span>: MutableMap&lt;<span class="built_in">Int</span>, String&gt; = storedUsers</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>外界可以简简单单通过 loadAll 方法获取到私有状态，并改变。要解决这个问题，可以考虑使用<strong>保护性拷贝</strong>，对于一个*<em>可变的 *</em>data 类对象(不可变的 data 类对象直接返回没问题)，那么直接使用 copy 方法进行保护性拷贝，对于容器类，可以通过将返回类型转变成一个不可变类型解决。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UserRepository</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> storedUsers: MutableMap&lt;<span class="built_in">Int</span>, String&gt; = mutableMapOf()</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">loadAll</span><span class="params">()</span></span>: Map&lt;<span class="built_in">Int</span>, String&gt; = storedUsers</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>主要有以下几点需要注意：</p>
+<ol>
+<li>var、val 优先考虑 val。</li>
+<li>优先考虑不可变属性。</li>
+<li>优先考虑不可变对象。</li>
+<li>对于数据类，如果要改变属性，考虑变成一个不可变的数据类，然后使用 copy 方法改变属性。</li>
+<li>当持有状态时，优先考虑使用不可变容器，因为其可以通过属性代理追踪状态改变。</li>
+<li>尽量减少可变点。</li>
+<li>不要暴露可变的对象。</li>
+</ol>
+<p>但是也不是任何情况下都是要优先考虑不可变，在某些性能优化时可能应该考虑使用可变，书后面应该有讲，现在就做到上面 7 点就行。</p>
+<h4 id="2-最小化变量的作用域"><a href="#2-最小化变量的作用域" class="headerlink" title="2. 最小化变量的作用域"></a>2. 最小化变量的作用域</h4><p>变量的作用域越小，那么程序就更加容易追踪和管理。作用域越大就会有更多导致其变化的地方。</p>
+<ol>
+<li>使用局部变量代替属性。</li>
+<li>尽可能的收紧变量的作用域，比如一个变量只在循环代码中使用，那么就应该定义在代码块中。</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> users = listOf&lt;User&gt;()</span><br><span class="line">    <span class="keyword">var</span> user: User</span><br><span class="line">    <span class="comment">// 第一种</span></span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> users.indices) &#123;</span><br><span class="line">        user = users[i]</span><br><span class="line">        println(<span class="string">"“User at <span class="variable">$i</span> is <span class="variable">$user</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 第二种</span></span><br><span class="line">    <span class="keyword">for</span> (i <span class="keyword">in</span> users.indices) &#123;</span><br><span class="line">        <span class="keyword">val</span> user = users[i]</span><br><span class="line">        println(<span class="string">"“User at <span class="variable">$i</span> is <span class="variable">$user</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 第三种</span></span><br><span class="line">    <span class="keyword">for</span> ((i, user) <span class="keyword">in</span> users.withIndex()) &#123;</span><br><span class="line">        println(<span class="string">"“User at <span class="variable">$i</span> is <span class="variable">$user</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述三种方式应该优先采用第三种，其代码行数更少，并且将 user 的作用域限定在了循环体内。</p>
+<p><strong>无论变量是只读的或者可读可写的，都要在其定义的时候对其进行初始化</strong>，如果不这么做，就会强制开发者去寻找变量在哪里定义了。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 禁止</span></span><br><span class="line"><span class="keyword">val</span> user: User</span><br><span class="line"><span class="keyword">if</span> (hasValue) &#123;</span><br><span class="line">    user = getValue()</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    user = User()</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 推荐</span></span><br><span class="line"><span class="keyword">val</span> user: User = <span class="keyword">if</span> (hasValue) &#123;</span><br><span class="line">    getValue()</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    User()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果需要设置两个变量，解构语法可以派上用场：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="comment">// 禁止</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">updateWeather</span><span class="params">(degrees: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> description: String</span><br><span class="line">    <span class="keyword">val</span> color: <span class="built_in">Int</span></span><br><span class="line">    <span class="keyword">if</span> (degrees &lt; <span class="number">5</span>) &#123;</span><br><span class="line">        description = <span class="string">"cold"</span></span><br><span class="line">        color = Color.BLUE</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (degrees &lt; <span class="number">23</span>) &#123;</span><br><span class="line">        description = <span class="string">"mild"</span></span><br><span class="line">        color = Color.YELLOW</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        description = <span class="string">"hot"</span></span><br><span class="line">        color = Color.RED</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 禁止</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">updateWeather</span><span class="params">(degrees: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> description: String</span><br><span class="line">    <span class="keyword">val</span> color: <span class="built_in">Int</span></span><br><span class="line">    <span class="keyword">when</span> &#123;</span><br><span class="line">        degrees &lt; <span class="number">5</span> -&gt; &#123;</span><br><span class="line">            description = <span class="string">"cold"</span></span><br><span class="line">            color = Color.BLUE</span><br><span class="line">        &#125;</span><br><span class="line">        degrees &lt; <span class="number">23</span> -&gt; &#123;</span><br><span class="line">            description = <span class="string">"mild"</span></span><br><span class="line">            color = Color.YELLOW</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> -&gt; &#123;</span><br><span class="line">            description = <span class="string">"hot"</span></span><br><span class="line">            color = Color.RED</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 推荐</span></span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">updateWeather</span><span class="params">(degrees: <span class="type">Int</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> (description, color) = <span class="keyword">when</span> &#123;</span><br><span class="line">        degrees &lt; <span class="number">5</span> -&gt; <span class="string">"cold"</span> to Color.BLUE</span><br><span class="line">        degrees &lt; <span class="number">23</span> -&gt; <span class="string">"mild"</span> to Color.YELLOW</span><br><span class="line">        <span class="keyword">else</span> -&gt; <span class="string">"hot"</span> to Color.RED</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后面还提到了一个小算法，<strong>给定 2..100 的数字列表，如何获取到该列表中所有素数</strong>？<br>这里有个思路，素数定义是只能被 1 或者本身整除的数字，那么也就是说只要能被 2..x-1 整除的数字就不是素数，首先判断数字列表是否为空，不为空就获取到第一个数字，将其加入到素数列表中去，接着将数字列表中所有可以被第一个数字整除的数字过滤掉，然后看看数字列表中是否还有数字，有的话再进行循环。<strong>由于每次保留的数字列表都是不能被 2..x-1 整除的数字，所以数字列表的第一位一定是素数。</strong> 下面是代码实现：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> numbers = (<span class="number">2</span>..<span class="number">100</span>).toList()</span><br><span class="line">    <span class="keyword">val</span> primes = mutableListOf&lt;<span class="built_in">Int</span>&gt;()</span><br><span class="line">    <span class="keyword">while</span> (numbers.isNotEmpty()) &#123;</span><br><span class="line">        <span class="keyword">val</span> prime = numbers.first()</span><br><span class="line">        primes.add(prime)</span><br><span class="line">        numbers = numbers.filter &#123; it % prime != <span class="number">0</span> &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(primes)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* outputs:</span></span><br><span class="line"><span class="comment">[2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>如果想要创建一个无止境的素数序列，需要这么做：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> primes: Sequence&lt;<span class="built_in">Int</span>&gt; = sequence &#123;</span><br><span class="line">        <span class="keyword">var</span> numbers = generateSequence(<span class="number">2</span>) &#123; it + <span class="number">1</span> &#125;</span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            <span class="keyword">val</span> prime = numbers.first()</span><br><span class="line">            yield(prime)</span><br><span class="line">            numbers = numbers.filter &#123; it % prime != <span class="number">0</span> &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(primes.take(<span class="number">10</span>).toList())</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* outputs:</span></span><br><span class="line"><span class="comment">[2, 3, 5, 7, 11, 13, 17, 19, 23, 29]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>这段代码的基本意思可以搞明白，也就是当调用 toList 时，会执行 Lambda 表达式直到调用一个 yield 方法，然后 suspend，发现 1 个不够，那么 resume 继续执行表达式，直到产生 10 个素数。至于原理由于跟协程有关，暂时先不看。下面对其稍微做下改动：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> primes: Sequence&lt;<span class="built_in">Int</span>&gt; = sequence &#123;</span><br><span class="line">        <span class="keyword">var</span> numbers = generateSequence(<span class="number">2</span>) &#123; it + <span class="number">1</span> &#125;</span><br><span class="line">        <span class="keyword">var</span> prime: <span class="built_in">Int</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">            prime = numbers.first()</span><br><span class="line">            yield(prime)</span><br><span class="line">            numbers = numbers.filter &#123; it % prime != <span class="number">0</span> &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    println(primes.take(<span class="number">10</span>).toList())</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* outputs:</span></span><br><span class="line"><span class="comment">[2, 3, 2, 3, 2, 3, 2, 3, 2, 3]</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+
+<p>只是把 prime 放到了循环体外面，结果就出错了，这是为什么呢？因为 filter 方法是一个中间操作，并不会立即执行，到真正执行的时候 prime 变量的值，早就不是原先那个值了，这种错误排查起来相对来说还是比较麻烦的，所以要最小化变量的作用域。</p>
+<h5 id="总结-1"><a href="#总结-1" class="headerlink" title="总结"></a>总结</h5><p>出于多种原因，必须要最小化变量的作用域，写代码时一定要注意 Lambda 表达式会捕获变量，如果表达式会被延时执行，一定要想想到真正执行的时候，变量的值是否还是所期待的值。</p>
+<h4 id="3-尽可能的消除平台类型"><a href="#3-尽可能的消除平台类型" class="headerlink" title="3. 尽可能的消除平台类型"></a>3. 尽可能的消除平台类型</h4><p>虽然 Kotlin 支持空安全，使得空指针发生的几率很小，或者完全不出现，但是 Java、C 不支持空安全，如果 Kotlin 调用一个返回 String 类型的 Java 方法，那么在 Kotlin 中对应的类型是什么呢？</p>
+<ol>
+<li>如果返回值被注解了 @Nullable 那么会被转换成 String?。</li>
+<li>如果返回值被注解了 @NotNull 那么被转换成 String。</li>
+<li>如果没注解那么转换成 String!。</li>
+</ol>
+<p>为什么不将没注解的也当做 String? 进行处理呢，这样也更安全？原因是有些方法就是不可能返回 null 但是其没注解 @NotNull，如果将这些返回的返回值当做 String? 处理那么很多地方就要使用 !! 进行强转，非常麻烦，比如 Java 方法返回 List&lt;User&gt;，Kotlin 中不仅要把列表当做可空的，还要把列表中的元素当做可空的。<strong>这里书上还提到了一个方法 filterNotNull，其会将容器中所有为空的元素去除返回一个新列表。</strong></p>
+<p>平台类型就是在类型后面加个 !，表示该对象是从其它语言中获取的，拥有未知的可空性。注意：<strong>在 Kotlin 的代码中不能声明一个变量的类型为平台类型。</strong></p>
+<p>平台类型可以转化为非空类型或者是可空类型，亦或是不转化，这取决于开发者自身。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> userRepo = UserRepo()</span><br><span class="line"><span class="keyword">val</span> user1 = userRepo.user</span><br><span class="line"><span class="keyword">val</span> user2: User = userRepo.user</span><br><span class="line"><span class="keyword">val</span> user3: User? = userRepo.user</span><br></pre></td></tr></table></figure>
+
+<p>上面代码中 UserRepo 是一个 Java 类，user1 类型为 User!，user2 被转化为 User，user3 被转化为 User?。因为其也可以转化为非空类型，所以就不再需要很多没必要的强转，但是如果 API 没有被注解成 @NotNull 并且文档描述中也没说明返回值一定不为空，那么这个操作是很危险的，因为就算现在不可能为空，下一个版本也许就可能为空了，因此最好的方式还是把所有<strong>可能被 Kotlin 调用的方法都加上注解</strong>，这样才能有效避免错误，当 Kotlin 成为 Android 第一官方语言后，部分 Android API 也进行了相应的注解，但是还有好大一部分没加。</p>
+<p>以下为所有 Kotlin 可识别的注解：</p>
+<ul>
+<li>JetBrains (@Nullable and @NotNull from org.jetbrains.annotations)</li>
+<li>Android (@Nullable and @NonNull from androidx.annotation as well as from com.android.annotations and from the support library android.support.annotations)</li>
+<li>JSR-305 (@Nullable, @CheckForNull and @Nonnull from javax.annotation)</li>
+<li>JavaX (@Nullable, @CheckForNull, @Nonnull from javax.annotation)</li>
+<li>FindBugs (@Nullable, @CheckForNull, @PossiblyNull and @NonNull from edu.umd.cs.findbugs.annotation</li>
+<li>ReactiveX (@Nullable and @NonNull from io.reactivex.annotations)</li>
+<li>Eclipse (@Nullable and @NonNull from org.eclipse.jdt.annotation)</li>
+<li>Lombok (@NonNull from lombok)</li>
+</ul>
+<p>还有一个原因促使我们消除平台类型：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaClass</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getValue</span><span class="params">()</span> </span>&#123;     </span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> &#125;</span><br><span class="line">  </span><br><span class="line"><span class="comment">// Kotlin</span></span><br><span class="line"><span class="function">fun <span class="title">statedType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   val value: String = JavaClass().value</span><br><span class="line">   <span class="comment">//...</span></span><br><span class="line">   println(value.length)</span><br><span class="line">&#125; </span><br><span class="line"></span><br><span class="line"><span class="function">fun <span class="title">platformType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">   val value = JavaClass().value</span><br><span class="line">   <span class="comment">//...</span></span><br><span class="line">   println(value.length)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于 statedType 会在获取行就抛出 NPE，非常容易定位，而 platformType 要在使用时才会抛出 NPE，可能不好定位。 最后一点，方法返回值不要是平台类型，Idea 会给出警告，需要明确可空性。</p>
+<h5 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h5><p>来自另一种语言且具有未知的可空性类型称为平台类型。由于它们很危险，因此应尽快消除它们，不要让它们传播。使用在公开的Java构造函数，方法和字段上指定可空性，对于使用这些元素的Java和Kotlin开发人员而言，都是宝贵的信息。</p>
+<h4 id="4-不要暴露推导类型"><a href="#4-不要暴露推导类型" class="headerlink" title="4. 不要暴露推导类型"></a>4. 不要暴露推导类型</h4><p>类型推断是 Kotlin 非常受欢迎的功能之一，Java10 也加入了该功能，但是与 Kotlin 相比限制很大。但是使用类型推导时要注意类型推导到的是具体的类型，而不是其父接口、父类：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">Animal</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Zebra</span>: <span class="type">Animal</span></span>()</span><br><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> animal = Zebra() <span class="comment">// 1</span></span><br><span class="line">    animal = Animal()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码1编译不过，原因是将 Zebra() 类型推导成了 Zebra 类型，而不是 Animal 类型。解决这个问题非常简单明确指明 animal 类型为 Animal 就行了：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> animal: Animal = Zebra()</span><br><span class="line">    animal = Animal()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>再来另一个例子，假设要写一个名为CarFactory的接口：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">produce</span><span class="params">()</span></span>: Car</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">Car</span></span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Fiat126P</span>: <span class="type">Car</span></span>()</span><br></pre></td></tr></table></figure>
+
+<p>如果给CarFactory的produce方法返回一个默认对象，可能会这么写：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">produce</span><span class="params">()</span></span> = Fiat126P()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：这段代码有问题，本意 produce 方法返回的是 Car 对象，但是实际上现在被固定死了只能返回 Fiat126P 对象，如果开放这种 API 给用户用，结果可想而知。因此不要将推导类型做为方法的返回类型，同时返回类型也是方法的一个重要信息，使用推导类型不明确，必须要明确的指出返回的具体类型：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">CarFactory</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">produce</span><span class="params">()</span></span>: Car = Fiat126P()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="总结-2"><a href="#总结-2" class="headerlink" title="总结"></a>总结</h5><p>如果不确定类型，则应指定它。这是重要的信息，我们不应将其隐藏。另外，为了安全起见，在暴露给外部的API中，应始终指定类型。不能让它们被意外更改。</p>
+<h4 id="5-指定对参数和状态的期望"><a href="#5-指定对参数和状态的期望" class="headerlink" title="5. 指定对参数和状态的期望"></a>5. 指定对参数和状态的期望</h4><p>当有期望时，尽可能的声明它们，在 Kotlin 中可以使用以下方式：</p>
+<ul>
+<li>require 代码块，一种对参数指定期望的通用方式，不符合抛出 IllegalArgumentException。</li>
+<li>check 代码块，一种对状态指定期望的通用方式，不符合抛出 IllegalStateException。</li>
+<li>assert 代码块，一种检查某个条件是否为真的通用方式，这种检查测试环境才有效。</li>
+<li>Elvis 表达式( ?: ) return 或者 throw  操作。</li>
+</ul>
+<p>下面是书上的一个例子，从这里学到了那个扩展方法 <strong>take</strong> (获取容器前 n 个元素组成一个 List 返回)以及 <strong>drop</strong> (将除了前 n 个元素以外的元素组成一个 List 返回)</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">pop</span><span class="params">(num: <span class="type">Int</span> = <span class="number">1</span>)</span></span>: List&lt;T&gt; &#123;</span><br><span class="line">    require(num &lt;= size) &#123;</span><br><span class="line">        <span class="string">"Cannot remove more elements than current size"</span></span><br><span class="line">    &#125;</span><br><span class="line">    check(isOpen) &#123;</span><br><span class="line">        <span class="string">"Cannot pop from closed stack"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> ret = collection.take(num)</span><br><span class="line">    collection = collection.drop(num)</span><br><span class="line">    assert(ret.size == num)</span><br><span class="line">    <span class="keyword">return</span> ret</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 require 对参数进行了校验，使用 check 对状态进行校验，使用 assert 检查返回列表长度是否与期望长度一致，以这种方式指定期望并不能再文档中省略这些期望，不过它确实是有帮助的：</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/25/LeakCanary2-Android%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="next" title="LeakCanary2-Android 源码分析">
+                <i class="fa fa-chevron-left"></i> LeakCanary2-Android 源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/06/23/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/" rel="prev" title="第三方登录">
+                第三方登录 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Part-1-Good-code"><span class="nav-number">2.</span> <span class="nav-text">Part 1: Good code</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一章：Safety"><span class="nav-number">2.1.</span> <span class="nav-text">第一章：Safety</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-限制可变性"><span class="nav-number">2.1.1.</span> <span class="nav-text">1. 限制可变性</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#仅读属性-val"><span class="nav-number">2.1.1.1.</span> <span class="nav-text">仅读属性 val</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#将可变和只可读的容器分开"><span class="nav-number">2.1.1.2.</span> <span class="nav-text">将可变和只可读的容器分开</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#data-class-的-copy-方法"><span class="nav-number">2.1.1.3.</span> <span class="nav-text">data class 的 copy 方法</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#不同种类的可变点"><span class="nav-number">2.1.1.4.</span> <span class="nav-text">不同种类的可变点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#不要暴露可变点"><span class="nav-number">2.1.1.5.</span> <span class="nav-text">不要暴露可变点</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#总结"><span class="nav-number">2.1.1.6.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-最小化变量的作用域"><span class="nav-number">2.1.2.</span> <span class="nav-text">2. 最小化变量的作用域</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#总结-1"><span class="nav-number">2.1.2.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-尽可能的消除平台类型"><span class="nav-number">2.1.3.</span> <span class="nav-text">3. 尽可能的消除平台类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#总结："><span class="nav-number">2.1.3.1.</span> <span class="nav-text">总结：</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-不要暴露推导类型"><span class="nav-number">2.1.4.</span> <span class="nav-text">4. 不要暴露推导类型</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#总结-2"><span class="nav-number">2.1.4.1.</span> <span class="nav-text">总结</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-指定对参数和状态的期望"><span class="nav-number">2.1.5.</span> <span class="nav-text">5. 指定对参数和状态的期望</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

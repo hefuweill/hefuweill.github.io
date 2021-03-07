@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言最近在写交易虎的消息模块，需要进行买家与客服或者卖家与客服之间的即时通信，因为以前看过 OkHttp 的源码，了解其支持 WebSocket，于是就尝试使用 OkHttp 来实现。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebSocket 聊天">
+<meta property="og:url" content="http://yoursite.com/2020/06/30/WebSocket%20%E8%81%8A%E5%A4%A9/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言最近在写交易虎的消息模块，需要进行买家与客服或者卖家与客服之间的即时通信，因为以前看过 OkHttp 的源码，了解其支持 WebSocket，于是就尝试使用 OkHttp 来实现。">
+<meta property="article:published_time" content="2020-06-30T13:21:33.000Z">
+<meta property="article:modified_time" content="2021-03-07T14:20:48.245Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/06/30/WebSocket 聊天/"/>
+
+
+
+
+
+  <title>WebSocket 聊天 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/30/WebSocket%20%E8%81%8A%E5%A4%A9/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebSocket 聊天</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-30T21:21:33+08:00">
+                2020-06-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在写交易虎的消息模块，需要进行买家与客服或者卖家与客服之间的即时通信，因为以前看过 OkHttp 的源码，了解其支持 WebSocket，于是就尝试使用 OkHttp 来实现。<a id="more"></a></p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>什么是 WebSocket ，它解决了什么问题？WebSocket 协议是为了解决 Http 协议的无状态、短连接和服务端无法主动给客户端推送数据等问题而开发的协议，其通信基础也是基于 TCP。</p>
+<p>WebSocket 协议分为握手和数据传输两部分。</p>
+<h3 id="握手"><a href="#握手" class="headerlink" title="握手"></a>握手</h3><p>握手基于 Http 协议实现，请求格式如下：</p>
+<figure class="highlight http"><table><tr><td class="code"><pre><span class="line"><span class="keyword">GET</span> <span class="string">/chat</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: server.example.com</span><br><span class="line"><span class="attribute">Upgrade</span>: websocket</span><br><span class="line"><span class="attribute">Connection</span>: Upgrade</span><br><span class="line"><span class="attribute">Sec-WebSocket-Key</span>: dGhlIHNhbXBsZSBub25jZQ==</span><br><span class="line"><span class="attribute">Origin</span>: http://example.com</span><br><span class="line"><span class="attribute">Sec-WebSocket-Protocol</span>: chat, superchat</span><br><span class="line"><span class="attribute">Sec-WebSocket-Version</span>: 13</span><br></pre></td></tr></table></figure>
+
+<p>响应格式如下：</p>
+<figure class="highlight http"><table><tr><td class="code"><pre><span class="line">HTTP/1.1 <span class="number">101</span> Switching Protocols</span><br><span class="line"><span class="attribute">Upgrade</span>: websocket</span><br><span class="line"><span class="attribute">Connection</span>: Upgrade</span><br><span class="line"><span class="attribute">Sec-WebSocket-Accept</span>: s3pPLMBiTxaQ9kYGzzhZRbK+xOo=</span><br><span class="line"><span class="attribute">Sec-WebSocket-Protocol</span>: chat</span><br></pre></td></tr></table></figure>
+
+<h3 id="数据传输"><a href="#数据传输" class="headerlink" title="数据传输"></a>数据传输</h3><p>在传输过程中，一条消息有一个或者多个帧组成，帧又分为数据帧以及控制帧，而每一个帧又都包含两个字节的头部信息，结构如下所示：</p>
+<table style="table-layout:fixed">
+    <tr>
+        <th colspan="8" style="text-align:center;vertical-align:middle;">第一字节</th>
+        <th colspan="8" style="text-align:center;vertical-align:middle;">第二字节</th>
+    </tr>
+    <tr>
+        <td style="text-align:center;vertical-align:middle;">0</td>
+        <td style="text-align:center;vertical-align:middle;">1</td>
+        <td style="text-align:center;vertical-align:middle;">2</td>
+        <td style="text-align:center;vertical-align:middle;">3</td>
+        <td style="text-align:center;vertical-align:middle;">4</td>
+        <td style="text-align:center;vertical-align:middle;">5</td>
+        <td style="text-align:center;vertical-align:middle;">6</td>
+        <td style="text-align:center;vertical-align:middle;">7</td>
+        <td style="text-align:center;vertical-align:middle;">0</td>
+        <td style="text-align:center;vertical-align:middle;">1</td>
+        <td style="text-align:center;vertical-align:middle;">2</td>
+        <td style="text-align:center;vertical-align:middle;">3</td>
+        <td style="text-align:center;vertical-align:middle;">4</td>
+        <td style="text-align:center;vertical-align:middle;">5</td>
+        <td style="text-align:center;vertical-align:middle;">6</td>
+        <td style="text-align:center;vertical-align:middle;">7</td>
+    </tr>
+    <tr>
+        <td style="text-align:center;vertical-align:middle;">F</br>I</br>N</td>
+        <td style="text-align:center;vertical-align:middle;">R</br>S</br>V</br>1</td>
+        <td style="text-align:center;vertical-align:middle;">R</br>S</br>V</br>2</td>
+        <td style="text-align:center;vertical-align:middle;">R</br>S</br>V</br>3</td>
+        <td colspan="4" style="text-align:center;vertical-align:middle;">OPCODE</td>
+        <td style="text-align:center;vertical-align:middle;">M</br>A</br>S</br>K</td>
+        <td colspan="7" style="text-align:center;vertical-align:middle;">LENGTH</td>
+    </tr>
+</table>
+
+<p>FIN 位如果被设置为 1，表示该帧是消息的最后一帧。</p>
+<p>RSV1 位为保留位，一般为 0。</p>
+<p>RSV2 位为保留位，一般为 0。</p>
+<p>RSV3 位为保留位，一般为 0。</p>
+<p>OPCODE  占用 4 位。</p>
+<ol>
+<li>0x0 表示一个持续帧。</li>
+<li>0x1 表示一个文本帧。</li>
+<li>0x2 表示一个二进制帧。</li>
+<li>0x3 ~ 0x7 预留给以后的非控制帧。</li>
+<li>0x8 表示一个连接关闭包。</li>
+<li>0x9 ping 表示一个 ping 包。</li>
+<li>0xa pong 表示一个 pong 包。</li>
+<li>0xb ~ 0xf 预留给以后的控制帧。</li>
+</ol>
+<p>MASK 位如果被设置为 1，表示数据必须<strong>经过</strong>掩码处理，数据长度后 4 个字节为掩码，客户端发送的数据必须经过掩码处理，服务端发送的数据必须<strong>不经过</strong>掩码处理。</p>
+<p>LENGTH 占用 7 位，含义需要分成三类：</p>
+<ol>
+<li>如果值为 0 ~ 125 则是数据的真实长度。</li>
+<li>如果值为 126 ，则数据的真实长度由后续 2 个字节记录。</li>
+<li>如果值为 127 ，则数据的真实长度由后续 8 个字节记录。</li>
+</ol>
+<p>完整的数据帧格式如下：</p>
+<pre><code> 0                   1                   2                   3      
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-------+-+-------------+-------------------------------+
+|F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+|I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+| |1|2|3|       |K|             |                               |
++-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+|     Extended payload length continued, if payload len == 127  |
++ - - - - - - - - - - - - - - - +-------------------------------+
+|                               |Masking-key, if MASK set to 1  |
++-------------------------------+-------------------------------+
+| Masking-key (continued)       |          Payload Data         |
++-------------------------------- - - - - - - - - - - - - - - - +
+:                     Payload Data continued ...                :
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                     Payload Data continued ...                |
++---------------------------------------------------------------+</code></pre><p>注：RFC <a href="https://tools.ietf.org/html/rfc6455" target="_blank" rel="noopener">原文文档地址</a> <a href="https://juejin.im/post/6844903753749905422" target="_blank" rel="noopener">翻译文档地址</a></p>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>基本的使用流程为：</p>
+<ol>
+<li>创建 OkHttpClient 实例。</li>
+<li>创建 Request 实例。</li>
+<li>创建 WebSocket 实例。</li>
+</ol>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">main</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> client = createClient(<span class="number">5000</span>)</span><br><span class="line">    <span class="keyword">val</span> request = createRequest(<span class="string">"ws://im.sdh-test.com?token=xxx"</span>)</span><br><span class="line">    <span class="keyword">val</span> webSocket = createWebSocket(client, request, MyWebSocketListener())</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">createClient</span><span class="params">(timeout: <span class="type">Long</span>)</span></span>: OkHttpClient &#123;</span><br><span class="line">    <span class="keyword">val</span> builder = OkHttpClient.Builder()</span><br><span class="line">        .connectTimeout(timeout, TimeUnit.MILLISECONDS)</span><br><span class="line">        .readTimeout(timeout, TimeUnit.MILLISECONDS)</span><br><span class="line">        .writeTimeout(timeout, TimeUnit.MILLISECONDS)</span><br><span class="line">    <span class="keyword">return</span> builder.build()</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">createRequest</span><span class="params">(address: <span class="type">String</span>)</span></span>: Request &#123;</span><br><span class="line">    <span class="keyword">return</span> Request.Builder().url(address).build()</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">createWebSocket</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    client: <span class="type">OkHttpClient</span>, request: <span class="type">Request</span>, listener: <span class="type">WebSocketListener</span>)</span></span>: WebSocket &#123;</span><br><span class="line">    <span class="keyword">return</span> client.newWebSocket(request, listener)</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyWebSocketListener</span>: <span class="type">WebSocketListener</span></span>() &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onOpen</span><span class="params">(webSocket: <span class="type">WebSocket</span>, response: <span class="type">Response</span>)</span></span> &#123;&#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onMessage</span><span class="params">(webSocket: <span class="type">WebSocket</span>, text: <span class="type">String</span>)</span></span> &#123;&#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onClosing</span><span class="params">(webSocket: <span class="type">WebSocket</span>, code: <span class="type">Int</span>, reason: <span class="type">String</span>)</span></span> &#123;&#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onClosed</span><span class="params">(webSocket: <span class="type">WebSocket</span>, code: <span class="type">Int</span>, reason: <span class="type">String</span>)</span></span> &#123;&#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onFailure</span><span class="params">(webSocket: <span class="type">WebSocket</span>, t: <span class="type">Throwable</span>, response: <span class="type">Response</span>?)</span></span> &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上就是 OkHttp 实现 WebSocket 通信的基本使用方式。下面分析下源码。</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><p>Request 实例的创建与普通 http 请求没什么不同，只需注意执行 url 方法时会将 ws: 替换为 http: ，将 wss: 替换为 https:。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="function"><span class="keyword">fun</span> <span class="title">url</span><span class="params">(url: <span class="type">String</span>)</span></span>: Builder &#123;</span><br><span class="line">    <span class="keyword">val</span> finalUrl: String = <span class="keyword">when</span> &#123;</span><br><span class="line">        url.startsWith(<span class="string">"ws:"</span>, ignoreCase = <span class="literal">true</span>) -&gt; &#123;</span><br><span class="line">            <span class="string">"http:<span class="subst">$&#123;url.substring(<span class="number">3</span>)&#125;</span>"</span></span><br><span class="line">        &#125;</span><br><span class="line">        url.startsWith(<span class="string">"wss:"</span>, ignoreCase = <span class="literal">true</span>) -&gt; &#123;</span><br><span class="line">            <span class="string">"https:<span class="subst">$&#123;url.substring(<span class="number">4</span>)&#125;</span>"</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> -&gt; url</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> url(finalUrl.toHttpUrl())</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="OkHttpClient-newWebSocket"><a href="#OkHttpClient-newWebSocket" class="headerlink" title="OkHttpClient.newWebSocket()"></a>OkHttpClient.newWebSocket()</h3><p>源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">newWebSocket</span><span class="params">(request: <span class="type">Request</span>, listener: <span class="type">WebSocketListener</span>)</span></span>: WebSocket &#123;</span><br><span class="line">    <span class="keyword">val</span> webSocket = RealWebSocket(</span><br><span class="line">        taskRunner = TaskRunner.INSTANCE,</span><br><span class="line">        originalRequest = request,</span><br><span class="line">        listener = listener,</span><br><span class="line">        random = Random(),</span><br><span class="line">        pingIntervalMillis = pingIntervalMillis.toLong(),</span><br><span class="line">        extensions = <span class="literal">null</span>, <span class="comment">// Always null for clients.</span></span><br><span class="line">        minimumDeflateSize = minWebSocketMessageToCompress</span><br><span class="line">    )</span><br><span class="line">    webSocket.connect(<span class="keyword">this</span>)</span><br><span class="line">    <span class="keyword">return</span> webSocket</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部创建一个 RealWebSocket 实例，然后调用其 connect 方法（<strong>因此外界不需要手动调用</strong>）。</p>
+<h4 id="RealWebSocket"><a href="#RealWebSocket" class="headerlink" title="RealWebSocket()"></a>RealWebSocket()</h4><p>构造器一共有 7 个参数分别为：</p>
+<ol>
+<li>taskRunner: TaskRunner 内部包含若干工作线程，多个任务队列共享。</li>
+<li>originalRequest: Request 客户端传入的 Request 实例。</li>
+<li>listener: WebSocketListener 客户端传入的 WebSocketListener 实例。</li>
+<li>random: Random 随机值生成器。</li>
+<li>pingIntervalMillis: Long 心跳包发送间隔。</li>
+<li>extensions: WebSocketExtensions? 客户端该字段永远为 null。</li>
+<li>minimumDeflateSize: Long 最小压缩大小，低于该大小不进行压缩。</li>
+</ol>
+<p>newWebSocket 方法<strong>默认心跳包间隔为 0 ms (也就是不发送 ping)</strong>，最小压缩大小为 1024 字节。</p>
+<p>接着看看其 init 代码块：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">init</span> &#123;</span><br><span class="line">    require(<span class="string">"GET"</span> == originalRequest.method) &#123;</span><br><span class="line">        <span class="string">"Request must be GET: <span class="subst">$&#123;originalRequest.method&#125;</span>"</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.key = ByteArray(<span class="number">16</span>).apply &#123; random.nextBytes(<span class="keyword">this</span>) &#125;.toByteString().base64()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部强制要求请求方法为 GET（默认就是 GET），然后创建随机数校验值（创建一个 16 字节随机数数组对其进行 base 64 编码）。</p>
+<h4 id="RealWebSocket-connect"><a href="#RealWebSocket-connect" class="headerlink" title="RealWebSocket.connect()"></a>RealWebSocket.connect()</h4><p>主要逻辑全部在 connect 方法中，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">connect</span><span class="params">(client: <span class="type">OkHttpClient</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (originalRequest.header(<span class="string">"Sec-WebSocket-Extensions"</span>) != <span class="literal">null</span>) &#123;</span><br><span class="line">        failWebSocket(ProtocolException(</span><br><span class="line">            <span class="string">"Request header not permitted: 'Sec-WebSocket-Extensions'"</span>), <span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> webSocketClient = client.newBuilder()</span><br><span class="line">        .eventListener(EventListener.NONE)</span><br><span class="line">        .protocols(ONLY_HTTP1)</span><br><span class="line">        .build()</span><br><span class="line">    <span class="keyword">val</span> request = originalRequest.newBuilder()</span><br><span class="line">        .header(<span class="string">"Upgrade"</span>, <span class="string">"websocket"</span>)</span><br><span class="line">        .header(<span class="string">"Connection"</span>, <span class="string">"Upgrade"</span>)</span><br><span class="line">        .header(<span class="string">"Sec-WebSocket-Key"</span>, key)</span><br><span class="line">        .header(<span class="string">"Sec-WebSocket-Version"</span>, <span class="string">"13"</span>)</span><br><span class="line">        .header(<span class="string">"Sec-WebSocket-Extensions"</span>, <span class="string">"permessage-deflate"</span>)</span><br><span class="line">        .build()</span><br><span class="line">    call = RealCall(webSocketClient, request, forWebSocket = <span class="literal">true</span>)</span><br><span class="line">    call!!.enqueue(<span class="keyword">object</span> : Callback &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResponse</span><span class="params">(call: <span class="type">Call</span>, response: <span class="type">Response</span>)</span></span> &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onFailure</span><span class="params">(call: <span class="type">Call</span>, e: <span class="type">IOException</span>)</span></span> &#123;</span><br><span class="line">            ...</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部首先强制要求不能带请求头 Sec-WebSocket-Extensions 该请求头用于<strong>请求扩展</strong>，接着基于外界传入新建一个 OkHttpClient 实例，修改协议为 HTTP/1.1，基于外界传入新建一个 Request 实例，添加以下 5 个请求头。</p>
+<ol>
+<li>Upgrade: webSocket 表示客户端想要升级协议为 webSocket 。</li>
+<li>Connection: Upgrade 是给代理看的，如果最终服务端没有收到该请求头就会当做普通请求来处理。</li>
+<li>Sec-WebSocket-Key 用于校验，只有当该字段经过固定算法加密后与响应头 Sec-WebSocket-Accept 返回的内容相同时，连接才会被认可。</li>
+<li>Sec-WebSocket-Version 标识了客户端支持的 WebSocket 协议版本目前也只有 13。</li>
+<li>Sec-WebSocket-Extensions 可以有多个该请求头，根据偏好决定先后顺序，但是目前 OkHttp 只支持 permessage-deflate ，表示与对等方协商是否进行 deflate 压缩(  Java 中提供了 java.util.zip.deflater 以及 java.util.zip.inflater ) 对等方如果支持该压缩，那么就返回响应头 Sec-WebSocket-Extensions: permessage-deflate 如果不支持可以不返回该响应头，后续双方都不进行压缩。</li>
+</ol>
+<p>总结下：其中 <strong>Upgrade、Connection、Sec-WebSocket-Version、Sec-WebSocket-Key</strong> 这 4 个请求头必须存在，并且前三个值都是固定值。</p>
+<p>接着和普通 Http 请求一样，都是创建 RealCall ，然后执行 RealCall.enqueue，不过需要注意创建 RealCall 时 forWebSocket = true，这表示不会添加 networkInterceptors。当请求成功后就会执行 onResponse。源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onResponse</span><span class="params">(call: <span class="type">Call</span>, response: <span class="type">Response</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> exchange = response.exchange</span><br><span class="line">    <span class="keyword">val</span> streams: Streams</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        checkUpgradeSuccess(response, exchange)</span><br><span class="line">        streams = exchange!!.newWebSocketStreams()</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: IOException) &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> extensions = WebSocketExtensions.parse(response.headers)</span><br><span class="line">    <span class="keyword">this</span><span class="symbol">@RealWebSocket</span>.extensions = extensions</span><br><span class="line">    <span class="keyword">if</span> (!extensions.isValid()) &#123;</span><br><span class="line">        synchronized(<span class="keyword">this</span><span class="symbol">@RealWebSocket</span>) &#123;</span><br><span class="line">            messageAndCloseQueue.clear() <span class="comment">// Don't transmit any messages.</span></span><br><span class="line">            close(<span class="number">1010</span>, <span class="string">"unexpected Sec-WebSocket-Extensions in response header"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">val</span> name = <span class="string">"<span class="variable">$okHttpName</span> WebSocket <span class="subst">$&#123;request.url.redact()&#125;</span>"</span></span><br><span class="line">        initReaderAndWriter(name, streams)</span><br><span class="line">        listener.onOpen(<span class="keyword">this</span><span class="symbol">@RealWebSocket</span>, response)</span><br><span class="line">        loopReader()</span><br><span class="line">    &#125; <span class="keyword">catch</span> (e: Exception) &#123;</span><br><span class="line">        failWebSocket(e, <span class="literal">null</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="RealWebSocket-checkUpgradeSuccess"><a href="#RealWebSocket-checkUpgradeSuccess" class="headerlink" title="RealWebSocket.checkUpgradeSuccess()"></a>RealWebSocket.checkUpgradeSuccess()</h5><p>当请求成功后检查下响应，检查协议升级是否成功，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">fun</span> <span class="title">checkUpgradeSuccess</span><span class="params">(response: <span class="type">Response</span>, exchange: <span class="type">Exchange</span>?)</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (response.code != <span class="number">101</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(...)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> headerConnection = response.header(<span class="string">"Connection"</span>)</span><br><span class="line">    <span class="keyword">if</span> (!<span class="string">"Upgrade"</span>.equals(headerConnection, ignoreCase = <span class="literal">true</span>)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(...)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> headerUpgrade = response.header(<span class="string">"Upgrade"</span>)</span><br><span class="line">    <span class="keyword">if</span> (!<span class="string">"websocket"</span>.equals(headerUpgrade, ignoreCase = <span class="literal">true</span>)) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(...)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> headerAccept = response.header(<span class="string">"Sec-WebSocket-Accept"</span>)</span><br><span class="line">    <span class="keyword">val</span> acceptExpected = (key + WebSocketProtocol.ACCEPT_MAGIC).encodeUtf8().sha1().base64()</span><br><span class="line">    <span class="keyword">if</span> (acceptExpected != headerAccept) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(...)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (exchange == <span class="literal">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(...)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只有当响应码为 101，含有响应头 Connection: Upgrade、Upgrade: webSocket ，并且响应头 Sec-WebSocket-Accept 的值通过校验，才不会抛出异常，一旦抛出异常那么直接回调 WebSocketListener.onFailure 。</p>
+<h5 id="Exchange-newWebSocketStreams"><a href="#Exchange-newWebSocketStreams" class="headerlink" title="Exchange.newWebSocketStreams()"></a>Exchange.newWebSocketStreams()</h5><p>当通过响应校验后，创建 WebSocketSteam，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">newWebSocketStreams</span><span class="params">()</span></span>: RealWebSocket.Streams &#123;</span><br><span class="line">    <span class="keyword">return</span> codec.connection.newWebSocketStreams(<span class="keyword">this</span>)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// RealConnection.kt</span></span><br><span class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">fun</span> <span class="title">newWebSocketStreams</span><span class="params">(exchange: <span class="type">Exchange</span>)</span></span>: RealWebSocket.Streams &#123;</span><br><span class="line">    <span class="keyword">val</span> socket = <span class="keyword">this</span>.socket!!</span><br><span class="line">    <span class="keyword">val</span> source = <span class="keyword">this</span>.source!!</span><br><span class="line">    <span class="keyword">val</span> sink = <span class="keyword">this</span>.sink!!</span><br><span class="line">    socket.soTimeout = <span class="number">0</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">object</span> : RealWebSocket.Streams(<span class="literal">true</span>, source, sink) &#123;</span><br><span class="line">        <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">close</span><span class="params">()</span></span> &#123;</span><br><span class="line">            exchange.bodyComplete&lt;IOException?&gt;(-<span class="number">1L</span>, responseDone = <span class="literal">true</span>, requestDone = <span class="literal">true</span>, e = <span class="literal">null</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Streams</span></span>(</span><br><span class="line">    <span class="keyword">val</span> client: <span class="built_in">Boolean</span>,</span><br><span class="line">    <span class="keyword">val</span> source: BufferedSource,</span><br><span class="line">    <span class="keyword">val</span> sink: BufferedSink</span><br><span class="line">) : Closeable</span><br></pre></td></tr></table></figure>
+
+<p>内部设置 Socket 超时时间为永久后创建了 Stream 实例返回。</p>
+<h5 id="WebSocketExtensions-parse"><a href="#WebSocketExtensions-parse" class="headerlink" title="WebSocketExtensions.parse()"></a>WebSocketExtensions.parse()</h5><p>创建 WebSocketSteams 完毕后，会解析响应头 Sec-WebSocket-Extensions，如果服务端支持压缩，那么该响应头为 permessage-deflate 并带上以下四个选项中若干个选项。</p>
+<ol>
+<li>client_max_window_bits</li>
+<li>client_no_context_takeover</li>
+<li>server_max_window_bits</li>
+<li>server_no_context_takeover</li>
+</ol>
+<p>这些是一些压缩选项，至此与服务端的握手就已经完成了，下面来看看客户端是如何发消息给服务端的。</p>
+<h3 id="RealWebSocket-send"><a href="#RealWebSocket-send" class="headerlink" title="RealWebSocket.send()"></a>RealWebSocket.send()</h3><p>一共有两个 send 方法供外界调用，参数类型分别为 String 以及 ByteString，分别用于传输文本数据和二进制数据（如图片），源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">send</span><span class="params">(text: <span class="type">String</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> send(text.encodeUtf8(), OPCODE_TEXT)</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">send</span><span class="params">(bytes: <span class="type">ByteString</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> send(bytes, OPCODE_BINARY)</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Synchronized</span> <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">send</span><span class="params">(<span class="keyword">data</span>: <span class="type">ByteString</span>, formatOpcode: <span class="type">Int</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (failed || enqueuedClose) <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    <span class="keyword">if</span> (queueSize + <span class="keyword">data</span>.size &gt; MAX_QUEUE_SIZE) &#123;</span><br><span class="line">        close(CLOSE_CLIENT_GOING_AWAY, <span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    &#125;</span><br><span class="line">    queueSize += <span class="keyword">data</span>.size.toLong()</span><br><span class="line">    messageAndCloseQueue.add(Message(formatOpcode, <span class="keyword">data</span>))</span><br><span class="line">    runWriter()</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">runWriter</span><span class="params">()</span></span> &#123;</span><br><span class="line">    taskQueue.schedule(writerTask)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于内部进行了最大队列限制，因此基于 OkHttp 实现的 WebSocket 不能传输大于等于 16 MB 的文件，这也是正常的，因为 ByteString 会将所有数组保存到内存中，如果过大那么可能导致 OOM，因此在<strong>消息模块开发过程中，对于图片消息不考虑直接将二进制数据进行传输</strong>，而是采用客户端先将消息上传，然后再将图片地址发送给服务端。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">inner</span> <span class="class"><span class="keyword">class</span> <span class="title">WriterTask</span> : <span class="type">Task</span></span>(<span class="string">"<span class="variable">$name</span> writer"</span>) &#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">runOnce</span><span class="params">()</span></span>: <span class="built_in">Long</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (writeOneFrame()) <span class="keyword">return</span> <span class="number">0L</span></span><br><span class="line">        <span class="keyword">return</span> -<span class="number">1L</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">internal</span> <span class="function"><span class="keyword">fun</span> <span class="title">writeOneFrame</span><span class="params">()</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    <span class="keyword">val</span> message = messageOrClose <span class="keyword">as</span> Message</span><br><span class="line">    writer!!.writeMessageFrame(message.formatOpcode, message.<span class="keyword">data</span>)</span><br><span class="line">    synchronized(<span class="keyword">this</span>) &#123;</span><br><span class="line">        queueSize -= message.<span class="keyword">data</span>.size.toLong()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码省略了心跳包，先直接看下 WebSocketWriter 是如何将消息发送出去的。</p>
+<h4 id="WebSocketWriter-writeMessageFrame"><a href="#WebSocketWriter-writeMessageFrame" class="headerlink" title="WebSocketWriter.writeMessageFrame()"></a>WebSocketWriter.writeMessageFrame()</h4><p>WebSocketWriter 用于发送数据给对等方，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">writeMessageFrame</span><span class="params">(formatOpcode: <span class="type">Int</span>, <span class="keyword">data</span>: <span class="type">ByteString</span>)</span></span> &#123;</span><br><span class="line">    messageBuffer.write(<span class="keyword">data</span>)</span><br><span class="line">    <span class="keyword">var</span> b0 = formatOpcode or B0_FLAG_FIN</span><br><span class="line">    <span class="keyword">if</span> (perMessageDeflate &amp;&amp; <span class="keyword">data</span>.size &gt;= minimumDeflateSize) &#123;</span><br><span class="line">        <span class="keyword">val</span> messageDeflater = <span class="keyword">this</span>.messageDeflater</span><br><span class="line">        ?: MessageDeflater(noContextTakeover).also &#123; <span class="keyword">this</span>.messageDeflater = it &#125;</span><br><span class="line">        messageDeflater.deflate(messageBuffer)</span><br><span class="line">        b0 = b0 or B0_FLAG_RSV1</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> dataSize = messageBuffer.size</span><br><span class="line">    sinkBuffer.writeByte(b0)</span><br><span class="line">    <span class="keyword">var</span> b1 = <span class="number">0</span></span><br><span class="line">    b1 = b1 or B1_FLAG_MASK</span><br><span class="line">    <span class="keyword">when</span> &#123;</span><br><span class="line">        dataSize &lt;= PAYLOAD_BYTE_MAX -&gt; &#123;</span><br><span class="line">            b1 = b1 or dataSize.toInt()</span><br><span class="line">            sinkBuffer.writeByte(b1)</span><br><span class="line">        &#125;</span><br><span class="line">        dataSize &lt;= PAYLOAD_SHORT_MAX -&gt; &#123;</span><br><span class="line">            b1 = b1 or PAYLOAD_SHORT</span><br><span class="line">            sinkBuffer.writeByte(b1)</span><br><span class="line">            sinkBuffer.writeShort(dataSize.toInt())</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> -&gt; &#123;</span><br><span class="line">            b1 = b1 or PAYLOAD_LONG</span><br><span class="line">            sinkBuffer.writeByte(b1)</span><br><span class="line">            sinkBuffer.writeLong(dataSize)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    random.nextBytes(maskKey!!)</span><br><span class="line">    sinkBuffer.write(maskKey)</span><br><span class="line">    <span class="keyword">if</span> (dataSize &gt; <span class="number">0L</span>) &#123;</span><br><span class="line">        messageBuffer.readAndWriteUnsafe(maskCursor!!)</span><br><span class="line">        maskCursor.seek(<span class="number">0L</span>)</span><br><span class="line">        toggleMask(maskCursor, maskKey)</span><br><span class="line">        maskCursor.close()</span><br><span class="line">    &#125;</span><br><span class="line">    sinkBuffer.write(messageBuffer, dataSize)</span><br><span class="line">    sink.emit()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大体流程为：</p>
+<ol>
+<li>将需要传入的数据写入 messageBuffer 中。</li>
+<li>拼接第一个字节的头部信息（FIN 、 OPCODE），写入 sinkBuffer 中。可以看出 OkHttp 没有分帧，只发送一帧。</li>
+<li>如果需要压缩，并且当前数据大小大于最小压缩大小，那么先对数据进行压缩，并且将 RSV1 置为 1 ，虽然 该位通常为 0，但是 OkHttp 使用该位表示是压缩消息。</li>
+<li>拼接第二个字节的头部信息（MASK 、 LENGTH）， 写入 sinkBuffer 中。其中 MASK 位必定为 1，LENGTH 根据规则指定。</li>
+<li>如果数据长度大于 125 那么填充 2 或 8 个字节用于表示数据长度。</li>
+<li>生成随机 4 位字节数组做为掩码，写入 sinkBuffer 中。</li>
+<li>将数据进行掩码处理（数据按序与 4 字节数组进行按位异或），并写入 sinkBuffer 中。</li>
+</ol>
+<p>发送消息逻辑分析完毕了，下面分析下客户端是如何接收消息的。</p>
+<h3 id="RealWebSocket-loadReader"><a href="#RealWebSocket-loadReader" class="headerlink" title="RealWebSocket.loadReader()"></a>RealWebSocket.loadReader()</h3><p>读取消息应该是一个不间断操作，在 RealWebConnect.connect 中当握手完毕后会执行 loopRead 方法。代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">loopReader</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (receivedCloseCode == -<span class="number">1</span>) &#123;</span><br><span class="line">        reader!!.processNextFrame()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要对等方没有关闭连接，就会一直尝试读取下一帧，注意该方法运行在子线程，不会阻塞主线程。</p>
+<h4 id="WebSocketReader-processNextFrame"><a href="#WebSocketReader-processNextFrame" class="headerlink" title="WebSocketReader.processNextFrame()"></a>WebSocketReader.processNextFrame()</h4><p>WebSocketReader 用于从对等方读取数据，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">fun</span> <span class="title">processNextFrame</span><span class="params">()</span></span> &#123;</span><br><span class="line">    readHeader()</span><br><span class="line">    <span class="keyword">if</span> (isControlFrame) &#123;</span><br><span class="line">        readControlFrame()</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        readMessageFrame()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="WebSocketRead-readHeader"><a href="#WebSocketRead-readHeader" class="headerlink" title="WebSocketRead.readHeader()"></a>WebSocketRead.readHeader()</h5><p>根据先前介绍的帧结构，每一个帧都会有两个字节的头部信息，因此首先需要读取头部信息，源码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> fun <span class="title">readHeader</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (closed) <span class="keyword">throw</span> IOException(<span class="string">"closed"</span>) <span class="comment">// 1</span></span><br><span class="line">    val b0: Int</span><br><span class="line">    val timeoutBefore = source.timeout().timeoutNanos()</span><br><span class="line">    b0 = source.readByte() and <span class="number">0xff</span> <span class="comment">// 2</span></span><br><span class="line">    opcode = b0 and B0_MASK_OPCODE <span class="comment">// 3</span></span><br><span class="line">    isFinalFrame = b0 and B0_FLAG_FIN != <span class="number">0</span></span><br><span class="line">    isControlFrame = b0 and OPCODE_FLAG_CONTROL != <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> (isControlFrame &amp;&amp; !isFinalFrame) &#123; <span class="comment">// 4</span></span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(<span class="string">"Control frames must be final."</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    val reservedFlag1 = b0 and B0_FLAG_RSV1 != <span class="number">0</span></span><br><span class="line">    when (opcode) &#123; <span class="comment">// 5</span></span><br><span class="line">        OPCODE_TEXT, OPCODE_BINARY -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (reservedFlag1) &#123;</span><br><span class="line">                <span class="keyword">if</span> (!perMessageDeflate) <span class="keyword">throw</span> ProtocolException(<span class="string">"Unexpected rsv1 flag"</span>)</span><br><span class="line">                readingCompressedMessage = <span class="keyword">true</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                readingCompressedMessage = <span class="keyword">false</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> -&gt; &#123;</span><br><span class="line">            <span class="keyword">if</span> (reservedFlag1) <span class="keyword">throw</span> ProtocolException(<span class="string">"Unexpected rsv1 flag"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    val reservedFlag2 = b0 and B0_FLAG_RSV2 != <span class="number">0</span> <span class="comment">// 6</span></span><br><span class="line">    <span class="keyword">if</span> (reservedFlag2) <span class="keyword">throw</span> ProtocolException(<span class="string">"Unexpected rsv2 flag"</span>)</span><br><span class="line">    val reservedFlag3 = b0 and B0_FLAG_RSV3 != <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> (reservedFlag3) <span class="keyword">throw</span> ProtocolException(<span class="string">"Unexpected rsv3 flag"</span>)</span><br><span class="line">    val b1 = source.readByte() and <span class="number">0xff</span> <span class="comment">// 7</span></span><br><span class="line">    val isMasked = b1 and B1_FLAG_MASK != <span class="number">0</span></span><br><span class="line">    <span class="keyword">if</span> (isMasked == isClient) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(<span class="keyword">if</span> (isClient) &#123; <span class="comment">// 8</span></span><br><span class="line">            <span class="string">"Server-sent frames must not be masked."</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="string">"Client-sent frames must be masked."</span></span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">    frameLength = (b1 and B1_MASK_LENGTH).toLong()</span><br><span class="line">    <span class="keyword">if</span> (frameLength == PAYLOAD_SHORT.toLong()) &#123; <span class="comment">// 9</span></span><br><span class="line">        frameLength = (source.readShort() and <span class="number">0xffff</span>).toLong()</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (frameLength == PAYLOAD_LONG.toLong()) &#123;</span><br><span class="line">        frameLength = source.readLong()</span><br><span class="line">        <span class="keyword">if</span> (frameLength &lt; <span class="number">0L</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> ProtocolException(</span><br><span class="line">                <span class="string">"Frame length 0x$&#123;frameLength.toHexString()&#125; &gt; 0x7FFFFFFFFFFFFFFF"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (isControlFrame &amp;&amp; frameLength &gt; PAYLOAD_BYTE_MAX) &#123; <span class="comment">// 10</span></span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(<span class="string">"Control frame must be less than $&#123;PAYLOAD_BYTE_MAX&#125;B."</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (isMasked) &#123;</span><br><span class="line">        source.readFully(maskKey!!)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>如果连接已经关闭了，那么抛出异常。</p>
+</li>
+<li><p>从输入流中读取一个字节（可能阻塞）。</p>
+</li>
+<li><p>从那个字节中获取操作码、是否是最后一帧、是否是控制帧。</p>
+</li>
+<li><p>控制帧必须是最后一帧，如果不是抛出异常。</p>
+</li>
+<li><p>判断是否是压缩消息，虽然 RSV1 通常为 0，但是 OkHttp 使用该位表示是压缩消息。 </p>
+</li>
+<li><p>不允许使用 RSV2、RSV3。</p>
+</li>
+<li><p>从输入流中读取一个字节（头部第二个字节）。</p>
+</li>
+<li><p>服务端发送的帧数据不能经过掩码处理。</p>
+</li>
+<li><p>读取该帧数据长度，最多为 Long 的最大值。</p>
+</li>
+<li><p>控制帧数据长度必须小于等于 125 字节。</p>
+</li>
+</ol>
+<h5 id="WebSocketReader-readControlFrame"><a href="#WebSocketReader-readControlFrame" class="headerlink" title="WebSocketReader.readControlFrame()"></a>WebSocketReader.readControlFrame()</h5><p>如果头部信息中操作码为 0x8、0x9、0xa 分别表示连接关闭、ping、pong，那么就会执行该方法，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">readControlFrame</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (frameLength &gt; <span class="number">0L</span>) &#123;</span><br><span class="line">        source.readFully(controlFrameBuffer, frameLength) <span class="comment">// 1</span></span><br><span class="line">        <span class="keyword">if</span> (!isClient) &#123; <span class="comment">// 2</span></span><br><span class="line">            controlFrameBuffer.readAndWriteUnsafe(maskCursor!!)</span><br><span class="line">            maskCursor.seek(<span class="number">0</span>)</span><br><span class="line">            toggleMask(maskCursor, maskKey!!)</span><br><span class="line">            maskCursor.close()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">when</span> (opcode) &#123;</span><br><span class="line">        OPCODE_CONTROL_PING -&gt; &#123;</span><br><span class="line">            frameCallback.onReadPing(controlFrameBuffer.readByteString()) <span class="comment">// 3</span></span><br><span class="line">        &#125;</span><br><span class="line">        OPCODE_CONTROL_PONG -&gt; &#123;</span><br><span class="line">            frameCallback.onReadPong(controlFrameBuffer.readByteString()) <span class="comment">// 4</span></span><br><span class="line">        &#125;</span><br><span class="line">        OPCODE_CONTROL_CLOSE -&gt; &#123; <span class="comment">// 5</span></span><br><span class="line">            <span class="keyword">var</span> code = CLOSE_NO_STATUS_CODE</span><br><span class="line">            <span class="keyword">var</span> reason = <span class="string">""</span></span><br><span class="line">            <span class="keyword">val</span> bufferSize = controlFrameBuffer.size</span><br><span class="line">            <span class="keyword">if</span> (bufferSize == <span class="number">1L</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> ProtocolException(<span class="string">"Malformed close payload length of 1."</span>)</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (bufferSize != <span class="number">0L</span>) &#123;</span><br><span class="line">                code = controlFrameBuffer.readShort().toInt()</span><br><span class="line">                reason = controlFrameBuffer.readUtf8()</span><br><span class="line">                <span class="keyword">val</span> codeExceptionMessage = WebSocketProtocol.closeCodeExceptionMessage(code)</span><br><span class="line">                <span class="keyword">if</span> (codeExceptionMessage != <span class="literal">null</span>) <span class="keyword">throw</span> ProtocolException(codeExceptionMessage)</span><br><span class="line">            &#125;</span><br><span class="line">            frameCallback.onReadClose(code, reason)</span><br><span class="line">            closed = <span class="literal">true</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> -&gt; &#123;</span><br><span class="line">            <span class="keyword">throw</span> ProtocolException(<span class="string">"Unknown control opcode: "</span> + opcode.toHexString())</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>将该帧的数据部分读取进入 controlFrameBuffer 中。</li>
+<li>如果是服务端那么需要对数据进行掩码处理。</li>
+<li>收到了对等方发来的 ping 控制帧，RealWebSocket  会通知 WebSocketWriter 发送 pong 进行回复。</li>
+<li>收到了对等方发来的 pong 控制帧，RealWebSocket 会标志已收到回复，如果在下次发送 ping 前没收到回复，那么就会回调 onFailure。</li>
+<li>收到了对等方发来的 close 控制帧，拆解关闭码以及原因，关闭连接，回调 onClosing、onClosed。</li>
+</ol>
+<h5 id="WebSocketReader-readMessageFrame"><a href="#WebSocketReader-readMessageFrame" class="headerlink" title="WebSocketReader.readMessageFrame()"></a>WebSocketReader.readMessageFrame()</h5><p>如果头部信息中操作码为 0x1、0x2 那么就会执行该方法，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">readMessageFrame</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">val</span> opcode = <span class="keyword">this</span>.opcode</span><br><span class="line">    <span class="keyword">if</span> (opcode != OPCODE_TEXT &amp;&amp; opcode != OPCODE_BINARY) &#123;</span><br><span class="line">        <span class="keyword">throw</span> ProtocolException(<span class="string">"Unknown opcode: <span class="subst">$&#123;opcode.toHexString()&#125;</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    readMessage() <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">if</span> (readingCompressedMessage) &#123;</span><br><span class="line">        <span class="keyword">val</span> messageInflater = <span class="keyword">this</span>.messageInflater</span><br><span class="line">        ?: MessageInflater(noContextTakeover).also &#123; <span class="keyword">this</span>.messageInflater = it &#125;</span><br><span class="line">        messageInflater.inflate(messageFrameBuffer)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (opcode == OPCODE_TEXT) &#123;</span><br><span class="line">        frameCallback.onReadMessage(messageFrameBuffer.readUtf8())</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        frameCallback.onReadMessage(messageFrameBuffer.readByteString())</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">readMessage</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (closed) <span class="keyword">throw</span> IOException(<span class="string">"closed"</span>)</span><br><span class="line">        <span class="keyword">if</span> (frameLength &gt; <span class="number">0L</span>) &#123;</span><br><span class="line">            source.readFully(messageFrameBuffer, frameLength)</span><br><span class="line">            <span class="keyword">if</span> (!isClient) &#123; <span class="comment">// 2</span></span><br><span class="line">                messageFrameBuffer.readAndWriteUnsafe(maskCursor!!)</span><br><span class="line">                maskCursor.seek(messageFrameBuffer.size - frameLength)</span><br><span class="line">                toggleMask(maskCursor, maskKey!!)</span><br><span class="line">                maskCursor.close()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (isFinalFrame) <span class="keyword">break</span> <span class="comment">// 4</span></span><br><span class="line">        readUntilNonControlFrame()</span><br><span class="line">        <span class="keyword">if</span> (opcode != OPCODE_CONTINUATION) &#123; <span class="comment">// 5</span></span><br><span class="line">            <span class="keyword">throw</span> ProtocolException(<span class="string">"Expected continuation opcode. Got: <span class="subst">$&#123;opcode.toHexString()&#125;</span>"</span>)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">readUntilNonControlFrame</span><span class="params">()</span></span> &#123;</span><br><span class="line">    <span class="keyword">while</span> (!closed) &#123;</span><br><span class="line">        readHeader()</span><br><span class="line">        <span class="keyword">if</span> (!isControlFrame) &#123;</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        &#125;</span><br><span class="line">        readControlFrame() <span class="comment">// 3</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>读取完整的消息，由于数据帧可能有若干帧，因此需要不停的读取直到最终帧。</li>
+<li>如果是服务端，还会对每次收到的数据帧进行掩码处理获取到源码。</li>
+<li>在一系列数据帧中间可能还会夹杂一些控制帧（防止心跳超时），读到后立即处理。</li>
+<li>读取最后一帧后退出循环，根据操作码回调 onReadMessage(String / ByteString)。</li>
+<li>非首帧的帧必须是延续帧，也就是操作码必须要是 0x0。</li>
+</ol>
+<p>至此数据接收流程也分析完毕了，下面看看连接关闭流程。</p>
+<h3 id="RealWebSocket-close"><a href="#RealWebSocket-close" class="headerlink" title="RealWebSocket.close()"></a>RealWebSocket.close()</h3><p>连接双方都可以关闭 WebSocket 连接，如果客户端主动关闭连接，需要调用该方法，源码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Synchronized</span> <span class="function"><span class="keyword">fun</span> <span class="title">close</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    code: <span class="type">Int</span>,</span></span></span><br><span class="line"><span class="function"><span class="params">    reason: <span class="type">String</span>?,</span></span></span><br><span class="line"><span class="function"><span class="params">    cancelAfterCloseMillis: <span class="type">Long</span></span></span></span><br><span class="line"><span class="function"><span class="params">)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">    validateCloseCode(code)</span><br><span class="line">    <span class="keyword">if</span> (failed || enqueuedClose) <span class="keyword">return</span> <span class="literal">false</span></span><br><span class="line">    enqueuedClose = <span class="literal">true</span></span><br><span class="line">    messageAndCloseQueue.add(Close(code, reasonBytes, cancelAfterCloseMillis))</span><br><span class="line">    runWriter()</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">onReadClose</span><span class="params">(code: <span class="type">Int</span>, reason: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">    <span class="keyword">var</span> toClose: Streams? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> readerToClose: WebSocketReader? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> writerToClose: WebSocketWriter? = <span class="literal">null</span></span><br><span class="line">    synchronized(<span class="keyword">this</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (enqueuedClose &amp;&amp; messageAndCloseQueue.isEmpty()) &#123;</span><br><span class="line">            toClose = <span class="keyword">this</span>.streams</span><br><span class="line">            <span class="keyword">this</span>.streams = <span class="literal">null</span></span><br><span class="line">            readerToClose = <span class="keyword">this</span>.reader</span><br><span class="line">            <span class="keyword">this</span>.reader = <span class="literal">null</span></span><br><span class="line">            writerToClose = <span class="keyword">this</span>.writer</span><br><span class="line">            <span class="keyword">this</span>.writer = <span class="literal">null</span></span><br><span class="line">            <span class="keyword">this</span>.taskQueue.shutdown()</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        listener.onClosing(<span class="keyword">this</span>, code, reason)</span><br><span class="line">        <span class="keyword">if</span> (toClose != <span class="literal">null</span>) &#123;</span><br><span class="line">            listener.onClosed(<span class="keyword">this</span>, code, reason)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        toClose?.closeQuietly()</span><br><span class="line">        readerToClose?.closeQuietly()</span><br><span class="line">        writerToClose?.closeQuietly()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用 WebSocketWriter 发送一个关闭控制帧给服务端，当接收到服务端的关闭控制帧后关闭连接回调 onClosing、onClosed。</p>
+<h2 id="实例使用"><a href="#实例使用" class="headerlink" title="实例使用"></a>实例使用</h2><p>实际使用场景也就是买家与客服以及卖家与客服之间的聊天，主要逻辑也就是进入页面，拉取历史聊天记录，然后连接 WebSocket ，连接成功后用户就可以发送消息了，用户可以发文本以及图片消息，文本消息那么直接传递文本给服务端，图片消息就先上传到七牛云，然后将图片连接发送给服务端就行。如果异常情况导致连接断开，那么尝试几次重连，此外监听网络变化，如果当前网络从无连接到已连接那么也尝试下重连。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/06/28/Base64%20%E7%BC%96%E7%A0%81/" rel="next" title="Base64 编码">
+                <i class="fa fa-chevron-left"></i> Base64 编码
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" rel="prev" title="Gradle 执行流程">
+                Gradle 执行流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#握手"><span class="nav-number">2.1.</span> <span class="nav-text">握手</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数据传输"><span class="nav-number">2.2.</span> <span class="nav-text">数据传输</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本使用"><span class="nav-number">3.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">4.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#OkHttpClient-newWebSocket"><span class="nav-number">4.1.</span> <span class="nav-text">OkHttpClient.newWebSocket()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RealWebSocket"><span class="nav-number">4.1.1.</span> <span class="nav-text">RealWebSocket()</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RealWebSocket-connect"><span class="nav-number">4.1.2.</span> <span class="nav-text">RealWebSocket.connect()</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#RealWebSocket-checkUpgradeSuccess"><span class="nav-number">4.1.2.1.</span> <span class="nav-text">RealWebSocket.checkUpgradeSuccess()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Exchange-newWebSocketStreams"><span class="nav-number">4.1.2.2.</span> <span class="nav-text">Exchange.newWebSocketStreams()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WebSocketExtensions-parse"><span class="nav-number">4.1.2.3.</span> <span class="nav-text">WebSocketExtensions.parse()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RealWebSocket-send"><span class="nav-number">4.2.</span> <span class="nav-text">RealWebSocket.send()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#WebSocketWriter-writeMessageFrame"><span class="nav-number">4.2.1.</span> <span class="nav-text">WebSocketWriter.writeMessageFrame()</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RealWebSocket-loadReader"><span class="nav-number">4.3.</span> <span class="nav-text">RealWebSocket.loadReader()</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#WebSocketReader-processNextFrame"><span class="nav-number">4.3.1.</span> <span class="nav-text">WebSocketReader.processNextFrame()</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#WebSocketRead-readHeader"><span class="nav-number">4.3.1.1.</span> <span class="nav-text">WebSocketRead.readHeader()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WebSocketReader-readControlFrame"><span class="nav-number">4.3.1.2.</span> <span class="nav-text">WebSocketReader.readControlFrame()</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#WebSocketReader-readMessageFrame"><span class="nav-number">4.3.1.3.</span> <span class="nav-text">WebSocketReader.readMessageFrame()</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RealWebSocket-close"><span class="nav-number">4.4.</span> <span class="nav-text">RealWebSocket.close()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例使用"><span class="nav-number">5.</span> <span class="nav-text">实例使用</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

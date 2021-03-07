@@ -124,7 +124,7 @@
 <meta property="og:site_name" content="何富威的博客">
 <meta property="og:description" content="前言LeakCanary 是 Square 公司为 Android 开发者提供的一个自动检测内存泄漏的工具，在4月23日推出了2.0预览版，更新内容见 Github，其中新增了一个 LeakSentry 库，该库作为 LeakCanary 的开关，可以实时查看那些被观察的对象是否可能内存泄露，并且可以独立引入使用，下面从源码角度来分析下该库，本文基于 2.0-alpha-2。">
 <meta property="article:published_time" content="2019-06-18T06:12:10.000Z">
-<meta property="article:modified_time" content="2020-05-11T13:47:11.125Z">
+<meta property="article:modified_time" content="2020-05-14T11:00:22.641Z">
 <meta property="article:author" content="何富威">
 <meta name="twitter:card" content="summary">
 
@@ -366,7 +366,7 @@
       
 
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>LeakCanary 是 Square 公司为 Android 开发者提供的一个自动检测内存泄漏的工具，在4月23日推出了2.0预览版，更新内容见 <a href="https://github.com/square/leakcanary/blob/master" target="_blank" rel="noopener">Github</a>，其中新增了一个 LeakSentry 库，该库作为 LeakCanary 的开关，可以实时查看那些被观察的对象是否可能内存泄露，并且可以独立引入使用，下面从源码角度来分析下该库，本文基于 2.0-alpha-2。<a id="more"></a></p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>LeakCanary 是 Square 公司为 Android 开发者提供的一个自动检测内存泄漏的工具，在4月23日推出了2.0预览版，更新内容见 <a href="https://github.com/square/leakcanary" target="_blank" rel="noopener">Github</a>，其中新增了一个 LeakSentry 库，该库作为 LeakCanary 的开关，可以实时查看那些被观察的对象是否可能内存泄露，并且可以独立引入使用，下面从源码角度来分析下该库，本文基于 2.0-alpha-2。<a id="more"></a></p>
 <h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><h3 id="LeakSentryInstaller-onCreate"><a href="#LeakSentryInstaller-onCreate" class="headerlink" title="LeakSentryInstaller.onCreate"></a>LeakSentryInstaller.onCreate</h3><p>首先查看其 manifest 文件，发现其中注册了一个名叫 LeakSentryInstaller 的 ContentProvider，因此其onCreate 方法会在 Application.onCreate 之前得到执行，原因如下：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ActivityThread.java</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">handleBindApplication</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    Application app = data.info.makeApplication(data.restrictedBackupMode, <span class="keyword">null</span>);</span><br><span class="line">    <span class="keyword">if</span> (!ArrayUtils.isEmpty(data.providers)) &#123;</span><br><span class="line">        installContentProviders(app, data.providers);</span><br><span class="line">    &#125;</span><br><span class="line">    mInstrumentation.callApplicationOnCreate(app);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">installContentProviders</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    installProvider(...);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> IActivityManager.<span class="function">ContentProviderHolder <span class="title">installProvider</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    ContentProvider localProvider = <span class="keyword">null</span>;</span><br><span class="line">    localProvider = (ContentProvider)cl.loadClass(info.name).newInstance();</span><br><span class="line">    localProvider.attachInfo(c, info);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// ContentProvider.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">attachInfo</span><span class="params">(Context context, ProviderInfo info)</span> </span>&#123;</span><br><span class="line">    attachInfo(context, info, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">attachInfo</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">    ContentProvider.<span class="keyword">this</span>.onCreate();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -525,12 +525,21 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
             
 
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
             
 
             
@@ -582,7 +591,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>

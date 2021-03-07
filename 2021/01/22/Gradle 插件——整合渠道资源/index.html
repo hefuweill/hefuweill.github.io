@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言公司现有渠道 SDK 接入需要使用两个工程，首先在粘合工程编写粘合代码测试完毕后需要手动将粘合代码打成一个 jar 包，然后移动该 jar 包以及相关资源到 SDK 工程，接着再手动打成 zip 包上传 oss，同时同步信息到 oms 后台，过程非常繁琐。于是我就开发了该插件用于解决该问题。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle 插件——整合渠道资源">
+<meta property="og:url" content="http://yoursite.com/2021/01/22/Gradle%20%E6%8F%92%E4%BB%B6%E2%80%94%E2%80%94%E6%95%B4%E5%90%88%E6%B8%A0%E9%81%93%E8%B5%84%E6%BA%90/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言公司现有渠道 SDK 接入需要使用两个工程，首先在粘合工程编写粘合代码测试完毕后需要手动将粘合代码打成一个 jar 包，然后移动该 jar 包以及相关资源到 SDK 工程，接着再手动打成 zip 包上传 oss，同时同步信息到 oms 后台，过程非常繁琐。于是我就开发了该插件用于解决该问题。">
+<meta property="article:published_time" content="2021-01-22T05:13:17.000Z">
+<meta property="article:modified_time" content="2021-03-07T14:17:43.892Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2021/01/22/Gradle 插件——整合渠道资源/"/>
+
+
+
+
+
+  <title>Gradle 插件——整合渠道资源 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/22/Gradle%20%E6%8F%92%E4%BB%B6%E2%80%94%E2%80%94%E6%95%B4%E5%90%88%E6%B8%A0%E9%81%93%E8%B5%84%E6%BA%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gradle 插件——整合渠道资源</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2021-01-22T13:13:17+08:00">
+                2021-01-22
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%89%93%E5%8C%85%E6%9E%84%E5%BB%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">打包构建</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>公司现有渠道 SDK 接入需要使用两个工程，首先在粘合工程编写粘合代码测试完毕后需要手动将粘合代码打成一个 jar 包，然后移动该 jar 包以及相关资源到 SDK 工程，接着再手动打成 zip 包上传 oss，同时同步信息到 oms 后台，过程非常繁琐。于是我就开发了该插件用于解决该问题。<a id="more"></a></p>
+<h3 id="需求分析"><a href="#需求分析" class="headerlink" title="需求分析"></a>需求分析</h3><p>目标为将两个工程合并成一个，执行一个 Task 就会自动执行以下操作：</p>
+<ol>
+<li>抽取粘合代码并打成 jar 包，并拷贝到 build/pack 目录下。</li>
+<li>迁移相关资源文件夹 res、libs、assets 及 sdk_script 文件到 build/pack 目录下。</li>
+<li>根据 AndroidManifest.xml 自动生成 SDKManifest.xml。</li>
+<li>根据 Gradle 配置信息生成 config.xml。</li>
+<li>将上述资源打包成 zip 包。</li>
+<li>上传 zip 包到 oss 后台，更新 oms 后台 sdk 版本及下载链接。</li>
+<li>自动更新 versionCode，确保每次打包使用最新资源。</li>
+</ol>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><p>首先根据上篇文章，自定义插件类 PackPlugin，先不急于实现逻辑，分析下是否需要配置信息，很明显需要，于是创建类 PackExtension，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackExtension</span> </span>&#123;</span><br><span class="line">    <span class="keyword">var</span> sdkName: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> proxyApp: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> userClass: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> payClass: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> versionName: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> versionCode: <span class="built_in">Int</span> = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> channelId: <span class="built_in">Int</span> = <span class="number">0</span></span><br><span class="line">    <span class="keyword">var</span> username: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> password: String? = <span class="literal">null</span></span><br><span class="line">    <span class="keyword">var</span> environment: PackEnv = PackEnv.DEV</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>定义好了配置，那么就来实现功能，首先是第一步。自定义 Task 类 PackJarTask ，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackJarTask</span>: <span class="type">Jar</span></span>() &#123;</span><br><span class="line">    <span class="keyword">init</span> &#123;</span><br><span class="line">        project.afterEvaluate &#123;</span><br><span class="line">            it.delete(TEMP_DIR, OUTPUT_DIR)</span><br><span class="line">            from(SOURCE_DIR)</span><br><span class="line">            into(<span class="string">""</span>)</span><br><span class="line">            exclude(<span class="string">"BuildConfig.class"</span>, <span class="string">"R.class"</span>)</span><br><span class="line">            exclude &#123; element -&gt;</span><br><span class="line">                element.name.startsWith(<span class="string">"R$"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            destinationDir = project.file(TEMP_DIR)</span><br><span class="line">            baseName = it.extension.sdkName</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意父类 Jar 类会实现打包，所有只需要在 init 代码块中配置好输入输出即可，第一步完成后那么来实现第二步。自定义 Task 类 PackMoveTask ，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackMoveTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">runTask</span><span class="params">()</span></span> &#123;</span><br><span class="line">        with(project) &#123;</span><br><span class="line">            copy &#123;</span><br><span class="line">                it.from(<span class="string">"libs"</span>)</span><br><span class="line">                it.into(<span class="string">"<span class="variable">$TEMP_DIR</span>/libs"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            copy &#123;</span><br><span class="line">                it.from(<span class="string">"src/main/res"</span>)</span><br><span class="line">                it.into(<span class="string">"<span class="variable">$TEMP_DIR</span>/res"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            copy &#123;</span><br><span class="line">                it.from(<span class="string">"src/main/assets"</span>)</span><br><span class="line">                it.into(<span class="string">"<span class="variable">$TEMP_DIR</span>/assets"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            copy &#123;</span><br><span class="line">                it.from(<span class="string">"extraFiles"</span>)</span><br><span class="line">                it.into(<span class="string">"<span class="variable">$TEMP_DIR</span>/extraFiles"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">            copy &#123;</span><br><span class="line">                it.from(<span class="string">"sdk_script.py"</span>)</span><br><span class="line">                it.into(<span class="string">"<span class="variable">$TEMP_DIR</span>/"</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步就是简单的拷贝资源，第二步完成后那么来实现第三步。自定义 Task 类 PackManifest ，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackManifestTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">runTask</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> proxyApp = project.extension.proxyApp</span><br><span class="line">        <span class="keyword">val</span> manifest = project.file(<span class="string">"src/main/AndroidManifest.xml"</span>)</span><br><span class="line">        <span class="keyword">val</span> rootNode = XmlParser(<span class="literal">false</span>, <span class="literal">false</span>).parse(manifest)</span><br><span class="line">        <span class="keyword">val</span> permissions = rootNode.<span class="keyword">get</span>(<span class="string">"uses-permission"</span>) <span class="keyword">as</span> NodeList</span><br><span class="line">        <span class="keyword">val</span> applications = rootNode.<span class="keyword">get</span>(<span class="string">"application"</span>) <span class="keyword">as</span> NodeList</span><br><span class="line">        <span class="keyword">if</span> (applications.isNullOrEmpty() || applications.size &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> RuntimeException(<span class="string">"application config error, please fix it first."</span>)</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">val</span> application = applications[<span class="number">0</span>] <span class="keyword">as</span> Node</span><br><span class="line">        <span class="keyword">val</span> xml = xml(<span class="string">"manifest"</span>, <span class="string">"UTF-8"</span>, XmlVersion.V10) &#123;</span><br><span class="line">            attribute(<span class="string">"xmlns:android"</span>, <span class="string">"http://schemas.android.com/apk/res/android"</span>)</span><br><span class="line">            <span class="string">"permissionConfig"</span> &#123;</span><br><span class="line">                permissions.forEach &#123;</span><br><span class="line">                    <span class="keyword">if</span> (it <span class="keyword">is</span> Node) &#123;</span><br><span class="line">                        <span class="string">"uses-permission"</span> &#123;</span><br><span class="line">                            attribute(<span class="string">"android:name"</span>, it.attribute(<span class="string">"android:name"</span>))</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="string">"applicationConfig"</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (!proxyApp.isNullOrEmpty()) &#123;</span><br><span class="line">                    attribute(<span class="string">"proxyApplication"</span>, proxyApp)</span><br><span class="line">                &#125;</span><br><span class="line">                application.children().forEach &#123; node -&gt;</span><br><span class="line">                    <span class="keyword">if</span> (node <span class="keyword">is</span> Node) &#123;</span><br><span class="line">                        handleComponent(<span class="keyword">this</span>, node, node.name().toString())</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        project.file(<span class="string">"<span class="variable">$TEMP_DIR</span>/SDKManifest.xml"</span>).writeText(xml.toString())</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 1. 创建当前节点</span></span><br><span class="line"><span class="comment">     * 2. 处理当前节点属性</span></span><br><span class="line"><span class="comment">     * 3. 处理子节点（递归）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">handleComponent</span><span class="params">(parentNode: <span class="type">KNode</span>, sourceNode: <span class="type">Node</span>, name: <span class="type">String</span>)</span></span> &#123;</span><br><span class="line">        with(parentNode) &#123;</span><br><span class="line">            name &#123;</span><br><span class="line">                handleAttributes(<span class="keyword">this</span>, sourceNode)</span><br><span class="line">                sourceNode.children().forEach &#123; subNode -&gt;</span><br><span class="line">                    <span class="keyword">if</span> (subNode <span class="keyword">is</span> Node) &#123;</span><br><span class="line">                        handleComponent(<span class="keyword">this</span>, subNode, subNode.name().toString())</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 处理节点属性</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">handleAttributes</span><span class="params">(parentNode: <span class="type">KNode</span>, sourceNode: <span class="type">Node</span>)</span></span> &#123;</span><br><span class="line">        sourceNode.attributes().entries.forEach &#123; entry -&gt;</span><br><span class="line">            <span class="keyword">if</span> (entry <span class="keyword">is</span> MutableMap.MutableEntry&lt;*, *&gt;) &#123;</span><br><span class="line">                parentNode.attribute(entry.key.toString(), entry.value.toString())</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步稍稍复杂，首先借助了 XmlParser 解析 AndroidManifest.xml ，然后借助代码库 <a href="https://github.com/redundent/kotlin-xml-builder" target="_blank" rel="noopener">kotlin-xml-builder</a> 以 DSL 的形式构建 SDKManifest.xml 。第三步完成了那么来实现第四步。自定义 Task 类 PackConfigTask ，代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">open class PackConfigTask : DefaultTask() &#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function">fun <span class="title">runTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        val extension = project.extension</span><br><span class="line">        val sdkName = extension.sdkName.orEmpty()</span><br><span class="line">        val versionName = extension.versionName.orEmpty()</span><br><span class="line">        val versionCode = extension.versionCode</span><br><span class="line">        val xml = xml(<span class="string">"config"</span>, <span class="string">"UTF-8"</span>, XmlVersion.V10) &#123;</span><br><span class="line">            <span class="string">"operations"</span> &#123;</span><br><span class="line">                <span class="string">"operation"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"step"</span>, <span class="number">1</span>)</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"mergeManifest"</span>)</span><br><span class="line">                    attribute(<span class="string">"from"</span>, <span class="string">"SDKManifest.xml"</span>)</span><br><span class="line">                    attribute(<span class="string">"to"</span>, <span class="string">"AndroidManifest.xml"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="string">"operation"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"step"</span>, <span class="number">2</span>)</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"copyRes"</span>)</span><br><span class="line">                    attribute(<span class="string">"from"</span>, <span class="string">"assets"</span>)</span><br><span class="line">                    attribute(<span class="string">"to"</span>, <span class="string">"assets"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="string">"operation"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"step"</span>, <span class="number">3</span>)</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"copyRes"</span>)</span><br><span class="line">                    attribute(<span class="string">"from"</span>, <span class="string">"libs"</span>)</span><br><span class="line">                    attribute(<span class="string">"to"</span>, <span class="string">"libs"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="string">"operation"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"step"</span>, <span class="number">4</span>)</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"copyRes"</span>)</span><br><span class="line">                    attribute(<span class="string">"from"</span>, <span class="string">"res"</span>)</span><br><span class="line">                    attribute(<span class="string">"to"</span>, <span class="string">"res"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="string">"plugins"</span> &#123;</span><br><span class="line">                <span class="string">"plugin"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"name"</span>, project.extension.userClass.orEmpty())</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"1"</span>)</span><br><span class="line">                    attribute(<span class="string">"desc"</span>, <span class="string">"用户登录接口"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="string">"plugin"</span> &#123;</span><br><span class="line">                    attribute(<span class="string">"name"</span>, project.extension.payClass.orEmpty())</span><br><span class="line">                    attribute(<span class="string">"type"</span>, <span class="string">"2"</span>)</span><br><span class="line">                    attribute(<span class="string">"desc"</span>, <span class="string">"用户支付接口"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="string">"version"</span> &#123;</span><br><span class="line">                <span class="string">"name"</span> &#123;</span><br><span class="line">                    <span class="string">"name"</span> &#123;</span><br><span class="line">                        text(sdkName)</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="string">"versionName"</span> &#123;</span><br><span class="line">                        text(versionName)</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="string">"versionCode"</span> &#123;</span><br><span class="line">                        text(versionCode.toString())</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        project.file(<span class="string">"$TEMP_DIR/config.xml"</span>).writeText(xml.toString())</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步就是读取 PackExtension 中定义的配置信息，将其写入 config.xml 中，第四步完成了那么实现第五步，自定义 Task 类 PackZipTask ，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackZipTask</span> : <span class="type">Zip</span></span>() &#123;</span><br><span class="line">    <span class="keyword">init</span> &#123;</span><br><span class="line">        project.afterEvaluate &#123;</span><br><span class="line">            <span class="keyword">val</span> sdkName = project.extension.sdkName</span><br><span class="line">            requireNotNull(sdkName) &#123;</span><br><span class="line">                <span class="string">"sdk name is empty!"</span></span><br><span class="line">            &#125;</span><br><span class="line">            from(<span class="string">"<span class="variable">$TEMP_DIR</span>/"</span>)</span><br><span class="line">            into(sdkName)</span><br><span class="line">            include(<span class="string">"**/*"</span>)</span><br><span class="line">            archiveName = <span class="string">"<span class="variable">$sdkName</span>.zip"</span></span><br><span class="line">            destinationDir = project.file(OUTPUT_DIR)</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步和第一步类似，父类 Zip 类会完成打包操作，只需在 init 代码块中配置好输入输出即可。第五步完成了那么实现第六步上传 oss 后台，并更新 oms 信息。自定义 Task 类 PackUploadTask。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackUploadTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">runTask</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> sdkFile = getSdkFile()</span><br><span class="line">        require(sdkFile.exists()) &#123;</span><br><span class="line">            SDK_NOT_EXIST</span><br><span class="line">        &#125;</span><br><span class="line">        uploadSDKFile(NetworkManager.getSdkInfo(project))</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getSdkFile</span><span class="params">()</span></span>: File &#123;</span><br><span class="line">        <span class="keyword">return</span> project.file(<span class="string">"<span class="variable">$OUTPUT_DIR</span>/<span class="subst">$&#123;project.extension.sdkName&#125;</span>.zip"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">uploadSDKFile</span><span class="params">(sdkInfo: <span class="type">SdkInfo</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> sdkFile = getSdkFile()</span><br><span class="line">        <span class="keyword">val</span> sdkUrl = <span class="string">"<span class="variable">$OSS_URL</span><span class="subst">$&#123;getUploadKey(sdkFile)&#125;</span>"</span></span><br><span class="line">        <span class="keyword">val</span> ossClient = OSSClientBuilder()</span><br><span class="line">            .build(END_POINT, ACCESS_KEY_ID, SECRET_ACCESS_KEY)</span><br><span class="line">        <span class="keyword">val</span> uploadReq = PutObjectRequest(BUCKET_NAME, getUploadKey(sdkFile), sdkFile)</span><br><span class="line">        uploadReq.progressListener = <span class="keyword">object</span> : ProgressListener &#123;</span><br><span class="line">            <span class="keyword">private</span> <span class="keyword">var</span> total = <span class="number">0L</span></span><br><span class="line">            <span class="keyword">private</span> <span class="keyword">var</span> bytes = <span class="number">0L</span></span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">progressChanged</span><span class="params">(event: <span class="type">ProgressEvent</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">when</span> (event.eventType) &#123;</span><br><span class="line">                    ProgressEventType.TRANSFER_STARTED_EVENT -&gt; &#123;</span><br><span class="line">                        println(<span class="string">"start upload please wait..."</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                    ProgressEventType.REQUEST_CONTENT_LENGTH_EVENT -&gt; &#123;</span><br><span class="line">                        total = event.bytes</span><br><span class="line">                        println(<span class="string">"upload total size is: <span class="variable">$total</span>"</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                    ProgressEventType.REQUEST_BYTE_TRANSFER_EVENT -&gt; &#123;</span><br><span class="line">                        bytes += event.bytes</span><br><span class="line">                        println(<span class="string">"upload progress is: <span class="subst">$&#123;bytes.toFloat() / total&#125;</span>"</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                    ProgressEventType.TRANSFER_COMPLETED_EVENT -&gt; &#123;</span><br><span class="line">                        NetworkManager.modifySdkInfo(project, sdkUrl, sdkInfo)</span><br><span class="line">                    &#125;</span><br><span class="line">                    ProgressEventType.TRANSFER_FAILED_EVENT -&gt; &#123;</span><br><span class="line">                        <span class="keyword">throw</span> RuntimeException(<span class="string">"upload to oss failed"</span>)</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span> -&gt; &#123; &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">        ossClient.putObject(uploadReq)</span><br><span class="line">        ossClient.shutdown()</span><br><span class="line">        println(<span class="string">"upload success. The url is <span class="variable">$sdkUrl</span>"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">getUploadKey</span><span class="params">(sdkFile: <span class="type">File</span>)</span></span>: String &#123;</span><br><span class="line">        <span class="keyword">val</span> environment = project.extension.environment</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"sdk/<span class="subst">$&#123;environment.name&#125;</span>/<span class="subst">$&#123;sdkFile.name&#125;</span>"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步首先使用 PackExtension 配置的用户名和密码登录 oms 后台，并获取到 token，然后将上个 Task 生成的 zip 包上传到了 oss 后台，然后调用调用接口修复 oms 后台 sdk 信息（带上 token）。上传完成后就只剩下最后一步了更新版本号，自定义 Task 类 PackTask ，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">open</span> <span class="class"><span class="keyword">class</span> <span class="title">PackTask</span> : <span class="type">DefaultTask</span></span>() &#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">fun</span> <span class="title">runTask</span><span class="params">()</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> versionFile = project.file(VERSION_FILE_NAME)</span><br><span class="line">        <span class="keyword">if</span> (versionFile.exists()) &#123;</span><br><span class="line">            Properties().apply &#123;</span><br><span class="line">                load(versionFile.inputStream())</span><br><span class="line">                <span class="keyword">val</span> nextVersion = (getProperty(VERSION_CODE).toInt() + <span class="number">1</span>).toString()</span><br><span class="line">                setProperty(VERSION_CODE, nextVersion)</span><br><span class="line">                store(versionFile.outputStream(), <span class="string">"auto increment"</span>)</span><br><span class="line">                println(<span class="string">"Next version is <span class="variable">$nextVersion</span>."</span>)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        println(<span class="string">"The replacement is successful."</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这一步也就是读取 properties 文件，然后将其 versionCode 自增 1 写入。至此逻辑全部完成了，现在可以编写 PackPlugin 类了，代码如下：</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PackPlugin</span> : <span class="type">Plugin</span>&lt;<span class="type">Project</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">apply</span><span class="params">(project: <span class="type">Project</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> extension = project.extensions.create(EXTENSION_NAME, PackExtension::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packJarTask = project.tasks.create(TASK_JAR_NAME, PackJarTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packMoveTask = project.tasks.create(TASK_MOVE_NAME, PackMoveTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packManiTask = project.tasks.create(TASK_MANIFEST_NAME, PackManifestTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packConfigTask = project.tasks.create(TASK_CONFIG_NAME, PackConfigTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packZipTask = project.tasks.create(TASK_ZIP_NAME, PackZipTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packUploadTask = project.tasks.create(TASK_UPLOAD_NAME, PackUploadTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packTask = project.tasks.create(TASK_NAME, PackTask::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>)</span></span><br><span class="line">        <span class="keyword">val</span> packCompileTask = project.tasks.getByName(TASK_BUILD_NAME)</span><br><span class="line">        packJarTask.mustRunAfter(packCompileTask)</span><br><span class="line">        packMoveTask.mustRunAfter(packJarTask)</span><br><span class="line">        packManiTask.mustRunAfter(packMoveTask)</span><br><span class="line">        packConfigTask.mustRunAfter(packManiTask)</span><br><span class="line">        packZipTask.mustRunAfter(packConfigTask)</span><br><span class="line">        packUploadTask.mustRunAfter(packZipTask)</span><br><span class="line">        packTask.group = TASK_GROUP</span><br><span class="line">        packTask.dependsOn(</span><br><span class="line">            listOf(</span><br><span class="line">                packCompileTask,</span><br><span class="line">                packJarTask,</span><br><span class="line">                packMoveTask,</span><br><span class="line">                packManiTask,</span><br><span class="line">                packConfigTask,</span><br><span class="line">                packZipTask,</span><br><span class="line">                packUploadTask</span><br><span class="line">            )</span><br><span class="line">        )</span><br><span class="line">        configurePlugin(project, extension)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="function"><span class="keyword">fun</span> <span class="title">configurePlugin</span><span class="params">(project: <span class="type">Project</span>, extension: <span class="type">PackExtension</span>)</span></span> &#123;</span><br><span class="line">        <span class="keyword">val</span> versionFile = project.file(VERSION_FILE_NAME)</span><br><span class="line">        <span class="keyword">if</span> (versionFile.exists()) &#123;</span><br><span class="line">            Properties().apply &#123;</span><br><span class="line">                load(versionFile.inputStream())</span><br><span class="line">                <span class="keyword">val</span> code = getProperty(VERSION_CODE)</span><br><span class="line">                <span class="keyword">val</span> name = getProperty(VERSION_NAME)</span><br><span class="line">                <span class="keyword">if</span> (code.isNullOrEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> RuntimeException(<span class="string">"version code is empty"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (name.isNullOrEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">throw</span> RuntimeException(<span class="string">"version name is empty"</span>)</span><br><span class="line">                &#125;</span><br><span class="line">                extension.versionName = name</span><br><span class="line">                extension.versionCode = code.toInt()</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>插件首先添加了 PackExtension 扩展，以及 PackJarTask、PackMoveTask、PackManiTask、PackConfigTask、PackZipTask、PackUploadTask、PackTask 这 7 个 Task，并使用 mustRunAfter 约束执行顺序，同时在打 jar 包时前需要执行下编译，因此使 PackJarTask 依赖 BuildTask。至此该插件就开发完成了，直接执行下 PackTask 就可以自动完成上述操作。 </p>
+<h3 id="上传-Maven-仓库"><a href="#上传-Maven-仓库" class="headerlink" title="上传 Maven 仓库"></a>上传 Maven 仓库</h3><p>在 build.gradle 中添加应用 maven 插件，然后配置以下信息：</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">uploadArchives &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenDeployer &#123;</span><br><span class="line">            pom.groupId = <span class="string">'com.yushi.android'</span></span><br><span class="line">            pom.artifactId = <span class="string">"pack"</span></span><br><span class="line">            pom.version = <span class="string">'1.0.1'</span></span><br><span class="line">            repository(<span class="string">url:</span> URL) &#123;</span><br><span class="line">                authentication(<span class="string">userName:</span> USERNAME, <span class="string">password:</span> PASSWORD)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行该 Task 就会把该插件上传到公司内部 Maven 仓库。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2021/01/04/DSBridge%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="next" title="DSBridge 源码分析">
+                <i class="fa fa-chevron-left"></i> DSBridge 源码分析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#需求分析"><span class="nav-number">2.</span> <span class="nav-text">需求分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">3.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#上传-Maven-仓库"><span class="nav-number">4.</span> <span class="nav-text">上传 Maven 仓库</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言目前在线打包系统虽然能够满足渠道分包需求，但是还存在很多问题，比如操作复杂度高、游戏渠道关联和渠道信息配置入口不统一、母包需要上传打包机器打完后还要下载（包体积上 G）、多个用户公用一个打包机器，基于上述原因开发了一款桌面打包工具。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="桌面打包工具">
+<meta property="og:url" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言目前在线打包系统虽然能够满足渠道分包需求，但是还存在很多问题，比如操作复杂度高、游戏渠道关联和渠道信息配置入口不统一、母包需要上传打包机器打完后还要下载（包体积上 G）、多个用户公用一个打包机器，基于上述原因开发了一款桌面打包工具。">
+<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/login.png">
+<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/game.png">
+<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/channel.png">
+<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/pack.png">
+<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/%E6%97%B6%E5%BA%8F%E5%9B%BE.jpg">
+<meta property="article:published_time" content="2020-09-30T13:22:00.000Z">
+<meta property="article:modified_time" content="2021-03-07T14:23:37.525Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/login.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/09/30/桌面打包工具/"/>
+
+
+
+
+
+  <title>桌面打包工具 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">桌面打包工具</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-30T21:22:00+08:00">
+                2020-09-30
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>目前在线打包系统虽然能够满足渠道分包需求，但是还存在很多问题，比如操作复杂度高、游戏渠道关联和渠道信息配置入口不统一、母包需要上传打包机器打完后还要下载（包体积上 G）、多个用户公用一个打包机器，基于上述原因开发了一款桌面打包工具。<a id="more"></a></p>
+<h2 id="技术选型"><a href="#技术选型" class="headerlink" title="技术选型"></a>技术选型</h2><p>由于我们开发者使用的是 Mac 电脑，而用户（运营或者游戏提供商）使用的是 Windows 电脑，因此两个平台都需要兼顾到，最初考虑是 Windows 版本使用 Java Swing 进行开发，Mac 版本使用原生进行开发，但是这样势必要写两份代码，那么有没有一份代码就可以同时在两个平台上运行的方法呢？通过查阅资料发现 <a href="http://www.electronjs.org/" target="_blank" rel="noopener">Electron</a> 可以满足这个要求，其使用前端技术（Vue、React）进行开发，一份代码可以同时编译出 dmg 以及 exe，同时 VisualStudioCode 也是使用该技术进行开发的，最终就选定使用该方案，由前端同事负责页面绘制，我负责逻辑处理。</p>
+<h2 id="界面展示"><a href="#界面展示" class="headerlink" title="界面展示"></a>界面展示</h2><p>大体上主要分为登录、游戏配置、渠道配置、打包四个界面。</p>
+<ol>
+<li><p>登录界面</p>
+ <img src="login.png" alt="" style="zoom:40%;" />
+</li>
+<li><p>游戏配置界面</p>
+ <img src="game.png" alt="" style="zoom:50%;" />
+</li>
+<li><p>渠道配置界面</p>
+ <img src="channel.png" alt="" style="zoom:50%;" />
+</li>
+<li><p>打包界面</p>
+ <img src="pack.png" alt="" style="zoom:50%;" />
+
+</li>
+</ol>
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>原理如以下时序图所示</p>
+<img src="时序图.jpg" alt="" style="zoom:40%;" />
+
+<h2 id="打包原理"><a href="#打包原理" class="headerlink" title="打包原理"></a>打包原理</h2><p>JS 层主要完成资源准备，比如下载闪屏图、渠道插件 SDK 资源等，以及结果处理，Python 脚本在打包过程中会适时的写文件更新进度，JS 只需开启一个定时器一直读取进度即可，等到脚本只需完成，判断下进度是否为 100，即可判断打包是否成功。这里只关注下打包流程。</p>
+<p>打包流程如下（参考 U8 SDK）：</p>
+<ol>
+<li><p>使用 <strong><em>apktool2</em></strong> 反编译母包，存放目录为 <strong>decompile</strong> 。</p>
+</li>
+<li><p>将 <strong>decompile/smali_classesN</strong> 文件夹下所有文件拷贝到 <strong>decompile/smali</strong> 文件夹下并删除对应文件夹。</p>
+<p> 注：N 从 2 开始，反编译后第一个 dex 生成的 smali 文件会放到 /smali 文件夹下，第二个放到 /smali_classes2 下，以此类推，这步用于合并所有 smali 文件，后续会进行拆分。</p>
+</li>
+<li><p>重命名包名。</p>
+<p> 注：根据配置将 AndroidManifest.xml 中 manifest 节点下 package 值改为指定的值。</p>
+</li>
+<li><p>添加调试。</p>
+<p> 注：根据配置将 AndroidManifest.xml 中 application 节点下 android: debuggable 改为指定的值。</p>
+</li>
+<li><p>处理渠道 SDK 资源。</p>
+<ul>
+<li><p>拷贝 SDK 资源到临时目录 <strong>sdkTemp</strong>。</p>
+</li>
+<li><p>处理 SDK 资源目录下所有的 aar 文件，全部合并到 <strong>sdkTemp</strong>。注：渠道资源优先级小于母包。</p>
+<ul>
+<li><p>解压 aar 文件。</p>
+</li>
+<li><p>合并 AndroidManifest.xml 文件。</p>
+</li>
+<li><p>合并 assets 文件夹。</p>
+</li>
+<li><p>合并 libs 文件夹。</p>
+</li>
+<li><p>合并 jni 文件夹。</p>
+</li>
+<li><p><strong><em>合并 res 文件夹</em></strong>。</p>
+<ul>
+<li>对于 values （values-xxx）以外的文件夹，直接简单的拷贝替换即可。</li>
+<li>对于 values（values-xxx）文件夹，则需要读取目录下所有文件内容。去重后将其整合为一个values.xml 文件，同时需要考虑到 declare-styleable 元素不能简单的去重，而要对其内部含有 format 属性的 attr 元素进行合并。</li>
+</ul>
+</li>
+<li><p>拷贝 classes.jar 到 <strong>sdkTemp/libs</strong> 下，需要加上前缀。注：生成 aar 时会将内部代码打成 classes.jar。</p>
+</li>
+<li><p>标记是否需要生成该库的 R 文件。</p>
+</li>
+</ul>
+</li>
+<li><p>解压 <strong>sdkTemp/libs</strong> 目录下所有的 jar 包，将解压后 jar 包中的 assets 文件夹与 <strong>sdkTemp/assets</strong> 合并。注：jar 包中也可能会有 assets，所以需要解析进行合并。</p>
+</li>
+<li><p>使用 <strong><em>d8</em></strong> 将 <strong>sdkTemp/libs</strong> 以及 <strong>sdkTemp/</strong>下所有的 jar 包编译成 classes.dex 文件。注：可能还会有 classes2.dex 等。</p>
+</li>
+<li><p>使用 <strong><em>baksmali</em></strong> 将上一步生成的 dex 文件编译成 smali 文件夹，并将其拷贝到 <strong>decompile/smali</strong> 目录下。</p>
+</li>
+<li><p>将 <strong>sdkTemp/SDKManifest.xml</strong> 与 <strong>decompile/AndroidManifest.xml</strong> 进行合并。</p>
+</li>
+<li><p>将 <strong>sdkTemp/libs</strong> 下所有文件（除 jar、aar，因为已被转换为 smali 拷贝过去了）与 <strong>decompile/libs</strong> 进行合并。</p>
+</li>
+<li><p>将 <strong>sdkTemp/assets</strong> 下所有文件与 <strong>decompile/assets</strong> 进行合并。</p>
+</li>
+</ul>
+</li>
+<li><p>处理插件 SDK 资源。流程与渠道 SDK 一致，就不展开了。</p>
+</li>
+<li><p>拷贝额外的资源到 <strong>decompile</strong> 目录下，这可用于替换母包资源。</p>
+</li>
+<li><p>写入配置信息，部分写入 assets/config.properties 另一部分以 meta-data 的形式写入清单文件。</p>
+</li>
+<li><p>将渠道以及插件的配置文件拷贝到指定位置。注：少部分渠道将配置参数以文件的形式保存到 assets 目录。</p>
+</li>
+<li><p>添加闪屏界面，使用用户配置的闪屏图片。注：由于本来就自带启动 Activity，因此需要解析清单文件将启动 Activity 更改为 SplashActivity （其以 smali 文件形式存放在脚本目录下）。</p>
+</li>
+<li><p>修改桌面图标，使用用户配置的桌面图标。注：生成不同分辨率的图片放入不同目录，文件名统一为 eu_app_icon.png ，接着修改清单文件找到 android:icon 将其修改为 @drawable/eu_app_icon 即可。</p>
+</li>
+<li><p>检查本地库 so 文件夹，将不需要的删除，只保留 <strong>decompile/libs/armeabi</strong> 以及  <strong>decompile/libs/armeabi-v7a</strong>，以缩减包体积。 注：需要保证两者拥有的 so 一致。</p>
+</li>
+<li><p>修改游戏名称，直接将清单文件中的 @string/app_name 替换为指定名称即可。</p>
+</li>
+<li><p>将渠道资源以及所有的插件资源与母包进行合并，合并方式与 aar 资源合并到渠道资源中一致。</p>
+</li>
+<li><p>执行插件以及渠道的自定义脚本，提供一个 hook 点，渠道/插件可以做一些自定义的操作。</p>
+</li>
+<li><p>读取清单文件将所有需要动态申请的权限过滤出来保存到文件中，当 App 启动后会自动进行申请。</p>
+</li>
+<li><p>使用 <strong><em>aapt2</em></strong> 编译 <strong>decompile/res</strong> 文件夹生成 <strong>res_flat.zip</strong> 文件，然后结合清单文件进行链接生成 <strong>res.apk</strong> 以及 R.java 文件。注：res.apk 中只包含 res 文件夹、resources.arsc 以及 AndroidManifest.xml 文件。</p>
+</li>
+<li><p>使用 <strong><em>javac</em></strong> 编译上一步生成的 R.java 文件，接着使用 <strong><em>d8</em></strong> 将其编译成 dex，最后再使用 <strong><em>baksmali</em></strong> 将其再转换为 smali 并保存到 <strong>decompile/smali</strong> 目录下。</p>
+</li>
+<li><p>处理额外的 R 文件，渠道 SDK 或者插件 SDK 可能内部使用了 R.xxx.xxx 前去引用资源，而由于资源进行了重新整合，会导致其引用不到，因此需要拷贝一份 R 文件放到目标包下并将其包名改为渠道或者插件的包名<a href="http://www.uustory.com/?p=2114" target="_blank" rel="noopener">参考网址</a>。</p>
+</li>
+<li><p>将 <strong>decompile/smali</strong> 文件夹进行拆分，为多个 dex 做准备，具体拆分流程为遍历所有的 smali 文件，获取该文件所包含的方法数，如果累计值是否超过临界值，那么剪切到下个目录 smali_classes2，重置累计值继续遍历没有没超过临界值那么继续剪切到 smali_classes2 如果又超过临界值，那么再剪切到下个目录 smali_classes3 以此类推。注：临界值为 60K ，具体根据 smali 文件计算方法数<a href="http://www.uustory.com/?p=2069" target="_blank" rel="noopener">参考网址</a>。</p>
+</li>
+<li><p>使用 <strong><em>apktool2</em></strong> 进行回编译，生成 output.apk。</p>
+</li>
+<li><p>如果配置 v1 签名，使用 <strong><em>jarsigner</em></strong> 对其进行签名然后使用 <strong><em>zipalign</em></strong> 对其进行对齐即打包完成，如果配置 v2 签名，先使用 <strong>zipalign</strong> 对其进行对其，然后使用 <strong><em>apksigner</em></strong>（v2 签名） 对其进行签名即打包完成。</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/08/07/Android%20%E6%9E%84%E5%BB%BA%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B/" rel="next" title="Android 构建打包流程">
+                <i class="fa fa-chevron-left"></i> Android 构建打包流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/11/23/%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E8%B0%83%E7%A0%94/" rel="prev" title="免密登录调研">
+                免密登录调研 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#技术选型"><span class="nav-number">2.</span> <span class="nav-text">技术选型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#界面展示"><span class="nav-number">3.</span> <span class="nav-text">界面展示</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本原理"><span class="nav-number">4.</span> <span class="nav-text">基本原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#打包原理"><span class="nav-number">5.</span> <span class="nav-text">打包原理</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

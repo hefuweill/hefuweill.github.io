@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本文主要记录下 HTTP 的一些基础知识，包括请求与响应以及常见的请求方法、状态码以及请求响应头。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Http 基础">
+<meta property="og:url" content="http://yoursite.com/2018/02/13/HTTP%20%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言本文主要记录下 HTTP 的一些基础知识，包括请求与响应以及常见的请求方法、状态码以及请求响应头。">
+<meta property="article:published_time" content="2018-02-13T11:48:46.000Z">
+<meta property="article:modified_time" content="2020-10-14T06:25:57.538Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/13/HTTP 基础/"/>
+
+
+
+
+
+  <title>Http 基础 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/13/HTTP%20%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Http 基础</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-13T19:48:46+08:00">
+                2018-02-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index">
+                    <span itemprop="name">计算机网络</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要记录下 HTTP 的一些基础知识，包括请求与响应以及常见的请求方法、状态码以及请求响应头。 <a id="more"></a></p>
+<h2 id="浏览器内核"><a href="#浏览器内核" class="headerlink" title="浏览器内核"></a>浏览器内核</h2><p>其实就是浏览器的渲染引擎，用于渲染 HTML。常见的有 WebKit。</p>
+<h2 id="Http-链接"><a href="#Http-链接" class="headerlink" title="Http 链接"></a>Http 链接</h2><p>分为三个部分，Scheme(协议)、Address(地址)、Path(路径)。</p>
+<h2 id="Http-请求"><a href="#Http-请求" class="headerlink" title="Http 请求"></a>Http 请求</h2><p>分为三个部分，请求行、请求头、请求体。</p>
+<h3 id="请求行"><a href="#请求行" class="headerlink" title="请求行"></a>请求行</h3><p>分为 Method(请求方法)、Path(路径)、HttpVersion(版本)。例: GET /users HTTP/1.1</p>
+<h4 id="Http-版本"><a href="#Http-版本" class="headerlink" title="Http 版本"></a>Http 版本</h4><p>0.9、1.0 已经被废弃，最新的是 Http 2.0，但是主流使用的都是 1.1 因为协议升级需浏览器和服务端都升级，但是在 <strong>Android 开发中可以和服务端约定使用 Http 2.0</strong>，因为双端都是同一个公司的。</p>
+<h3 id="请求头"><a href="#请求头" class="headerlink" title="请求头"></a>请求头</h3><p>在请求行后另起一行(无空行)以键值对的形式书写，可以有若干个·。</p>
+<h3 id="请求体"><a href="#请求体" class="headerlink" title="请求体"></a>请求体</h3><p>在请求行后<strong>空一行</strong>书写，可能为普通的文本信息，也可能为图片等二进制数据，常用于 POST、PUT 请求。</p>
+<h2 id="Http-响应"><a href="#Http-响应" class="headerlink" title="Http 响应"></a>Http 响应</h2><p>分为三个部分，状态行、响应头、响应体。</p>
+<h3 id="状态行"><a href="#状态行" class="headerlink" title="状态行"></a>状态行</h3><p>分为 HttpVersion(版本)、StatusCode(状态码)、StatusMessage(状态码描述)。例: HTTP/1.1 200 OK</p>
+<h3 id="响应头"><a href="#响应头" class="headerlink" title="响应头"></a>响应头</h3><p>在状态栏后另起一行(无空行)以键值对的形式书写，可以有若干个·。</p>
+<h3 id="响应体"><a href="#响应体" class="headerlink" title="响应体"></a>响应体</h3><p>在响应行后<strong>空一行</strong>书写，可能为普通的文本信息，也可能为图片等二进制数据。</p>
+<h2 id="请求方法"><a href="#请求方法" class="headerlink" title="请求方法"></a>请求方法</h2><p>请求方法主要关注 GET、POST、PUT、DELETE、HEAD 这 5 种方法。</p>
+<h3 id="GET"><a href="#GET" class="headerlink" title="GET"></a>GET</h3><p>无请求体，用于获取资源。幂等性。</p>
+<h3 id="POST"><a href="#POST" class="headerlink" title="POST"></a>POST</h3><p>有请求体，用于新增、修改资源。无幂等性。</p>
+<h3 id="PUT"><a href="#PUT" class="headerlink" title="PUT"></a>PUT</h3><p>有请求体，用于修改资源。幂等性。注：与 POST 的区别只是其只用于修改资源。</p>
+<h3 id="DELETE"><a href="#DELETE" class="headerlink" title="DELETE"></a>DELETE</h3><p>无请求体，用于删除资源。幂等性。如：DELETE /users/1 HTTP/1.1。</p>
+<h3 id="HEAD"><a href="#HEAD" class="headerlink" title="HEAD"></a>HEAD</h3><p>无<strong>响应体</strong>，用于获取信息。幂等性。常见应用场景为下载文件时先使用 HEAD 请求方法获取待下载文件的信息(从 Header 中可以获取到)，接着再使用 GET 请求去下载，这么做的优势是 HEAD 请求会比 GET 请求快。</p>
+<h3 id="CONNECT"><a href="#CONNECT" class="headerlink" title="CONNECT"></a>CONNECT</h3><p>无请求体，用于建立 HTTP TUNNEL，当客户端配置了 HTTP 代理，但是请求是 HTTPS 时，客户端首先发送一个 HTTP 请求给代理服务器，代理服务器与目标主机建立 TCP 连接后返回 200。后续代理服务器会将客户端发送的 TCP 流原封不对的传递给目标服务器，因此 HTTP 代理服务器也能支持 HTTPS 请求。</p>
+<h3 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h3><p>以上 5 种请求方式中，GET、DELETE 无请求体，HEAD 无响应体。</p>
+<h2 id="状态码"><a href="#状态码" class="headerlink" title="状态码"></a>状态码</h2><p>状态码主要用于对请求结果进行分类，共分为 1xx、2xx、3xx、4xx、5xx。</p>
+<h3 id="1xx"><a href="#1xx" class="headerlink" title="1xx"></a>1xx</h3><p>临时性消息，常见有 100 继续发、101 协议切换。</p>
+<h4 id="100"><a href="#100" class="headerlink" title="100"></a>100</h4><p>如果请求体内容很大，需要分成好几个请求，那么可以添加请求头 Expect: 100-continue ，服务端会返回状态码 100，让你继续发，直到没有 Expect 请求头，服务端再做一次响应。</p>
+<h4 id="101"><a href="#101" class="headerlink" title="101"></a>101</h4><p>协议切换，比如你想切换成 Http 2.0，就得先用 Http 1.1 发送一个请求，带上请求头 Upgrade: h2c ，如果服务端支持那么返回 101，后续就可以使用 Http 2.0 进行通信，再比如你想和服务端建立 WebSocket 连接，首先得先将 协议从 Ws 切换为 Http，发送一个 Get 请求，带上请求头 Upgrade: webSocket ，如果服务端支持那么返回 101。</p>
+<h3 id="2xx"><a href="#2xx" class="headerlink" title="2xx"></a>2xx</h3><p>成功，常见有 200 成功、201 创建成功、206 部分数据请求成功，用于断点下载。</p>
+<h3 id="3xx"><a href="#3xx" class="headerlink" title="3xx"></a>3xx</h3><p>重定向，常见有 301 永久移动、302 临时移动、304 文件未改变。 如 Http 请求百度返回 301，读取 Location 响应头指定地址再次请求。</p>
+<h3 id="4xx"><a href="#4xx" class="headerlink" title="4xx"></a>4xx</h3><p>客户端(发起请求方)错误，常见有 401 未授权，可能没登录、404 资源找不到。</p>
+<h3 id="5xx"><a href="#5xx" class="headerlink" title="5xx"></a>5xx</h3><p>服务端错误，常见有 500、502，时机为服务端抛出异常。</p>
+<h2 id="请求响应头"><a href="#请求响应头" class="headerlink" title="请求响应头"></a>请求响应头</h2><p>Http 消息的元数据（消息的消息）。</p>
+<h3 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h3><p>存放目标主机名，作用是给哪些拥有多个子主机的主机看的，让其区分具体请求的是哪个子主机。</p>
+<p>如一台 IP 地址为 61.135.169.125 的主机虚拟为三台主机分别部署谷歌、百度、淘宝，请求到达后该主机就通过 Host 请求头来选择目标子主机。</p>
+<p>注意：</p>
+<ol>
+<li>子主机要和同一主机不同端口区分，一台主机的子主机完全可以有相同端口号。</li>
+<li>在发起真正的 Http 请求前，客户端就会去访问 DNS 服务器获取目标主机的 IP 地址。因此该请求头<strong>不是用于网络寻址的</strong>。</li>
+</ol>
+<h3 id="Content-Type"><a href="#Content-Type" class="headerlink" title="Content-Type"></a>Content-Type</h3><p>表示请求或响应体数据的类型，有以下几个可选值：</p>
+<ol>
+<li><p>text/html，网页 <strong>默认</strong>。</p>
+</li>
+<li><p>text/xml，XML。</p>
+</li>
+<li><p>x-www-form-urlencoded， 普通表单，请求体内容就跟 GET 请求后参数格式一样。</p>
+</li>
+<li><p>multipart/form-data， 多块表单，如注册既有邮箱、昵称等文本信息，也有头像等文件。</p>
+ <figure class="highlight http"><table><tr><td class="code"><pre><span class="line"><span class="keyword">POST</span> <span class="string">/users</span> HTTP/1.1</span><br><span class="line"><span class="attribute">Host</span>: jiaoyihu-test.com</span><br><span class="line"><span class="attribute">Content-Type</span>: multipart/form-data; boundary=----</span><br><span class="line"><span class="attribute">WebKitFormBoundary7MA4YWxkTrZu0gW</span></span><br><span class="line"><span class="attribute">Content-Length</span>: 2382</span><br><span class="line">------WebKitFormBoundary7MA4YWxkTrZu0gW</span><br><span class="line"><span class="attribute">Content-Disposition</span>: form-data; name="name"</span><br><span class="line"><span class="attribute">rengwuxian</span></span><br><span class="line"><span class="attribute">------WebKitFormBoundary7MA4YWxkTrZu0gW</span></span><br><span class="line"><span class="attribute">Content-Disposition</span>: form-data; name="avatar";</span><br><span class="line">filename="avatar.jpg"</span><br><span class="line"><span class="attribute">Content-Type</span>: image/jpeg</span><br><span class="line"><span class="attribute">JFIFHHvOwX9jximQrWa......</span></span><br><span class="line"><span class="attribute">------WebKitFormBoundary7MA4YWxkTrZu0gW--</span></span><br></pre></td></tr></table></figure>
+
+<p> 使用 boundary 区分每一块，然后每一块内部又有对应的字段名，完全可以上传一些文本信息，若干个文件。</p>
+</li>
+<li><p>application/json， JSON。注意：retrofit 参数只需 @Body body: RequestBody，然后创建一个 content-type 为 application/json 类型的 RequestBody 实例传入即可。</p>
+</li>
+<li><p>image/jpeg，Jpg 格式图片，可用于上传或下载，使用方式同上，只是把 content-type 改成 image/jpeg。</p>
+</li>
+</ol>
+<h3 id="Content-Length"><a href="#Content-Length" class="headerlink" title="Content-Length"></a>Content-Length</h3><p>表示请求或者响应体所包含的字节数，接收方会在头后截取该长度的数据当做请求或响应体，如果没有该头，由于传输的数据可能为图片等二进制数据，会导致接收方无法判断哪里截断。</p>
+<h3 id="Transfer-Encoding"><a href="#Transfer-Encoding" class="headerlink" title="Transfer-Encoding"></a>Transfer-Encoding</h3><p>一般取值为 chunked ，表示分块传输，有该请求头可以不需要 content-length 。如服务端没法短时间将所有数据查询出来，则可以添加该请求头分块传输，来提高网络性能。</p>
+<figure class="highlight http"><table><tr><td class="code"><pre><span class="line">HTTP/1.1 <span class="number">200</span> OK</span><br><span class="line"><span class="attribute">Content-Type</span>: text/html</span><br><span class="line"><span class="attribute">Transfer-Encoding</span>: chunked</span><br><span class="line"></span><br><span class="line"><span class="attribute">4</span></span><br><span class="line"><span class="attribute">Tran</span></span><br><span class="line"><span class="attribute">3</span></span><br><span class="line"><span class="attribute">fer</span></span><br><span class="line"><span class="attribute">0</span></span><br></pre></td></tr></table></figure>
+
+<p>最后的 0 表示响应结束。</p>
+<h3 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h3><p>指定重定向的 Url。注意：如果使用 OkHttp 访问 <code>Http://www.baidu.com</code> 是可以获取到百度的网页数据，但是其实 OkHttp 发起了两个请求，首次请求 <code>Http://www.baidu.com</code>，服务端返回状态码 301 ，响应头 Location: <code>Https://www.baidu.com</code> OkHttp 内部的 BridgeInterceptor 执行重定向再次访问 <code>Https://www.baidu.com</code> 。</p>
+<h3 id="User-Agent"><a href="#User-Agent" class="headerlink" title="User-Agent"></a>User-Agent</h3><p>用户代理，标识了请求方的身份。服务端可以使用该字段来区分是手机还是电脑浏览器请求的，然后返回对应的网页内容。很多手机浏览器都支持桌面模式原理就是把该请求头内容修改了。</p>
+<h3 id="Accept-Ranges"><a href="#Accept-Ranges" class="headerlink" title="Accept-Ranges"></a>Accept-Ranges</h3><p>如果有该响应头，那么表示服务端支持访问部分数据。</p>
+<h3 id="Range"><a href="#Range" class="headerlink" title="Range"></a>Range</h3><p>当响应头包含 Accept-Ranges 后才能使用，指定访问的部分数据，常用于断点续传，多线程下载。</p>
+<h3 id="Accept"><a href="#Accept" class="headerlink" title="Accept"></a>Accept</h3><p>指定客户端期望接收的数据类型。如 text/html。</p>
+<h3 id="Accept-Charset"><a href="#Accept-Charset" class="headerlink" title="Accept-Charset"></a>Accept-Charset</h3><p>指定请求体使用的字符集。如 utf-8 代表 unicode 字符集。</p>
+<h3 id="Accept-Encoding"><a href="#Accept-Encoding" class="headerlink" title="Accept-Encoding"></a>Accept-Encoding</h3><p>指定请求体的压缩编码类型。如 gzip。</p>
+<h3 id="Content-Encoding"><a href="#Content-Encoding" class="headerlink" title="Content-Encoding"></a>Content-Encoding</h3><p>指定响应体的压缩编码类型。如 gzip。</p>
+<h3 id="Cache-Control"><a href="#Cache-Control" class="headerlink" title="Cache-Control"></a>Cache-Control</h3><p>缓存控制，暂时只需了解该请求头处理缓存优先级最高。</p>
+<h3 id="Last-Modified"><a href="#Last-Modified" class="headerlink" title="Last-Modified"></a>Last-Modified</h3><p>最近更改时间，对应请求头 If-Modified-Since 。</p>
+<h3 id="Etag"><a href="#Etag" class="headerlink" title="Etag"></a>Etag</h3><p>资源标签，对应请求头 If-none-match。</p>
+<h2 id="REST-API"><a href="#REST-API" class="headerlink" title="REST API"></a>REST API</h2><p>REST 是一种软件架构风格，一般而言满足需要满足以下两点：</p>
+<ol>
+<li>提供一个页面展示所有的 API，如 api.github.com。</li>
+<li>正确使用 Http，如删除使用 DELETE、获取资源使用 GET。</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/02/04/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/" rel="next" title="设计模式">
+                <i class="fa fa-chevron-left"></i> 设计模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/21/Thinking%20in%20Java%20%E6%80%BB%E7%BB%93/" rel="prev" title="Thinking in Java 总结">
+                Thinking in Java 总结 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#浏览器内核"><span class="nav-number">2.</span> <span class="nav-text">浏览器内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http-链接"><span class="nav-number">3.</span> <span class="nav-text">Http 链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http-请求"><span class="nav-number">4.</span> <span class="nav-text">Http 请求</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#请求行"><span class="nav-number">4.1.</span> <span class="nav-text">请求行</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Http-版本"><span class="nav-number">4.1.1.</span> <span class="nav-text">Http 版本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求头"><span class="nav-number">4.2.</span> <span class="nav-text">请求头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#请求体"><span class="nav-number">4.3.</span> <span class="nav-text">请求体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Http-响应"><span class="nav-number">5.</span> <span class="nav-text">Http 响应</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#状态行"><span class="nav-number">5.1.</span> <span class="nav-text">状态行</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#响应头"><span class="nav-number">5.2.</span> <span class="nav-text">响应头</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#响应体"><span class="nav-number">5.3.</span> <span class="nav-text">响应体</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求方法"><span class="nav-number">6.</span> <span class="nav-text">请求方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GET"><span class="nav-number">6.1.</span> <span class="nav-text">GET</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#POST"><span class="nav-number">6.2.</span> <span class="nav-text">POST</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#PUT"><span class="nav-number">6.3.</span> <span class="nav-text">PUT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DELETE"><span class="nav-number">6.4.</span> <span class="nav-text">DELETE</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#HEAD"><span class="nav-number">6.5.</span> <span class="nav-text">HEAD</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#CONNECT"><span class="nav-number">6.6.</span> <span class="nav-text">CONNECT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小结"><span class="nav-number">6.7.</span> <span class="nav-text">小结</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态码"><span class="nav-number">7.</span> <span class="nav-text">状态码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1xx"><span class="nav-number">7.1.</span> <span class="nav-text">1xx</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#100"><span class="nav-number">7.1.1.</span> <span class="nav-text">100</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#101"><span class="nav-number">7.1.2.</span> <span class="nav-text">101</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2xx"><span class="nav-number">7.2.</span> <span class="nav-text">2xx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3xx"><span class="nav-number">7.3.</span> <span class="nav-text">3xx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4xx"><span class="nav-number">7.4.</span> <span class="nav-text">4xx</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5xx"><span class="nav-number">7.5.</span> <span class="nav-text">5xx</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#请求响应头"><span class="nav-number">8.</span> <span class="nav-text">请求响应头</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Host"><span class="nav-number">8.1.</span> <span class="nav-text">Host</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Content-Type"><span class="nav-number">8.2.</span> <span class="nav-text">Content-Type</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Content-Length"><span class="nav-number">8.3.</span> <span class="nav-text">Content-Length</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transfer-Encoding"><span class="nav-number">8.4.</span> <span class="nav-text">Transfer-Encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Location"><span class="nav-number">8.5.</span> <span class="nav-text">Location</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#User-Agent"><span class="nav-number">8.6.</span> <span class="nav-text">User-Agent</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Accept-Ranges"><span class="nav-number">8.7.</span> <span class="nav-text">Accept-Ranges</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Range"><span class="nav-number">8.8.</span> <span class="nav-text">Range</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Accept"><span class="nav-number">8.9.</span> <span class="nav-text">Accept</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Accept-Charset"><span class="nav-number">8.10.</span> <span class="nav-text">Accept-Charset</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Accept-Encoding"><span class="nav-number">8.11.</span> <span class="nav-text">Accept-Encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Content-Encoding"><span class="nav-number">8.12.</span> <span class="nav-text">Content-Encoding</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Cache-Control"><span class="nav-number">8.13.</span> <span class="nav-text">Cache-Control</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Last-Modified"><span class="nav-number">8.14.</span> <span class="nav-text">Last-Modified</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Etag"><span class="nav-number">8.15.</span> <span class="nav-text">Etag</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#REST-API"><span class="nav-number">9.</span> <span class="nav-text">REST API</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

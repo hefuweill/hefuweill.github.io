@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言本文主要梳理下如何开发自定义 Gradle 插件，参考自 Gradle 官网。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Gradle 插件开发">
+<meta property="og:url" content="http://yoursite.com/2020/07/19/Gradle%20%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言本文主要梳理下如何开发自定义 Gradle 插件，参考自 Gradle 官网。">
+<meta property="article:published_time" content="2020-07-19T11:24:32.000Z">
+<meta property="article:modified_time" content="2021-02-10T17:12:06.035Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/07/19/Gradle 插件编写/"/>
+
+
+
+
+
+  <title>Gradle 插件开发 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/19/Gradle%20%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Gradle 插件开发</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-07-19T19:24:32+08:00">
+                2020-07-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%89%93%E5%8C%85%E6%9E%84%E5%BB%BA/" itemprop="url" rel="index">
+                    <span itemprop="name">打包构建</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要梳理下如何开发自定义 Gradle 插件，参考自<a href="https://docs.gradle.org/current/userguide/custom_plugins.html#header" target="_blank" rel="noopener"> Gradle 官网</a>。<a id="more"></a></p>
+<h3 id="源码放置"><a href="#源码放置" class="headerlink" title="源码放置"></a>源码放置</h3><p>一共有以下几个地方可以放置插件的源代码。</p>
+<ol>
+<li><p>build script</p>
+<p> 在构建脚本中直接包含插件的源代码。这样做的好处是插件会自动编译并包含在构建脚本的类路径中，而您不需要做任何事情。然而，插件在构建脚本之外是不可见的，因此不能在定义插件的构建脚本之外重用插件。</p>
+</li>
+<li><p>buildSrc module</p>
+<p> 可以把插件的源代码放在rootProjectDir/buildSrc/src/main/java 目录下，<strong>注：如果用 groovy 写就把 java 替换为 groovy ，kotlin 也一样。</strong>Gradle 会自动进行编译，并使其在构建脚本的类路径中可用。该插件对构建所使用的每个构建脚本都是可见的。然而，它在构建之外是不可见的，因此不能在定义它的构建之外重用插件。</p>
+</li>
+<li><p>standalone module</p>
+<p> 可以为你的插件创建一个单独的模块。该模块生成并发布一个 JAR，您可以在多个构建中使用该 JAR并与其他人共享。</p>
+</li>
+</ol>
+<p>在日常开发中 com.android.application、kotlin-android 等插件其实都是采用的第三种，因为前两种无法脱离当前项目，下面来看看如何编写插件。</p>
+<h3 id="插件编写"><a href="#插件编写" class="headerlink" title="插件编写"></a>插件编写</h3><p>要开发一个 Gradle 插件，需要编写一个类实现 Plugin 接口，当插件被应用到一个项目时，Gradle 会创建一个该类实例，并调用其 apply 方法。下面以一个简单插件为例（<strong>代码直接放置 build.gradle 中</strong>），该插件逻辑非常简单就添加了一个名为 hello 的 Task。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GreetingPlugin</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; &#123;</span></span><br><span class="line">    <span class="keyword">void</span> apply(Project project) &#123;</span><br><span class="line">        project.task(<span class="string">'hello'</span>) &#123;</span><br><span class="line">            doLast &#123;</span><br><span class="line">                println <span class="string">'Hello from the GreetingPlugin'</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 应用该插件</span></span><br><span class="line">apply <span class="string">plugin:</span> GreetingPlugin</span><br></pre></td></tr></table></figure>
+
+<p>配置好以后就可以在命令行中执行 <strong><code>gradle -q hello</code></strong> ，输出内容如下：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt; gradle -q hello</span><br><span class="line">Hello from the GreetingPlugin</span><br></pre></td></tr></table></figure>
+
+<p>注意：Plugin 是一个泛型类，泛型类型除了 Project 以外，还可以是 Settings 以及 Gradle，其中前者可以在 settings.gradle 中被应用，后者可以在 init.gradle 中被应用，不过这两种使用场景还是比较罕见的。</p>
+<h3 id="插件配置"><a href="#插件配置" class="headerlink" title="插件配置"></a>插件配置</h3><p>大多数插件都提供了配置项，比如 Android 构建插件 com.android.application 提供了以下配置项：</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">android &#123;</span><br><span class="line">    compileSdkVersion <span class="number">30</span></span><br><span class="line">    defaultConfig &#123;</span><br><span class="line">        applicationId <span class="string">"com.hefuwei.gradletest"</span></span><br><span class="line">        minSdkVersion <span class="number">16</span></span><br><span class="line">        targetSdkVersion <span class="number">30</span></span><br><span class="line">        versionCode <span class="number">1</span></span><br><span class="line">        versionName <span class="string">"1.0"</span></span><br><span class="line">    &#125;</span><br><span class="line">    buildTypes &#123;</span><br><span class="line">        release &#123;</span><br><span class="line">            minifyEnabled <span class="literal">false</span></span><br><span class="line">            proguardFiles getDefaultProguardFile(<span class="string">'proguard-android-optimize.txt'</span>), <span class="string">'proguard-rules.pro'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    compileOptions &#123;</span><br><span class="line">        sourceCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">        targetCompatibility JavaVersion.VERSION_1_8</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>那么这个是如何做到的？其实很简单 Project 实例关联了一个 ExtensionContainer 实例，我们只需要写一个 JavaBean 类并添加到该容器中即可。下面为一个简单示例，其允许用户配置问候语。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GreetingPluginExtension</span> &#123;</span></span><br><span class="line">    String message = <span class="string">'Hello from GreetingPlugin'</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GreetingPlugin</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; &#123;</span></span><br><span class="line">    <span class="keyword">void</span> apply(Project project) &#123;</span><br><span class="line">        <span class="comment">// 创建并添加扩展到 ExtensionContainer 中，并制定扩展名为 greeting。</span></span><br><span class="line">        <span class="keyword">def</span> extension = project.extensions.create(<span class="string">'greeting'</span>, GreetingPluginExtension)</span><br><span class="line">        project.task(<span class="string">'hello'</span>) &#123;</span><br><span class="line">            doLast &#123;</span><br><span class="line">                println extension.message</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">apply <span class="string">plugin:</span> GreetingPlugin</span><br><span class="line"><span class="comment">// 配置扩展</span></span><br><span class="line">greeting &#123;</span><br><span class="line">    message <span class="string">'Hi from Gradle'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置好以后再次在命令行中执行 <strong><code>gradle -q hello</code></strong> ，输出内容如下：</p>
+<figure class="highlight sh"><table><tr><td class="code"><pre><span class="line">&gt; gradle -q hello</span><br><span class="line">Hi from Gradle</span><br></pre></td></tr></table></figure>
+
+<p>插件扩展原理就是当 build.gradle 中使用了扩展名时 （本例中为 greeting ）Gradle 就会创建扩展类（本例中未 GreetingPluginExtension）实例，然后执行闭包或者赋值操作。最后插件内部就可以获取到配置的内容（<strong><em>需要到项目配置完毕后才能取到值</em></strong>，<strong><em>因为插件应用阶段项目还没配置结束</em></strong>）。</p>
+<h3 id="插件发布"><a href="#插件发布" class="headerlink" title="插件发布"></a>插件发布</h3><p>要发布插件那么只能把插件代码放到一个单独模块中去，然后在其 build.gradle 文件中应用 java-gradle-plugin 插件，这会应用 java 插件、添加 gradleApi 依赖以及自动生成 xxx.properties 文件（再也不用去记该把该文件放到哪里了）。同时还需要应用 maven 插件，添加 uploadArchives 这个 Task 其可以让我们把插件上传到 maven 仓库上去共享。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id <span class="string">'java-gradle-plugin'</span></span><br><span class="line">    id <span class="string">'maven'</span></span><br><span class="line">&#125;</span><br><span class="line">gradlePlugin &#123;</span><br><span class="line">    plugins &#123;</span><br><span class="line">        plugin1 &#123;</span><br><span class="line">            id = <span class="string">'com.hefuwei.test1'</span></span><br><span class="line">            implementationClass = <span class="string">'com.hefuwei.Test1'</span></span><br><span class="line">        &#125;</span><br><span class="line">        plugin2 &#123;</span><br><span class="line">            id = <span class="string">'com.hefuwei.test2'</span></span><br><span class="line">            implementationClass = <span class="string">'com.hefuwei.Test2'</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">uploadArchives &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenDeployer &#123;</span><br><span class="line">            pom.groupId = <span class="string">'com.hefuwei'</span></span><br><span class="line">            pom.artifactId = <span class="string">"pack"</span></span><br><span class="line">            pom.version = <span class="string">'1.0.0'</span></span><br><span class="line">            repository(<span class="string">url:</span> URL) &#123;</span><br><span class="line">                authentication(<span class="string">userName:</span> USERNAME, <span class="string">password:</span> PASSWORD)</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>配置完毕后，直接执行 gradle {moduleName}: uploadArchives 即可上传到 maven 仓库。</p>
+<h3 id="应用远程插件"><a href="#应用远程插件" class="headerlink" title="应用远程插件"></a>应用远程插件</h3><p>要想应用远程插件，首先得知道其在哪个仓库中，同时得了解其代码库名，以及插件 Id。配置项目级 build.gradle   文件配置插件仓库其代码库名。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        google()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath <span class="string">'com.android.tools.build:gradle:3.0.0'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码表示从 google 仓库中拉取 com.android.tools.build.gradle 代码库。同时在模块级 build.gradle 中应用指定插件。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id <span class="string">'com.android.application'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>完成上述配置后，Gradle 就会自动拉取代码库，并找到指定插件类并应用。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/17/Gradle%20%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B/" rel="next" title="Gradle 执行流程">
+                <i class="fa fa-chevron-left"></i> Gradle 执行流程
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/08/07/Android%20%E6%9E%84%E5%BB%BA%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B/" rel="prev" title="Android 构建打包流程">
+                Android 构建打包流程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#源码放置"><span class="nav-number">1.1.</span> <span class="nav-text">源码放置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件编写"><span class="nav-number">1.2.</span> <span class="nav-text">插件编写</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件配置"><span class="nav-number">1.3.</span> <span class="nav-text">插件配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#插件发布"><span class="nav-number">1.4.</span> <span class="nav-text">插件发布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应用远程插件"><span class="nav-number">1.5.</span> <span class="nav-text">应用远程插件</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

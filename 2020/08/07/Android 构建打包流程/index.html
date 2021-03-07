@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言公司做为游戏发行商，其中有一块业务为融合 SDK，游戏制作者接入我们的 SDK 提供母包给我们，由我们负责将各个渠道包打好给他，然后进行利益分摊。而我以前对打包细节了解的不多，于是就抽了点时间研究了下 Android 构建打包流程。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android 构建打包流程">
+<meta property="og:url" content="http://yoursite.com/2020/08/07/Android%20%E6%9E%84%E5%BB%BA%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言公司做为游戏发行商，其中有一块业务为融合 SDK，游戏制作者接入我们的 SDK 提供母包给我们，由我们负责将各个渠道包打好给他，然后进行利益分摊。而我以前对打包细节了解的不多，于是就抽了点时间研究了下 Android 构建打包流程。">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-02%20%E4%B8%8B%E5%8D%889.10.42.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-03%20%E4%B8%8A%E5%8D%8810.40.34.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-23%20%E4%B8%8B%E5%8D%884.22.33.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-02/manifest-merger_2x.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-03/%E6%88%AA%E5%B1%8F2021-03-03%20%E4%B8%8A%E5%8D%8812.09.29.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-03/%E6%88%AA%E5%B1%8F2021-03-03%20%E4%B8%8A%E5%8D%8812.12.26.png">
+<meta property="article:published_time" content="2020-08-07T05:22:13.000Z">
+<meta property="article:modified_time" content="2021-03-04T08:26:40.399Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-02%20%E4%B8%8B%E5%8D%889.10.42.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2020/08/07/Android 构建打包流程/"/>
+
+
+
+
+
+  <title>Android 构建打包流程 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-Android" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/07/Android%20%E6%9E%84%E5%BB%BA%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android 构建打包流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-08-07T13:22:13+08:00">
+                2020-08-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>公司做为游戏发行商，其中有一块业务为融合 SDK，游戏制作者接入我们的 SDK 提供母包给我们，由我们负责将各个渠道包打好给他，然后进行利益分摊。而我以前对打包细节了解的不多，于是就抽了点时间研究了下 Android 构建打包流程。<a id="more"></a></p>
+<h2 id="流程"><a href="#流程" class="headerlink" title="流程"></a>流程</h2><p>首先翻看了 Android <a href="https://developer.android.com/studio/build?hl=zh-cn" target="_blank" rel="noopener">官方文档</a> 找到了以下一个流程图：</p>
+<img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-02%20%E4%B8%8B%E5%8D%889.10.42.png" alt="截屏2021-02-02 下午9.10.42" style="zoom:50%;" />
+
+<p>上图中展示了大致了打包流程，不过不够详细，比如编译流程是什么样的，最后打包流程又是怎么样的，而这些源码都会告诉我。</p>
+<h2 id="源码"><a href="#源码" class="headerlink" title="源码"></a>源码</h2><p>众所周知，如果需要手动在命令行构建打包 Apk，可以使用以下几个命令：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 构建全量包</span></span><br><span class="line">./gradlew :app:assemble</span><br><span class="line"><span class="meta">#</span><span class="bash"> 构建测试包</span></span><br><span class="line">./gradlew :app:assembleDebug</span><br><span class="line"><span class="meta">#</span><span class="bash"> 构建正式包</span></span><br><span class="line">./gradlew :app:assembleRelease</span><br></pre></td></tr></table></figure>
+
+<p>这里以第二条命令为例，执行了上述命令后，Gradle 会在初始化、配置阶段完成后执行 assembleDebug 这个 Task，这时候第一个疑问就出现了，这个 Task 是哪里来的，难道是 Gradle 自带的？很明显并不是，它来自一个插件其 id 为 com.android.application 。</p>
+<p>查看<strong>应用程序模块下</strong>的 build.gradle 可以发现其应用了该插件。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">plugins &#123;</span><br><span class="line">    id <span class="string">'com.android.application'</span></span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p>那么该插件来自于哪呢？查看根项目 build.gradle 可以发现有如下配置。</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        google()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath <span class="string">'com.android.tools.build:gradle:3.0.0'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>显然 com.android.application 插件来自 com.android.tools.build:gradle:3.0.0 库，而该库又来自 Google 的 maven 仓库。根据自定义插件流程翻看该库源码发现该插件对应的实现类为 AppPlugin。跟进源码，当务之急是找寻到 assembleDebug 这个 Task 是在哪里创建的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AppPlugin</span> <span class="keyword">extends</span> <span class="title">BasePlugin</span> <span class="keyword">implements</span> <span class="title">Plugin</span>&lt;<span class="title">Project</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(@NonNull Project project)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.apply(project);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BasePlugin</span> <span class="keyword">implements</span> <span class="title">ToolingRegistryProvider</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">apply</span><span class="params">(@NonNull Project project)</span> </span>&#123;</span><br><span class="line">        threadRecorder = ThreadRecorder.get();</span><br><span class="line">        threadRecorder.record(..., <span class="keyword">this</span>::configureProject);</span><br><span class="line">        threadRecorder.record(..., <span class="keyword">this</span>::configureExtension);</span><br><span class="line">        threadRecorder.record(..., <span class="keyword">this</span>::createTasks);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ThreadRecorder#record 方法其实就是起个计时作用，内部会执行传入的方法。而上述三个方法前两个明显是配置相关的先行跳过，直接看看 createTasks。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createTasks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    project.afterEvaluate(</span><br><span class="line">        project -&gt; threadRecorder.record(..., () -&gt; createAndroidTasks(<span class="keyword">false</span>))</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createAndroidTasks</span><span class="params">(<span class="keyword">boolean</span> force)</span> </span>&#123;</span><br><span class="line">    threadRecorder.record(..., () -&gt; &#123; variantManager.createAndroidTasks(); &#125;);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">createAndroidTasks</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">final</span> VariantScope variantScope : variantScopes) &#123;</span><br><span class="line">        recorder.record(..., () -&gt; createTasksForVariantData(tasks, variantScope));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到其实最终会通过 VariantManager 去创建 Task，而对于每一个 Variant 都会创建自己的 Task。</p>
+<p>注：Variant 由 BuildType 和 ProductFlavor 组成。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createTasksForVariantData</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">final</span> TaskFactory tasks, <span class="keyword">final</span> VariantScope variantScope)</span> </span>&#123;</span><br><span class="line">    BuildTypeData buildTypeData = buildTypes.get(variantConfig.getBuildType().getName());</span><br><span class="line">    <span class="keyword">if</span> (buildTypeData.getAssembleTask() == <span class="keyword">null</span>) &#123;</span><br><span class="line">        buildTypeData.setAssembleTask(taskManager.createAssembleTask(tasks, buildTypeData));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> AndroidTask&lt;DefaultTask&gt; <span class="title">createAssembleTask</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @NonNull TaskFactory tasks,</span></span></span><br><span class="line"><span class="function"><span class="params">            @NonNull VariantDimensionData dimensionData)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> String sourceSetName =</span><br><span class="line">        StringHelper.capitalize(dimensionData.getSourceSet().getName());</span><br><span class="line">    <span class="keyword">return</span> androidTasks.create(</span><br><span class="line">        tasks,</span><br><span class="line">        <span class="string">"assemble"</span> + sourceSetName,</span><br><span class="line">        assembleTask -&gt; &#123;</span><br><span class="line">            assembleTask.setDescription(<span class="string">"Assembles all "</span> + sourceSetName + <span class="string">" builds."</span>);</span><br><span class="line">            assembleTask.setGroup(BasePlugin.BUILD_GROUP);</span><br><span class="line">        &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>终于找到了，其最终是通过 TaskManager 创建生成的。在 AS 右端 Gradle 窗口中寻找到 assembleDebug 鼠标悬浮会出现该 Task 的描述信息也能证明这一点。</p>
+<img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-03%20%E4%B8%8A%E5%8D%8810.40.34.png" alt="截屏2021-02-03 上午10.40.34" style="zoom:50%;" />
+
+
+
+<p>虽然找到了该 Task 的位置，不过它本身什么也不做，那么问题又来了，为啥执行它就能打包？其实根据 Gradle 规定 Task 可以添加依赖，使得在执行该 Task 前执行其它的 Task，但是由于依赖关系错综复杂，就不一处处的找了。直接执行一下，看看具体哪些 Task 被执行了。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">:app:preBuild SKIPPED</span><br><span class="line">:app:preDebugBuild SKIPPED</span><br><span class="line">:app:compileDebugAidl SKIPPED</span><br><span class="line">:app:compileDebugRenderscript SKIPPED</span><br><span class="line">:app:checkDebugManifest SKIPPED</span><br><span class="line">:app:generateDebugBuildConfig SKIPPED</span><br><span class="line">:app:prepareLintJar SKIPPED</span><br><span class="line">:app:generateDebugResValues SKIPPED</span><br><span class="line">:app:generateDebugResources SKIPPED</span><br><span class="line">:app:mergeDebugResources SKIPPED</span><br><span class="line">:app:createDebugCompatibleScreenManifests SKIPPED</span><br><span class="line">:app:processDebugManifest SKIPPED</span><br><span class="line">:app:splitsDiscoveryTaskDebug SKIPPED</span><br><span class="line">:app:processDebugResources SKIPPED</span><br><span class="line">:app:generateDebugSources SKIPPED</span><br><span class="line">:app:javaPreCompileDebug SKIPPED</span><br><span class="line">:app:compileDebugJavaWithJavac SKIPPED</span><br><span class="line">:app:compileDebugNdk SKIPPED</span><br><span class="line">:app:compileDebugSources SKIPPED</span><br><span class="line">:app:mergeDebugShaders SKIPPED</span><br><span class="line">:app:compileDebugShaders SKIPPED</span><br><span class="line">:app:generateDebugAssets SKIPPED</span><br><span class="line">:app:mergeDebugAssets SKIPPED</span><br><span class="line">:app:extractTryWithResourcesSupportJarDebug SKIPPED</span><br><span class="line">:app:transformClassesWithStackFramesFixerForDebug SKIPPED</span><br><span class="line">:app:transformClassesWithDesugarForDebug SKIPPED</span><br><span class="line">:app:transformClassesWithDexBuilderForDebug SKIPPED</span><br><span class="line">:app:transformDexArchiveWithExternalLibsDexMergerForDebug SKIPPED</span><br><span class="line">:app:transformDexArchiveWithDexMergerForDebug SKIPPED</span><br><span class="line">:app:mergeDebugJniLibFolders SKIPPED</span><br><span class="line">:app:transformNativeLibsWithMergeJniLibsForDebug SKIPPED</span><br><span class="line">:app:processDebugJavaRes SKIPPED</span><br><span class="line">:app:transformResourcesWithMergeJavaResForDebug SKIPPED</span><br><span class="line">:app:validateSigningDebug SKIPPED</span><br><span class="line">:app:packageDebug SKIPPED</span><br><span class="line">:app:assembleDebug SKIPPED</span><br></pre></td></tr></table></figure>
+
+<p>可以看到打一次包需要执行大量的 Task，下面一个个进行分析。</p>
+<h3 id="preBuild"><a href="#preBuild" class="headerlink" title="preBuild"></a>preBuild</h3><p>BasePlugin#createTasks</p>
+<p>TaskManager#createTasksBeforeEvaluate</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createTasksBeforeEvaluate</span><span class="params">(@NonNull TaskFactory tasks)</span> </span>&#123;</span><br><span class="line">	androidTasks.create(tasks, MAIN_PREBUILD, task -&gt; &#123;&#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>空实现，啥也没做，就是个锚点，任何变种构建都会执行。</p>
+<h3 id="preDebugBuild"><a href="#preDebugBuild" class="headerlink" title="preDebugBuild"></a>preDebugBuild</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#createAnchorTasks</p>
+<p>TaskManager#createPreBuildTasks</p>
+<p>TaskManager#createVariantPreBuildTask</p>
+<p>TaskManager#createDefaultPreBuildTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> AndroidTask&lt;? extends DefaultTask&gt; createDefaultPreBuildTask(</span><br><span class="line">            <span class="meta">@NonNull</span> TaskFactory tasks, <span class="meta">@NonNull</span> VariantScope scope) &#123;</span><br><span class="line">    <span class="keyword">return</span> getAndroidTasks().create(tasks, scope.getTaskName(<span class="string">"pre"</span>, <span class="string">"Build"</span>), task -&gt; &#123;</span><br><span class="line">         scope.getVariantData().preBuildTask = task;</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>空实现，啥也没做，就是个锚点，标志着当前变种开始构建。</p>
+<h3 id="compileDebugAidl"><a href="#compileDebugAidl" class="headerlink" title="compileDebugAidl"></a>compileDebugAidl</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createAidlTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> AndroidTask&lt;AidlCompile&gt; <span class="title">createAidlTask</span><span class="params">(TaskFactory tasks, VariantScope scope)</span> </span>&#123;</span><br><span class="line">    AndroidTask&lt;AidlCompile&gt; aidlCompileTask = androidTasks</span><br><span class="line">        .create(tasks, <span class="keyword">new</span> AidlCompile.ConfigAction(scope));</span><br><span class="line">    scope.setAidlCompileTask(aidlCompileTask);</span><br><span class="line">    scope.getSourceGenTask().dependsOn(tasks, aidlCompileTask);</span><br><span class="line">    aidlCompileTask.dependsOn(tasks, scope.getPreBuildTask());</span><br><span class="line">    <span class="keyword">return</span> aidlCompileTask;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 AidlCompile.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AidlCompile</span> <span class="keyword">extends</span> <span class="title">IncrementalTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFullTaskAction</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        compileAllFiles(processor);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">compileAllFiles</span><span class="params">(DependencyFileProcessor dependencyFileProcessor)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> InterruptedException, ProcessException, IOException </span>&#123;</span><br><span class="line">        getBuilder().compileAllAidlFiles(...);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">AidlCompile</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;AidlCompile&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> AidlCompile<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compileAllAidlFiles</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    String aidl = buildToolInfo.getPath(BuildToolInfo.PathId.AIDL);</span><br><span class="line">    AidlProcessor processor = <span class="keyword">new</span> AidlProcessor(aidl);</span><br><span class="line">    <span class="keyword">for</span> (File dir : sourceFolders) &#123;</span><br><span class="line">        DirectoryWalker.builder()</span><br><span class="line">            .root(dir.toPath())</span><br><span class="line">            .extensions(<span class="string">"aidl"</span>)</span><br><span class="line">            .action(processor)</span><br><span class="line">            .build()</span><br><span class="line">            .walk();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Task 执行时会首先创建一个处理器，然后遍历 main/aidl 下所有的文件，遍历到后缀为 aidl 的文件后，进行处理。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AidlProcessor</span> <span class="keyword">implements</span> <span class="title">DirectoryWalker</span>.<span class="title">FileAction</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">(@NonNull Path startDir, @NonNull Path path)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        ProcessInfoBuilder builder = <span class="keyword">new</span> ProcessInfoBuilder();</span><br><span class="line">        builder.setExecutable(mAidlExecutable);</span><br><span class="line">        builder.addArgs(<span class="string">"-p"</span> + mFrameworkLocation);</span><br><span class="line">        builder.addArgs(<span class="string">"-o"</span> + mSourceOutputDir.getAbsolutePath());</span><br><span class="line">        <span class="keyword">for</span> (File f : mImportFolders) &#123;</span><br><span class="line">            builder.addArgs(<span class="string">"-I"</span> + f.getAbsolutePath());</span><br><span class="line">        &#125;</span><br><span class="line">        File depFile = File.createTempFile(<span class="string">"aidl"</span>, <span class="string">".d"</span>);</span><br><span class="line">        builder.addArgs(<span class="string">"-d"</span> + depFile.getAbsolutePath());</span><br><span class="line">        builder.addArgs(path.toAbsolutePath().toString());</span><br><span class="line">        ProcessResult result = mProcessExecutor.execute(</span><br><span class="line">                builder.createProcess(), mProcessOutputHandler);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>处理过程也相当简单，也就是拼接参数然后执行 build-tools 下面的 aidl 工具。</p>
+<h3 id="compileDebugRenderscript"><a href="#compileDebugRenderscript" class="headerlink" title="compileDebugRenderscript"></a>compileDebugRenderscript</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createRenderscriptTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createRenderscriptTask</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    @NonNull TaskFactory tasks,</span></span></span><br><span class="line"><span class="function"><span class="params">    @NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">    scope.setRenderscriptCompileTask(</span><br><span class="line">        androidTasks.create(tasks, <span class="keyword">new</span> RenderscriptCompile.ConfigAction(scope)));</span><br><span class="line">    GradleVariantConfiguration config = scope.getVariantConfiguration();</span><br><span class="line">    scope.getRenderscriptCompileTask().dependsOn(tasks, scope.getPreBuildTask());</span><br><span class="line">    scope.getResourceGenTask().dependsOn(tasks, scope.getRenderscriptCompileTask());</span><br><span class="line">    <span class="keyword">if</span> (!config.getRenderscriptNdkModeEnabled()) &#123;</span><br><span class="line">        scope.getSourceGenTask().dependsOn(tasks, scope.getRenderscriptCompileTask());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 RenderscriptCompile.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">RenderscriptCompile</span> <span class="keyword">extends</span> <span class="title">NdkTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">taskAction</span><span class="params">()</span> <span class="keyword">throws</span> IOException, InterruptedException, ProcessException </span>&#123;</span><br><span class="line">        getBuilder().compileAllRenderscriptFiles(...);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">RenderscriptCompile</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;RenderscriptCompile&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> RenderscriptCompile<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">compileAllRenderscriptFiles</span><span class="params">(...)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> InterruptedException, ProcessException, IOException </span>&#123;</span><br><span class="line">    BuildToolInfo buildToolInfo = mTargetInfo.getBuildTools();</span><br><span class="line">    String renderscript = buildToolInfo.getPath(BuildToolInfo.PathId.LLVM_RS_CC);</span><br><span class="line">    RenderScriptProcessor processor = <span class="keyword">new</span> RenderScriptProcessor(...);</span><br><span class="line">    processor.build(mProcessExecutor, processOutputHandler);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">build</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    List&lt;File&gt; renderscriptFiles = Lists.newArrayList();</span><br><span class="line">    <span class="keyword">for</span> (File dir : mSourceFolders) &#123;</span><br><span class="line">        DirectoryWalker.builder()</span><br><span class="line">            .root(dir.toPath())</span><br><span class="line">            .extensions(<span class="string">"rs"</span>, <span class="string">"fs"</span>)</span><br><span class="line">            .action((start, path) -&gt; renderscriptFiles.add(path.toFile()))</span><br><span class="line">            .build()</span><br><span class="line">            .walk();</span><br><span class="line">    &#125;</span><br><span class="line">    doMainCompilation(renderscriptFiles, processExecutor, processOutputHandler, env);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Task 执行时会首先创建一个处理器，然后遍历 src/main/rs 下所有的文件，遍历到后缀为 rs 的文件后，进行处理。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">doMainCompilation</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    String renderscript = mBuildToolInfo.getPath(BuildToolInfo.PathId.LLVM_RS_CC);</span><br><span class="line">    String rsPath = mBuildToolInfo.getPath(BuildToolInfo.PathId.ANDROID_RS);</span><br><span class="line">    String rsClangPath = mBuildToolInfo.getPath(BuildToolInfo.PathId.ANDROID_RS_CLANG);</span><br><span class="line">    File rawFolder = <span class="keyword">new</span> File(mResOutputDir, SdkConstants.FD_RES_RAW);</span><br><span class="line">    builder.setExecutable(renderscript);</span><br><span class="line">    builder.addEnvironments(env);</span><br><span class="line">    builder.addArgs(<span class="string">"-O"</span>);</span><br><span class="line">    builder.addArgs(Integer.toString(mOptimizationLevel));</span><br><span class="line">    builder.addArgs(<span class="string">"-I"</span>);</span><br><span class="line">    builder.addArgs(rsPath);</span><br><span class="line">    builder.addArgs(<span class="string">"-I"</span>);</span><br><span class="line">    builder.addArgs(rsClangPath);</span><br><span class="line">    <span class="keyword">for</span> (File importPath : mImportFolders) &#123;</span><br><span class="line">        <span class="keyword">if</span> (importPath.isDirectory()) &#123;</span><br><span class="line">            builder.addArgs(<span class="string">"-I"</span>);</span><br><span class="line">            builder.addArgs(importPath.getAbsolutePath());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (mSupportMode) &#123;</span><br><span class="line">        builder.addArgs(<span class="string">"-rs-package-name=android.support.v8.renderscript"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    builder.addArgs(<span class="string">"-p"</span>);</span><br><span class="line">    builder.addArgs(mSourceOutputDir.getAbsolutePath());</span><br><span class="line">    builder.addArgs(<span class="string">"-o"</span>);</span><br><span class="line">    builder.addArgs(rawFolder.getAbsolutePath());</span><br><span class="line">    builder.addArgs(<span class="string">"-target-api"</span>);</span><br><span class="line">    <span class="keyword">int</span> targetApi = mTargetApi &lt; <span class="number">11</span> ? <span class="number">11</span> : mTargetApi;</span><br><span class="line">    targetApi = (mSupportMode &amp;&amp; targetApi &lt; <span class="number">18</span>) ? <span class="number">18</span> : targetApi;</span><br><span class="line">    builder.addArgs(Integer.toString(targetApi));</span><br><span class="line">    <span class="keyword">for</span> (File sourceFile : inputFiles) &#123;</span><br><span class="line">        builder.addArgs(sourceFile.getAbsolutePath());</span><br><span class="line">    &#125;</span><br><span class="line">    ProcessResult result = processExecutor.execute(</span><br><span class="line">        builder.createProcess(), processOutputHandler);</span><br><span class="line">    result.rethrowFailure().assertNormalExitValue();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>处理过程也很简单，也就是拼接参数然后执行 build-tools 下面的 llvm-rs-cc 工具，执行完毕后会生成对应的 java 类，在代码中就可以使用了。</p>
+<p>注： RenderScript 是用于在 Android 上以高性能运行计算密集型任务的框架。<a href="https://developer.android.com/guide/topics/renderscript/compute" target="_blank" rel="noopener">官方文档</a></p>
+<h3 id="checkDebugManifest"><a href="#checkDebugManifest" class="headerlink" title="checkDebugManifest"></a>checkDebugManifest</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createCheckManifestTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createCheckManifestTask</span><span class="params">(@NonNull TaskFactory tasks, @NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">    scope.setCheckManifestTask(</span><br><span class="line">        androidTasks.create(tasks, getCheckManifestConfig(scope)));</span><br><span class="line">    scope.getCheckManifestTask().dependsOn(tasks, scope.getPreBuildTask());</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">protected</span> CheckManifest.<span class="function">ConfigAction <span class="title">getCheckManifestConfig</span><span class="params">(@NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> CheckManifest.ConfigAction(scope, <span class="keyword">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 CheckManifest.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CheckManifest</span> <span class="keyword">extends</span> <span class="title">DefaultAndroidTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">check</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!isOptional &amp;&amp; manifest != <span class="keyword">null</span> &amp;&amp; !manifest.isFile()) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">                    String.format(</span><br><span class="line">                            <span class="string">"Main Manifest missing for variant %1$s. Expected path: %2$s"</span>,</span><br><span class="line">                            getVariantName(), getManifest().getAbsolutePath()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">CheckManifest</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;CheckManifest&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> CheckManifest<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 Task 很简单，就是检查了下 AndroidManifest.xml 这个文件是否存在，不存在则抛出异常。</p>
+<h3 id="generateDebugBuildConfig"><a href="#generateDebugBuildConfig" class="headerlink" title="generateDebugBuildConfig"></a>generateDebugBuildConfig</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createBuildConfigTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createBuildConfigTask</span><span class="params">(@NonNull TaskFactory tasks, @NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">    AndroidTask&lt;GenerateBuildConfig&gt; generateBuildConfigTask =</span><br><span class="line">        androidTasks.create(tasks, <span class="keyword">new</span> GenerateBuildConfig.ConfigAction(scope));</span><br><span class="line">    scope.setGenerateBuildConfigTask(generateBuildConfigTask);</span><br><span class="line">    scope.getSourceGenTask().dependsOn(tasks, generateBuildConfigTask.getName());</span><br><span class="line">    generateBuildConfigTask.dependsOn(tasks, scope.getCheckManifestTask());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 GenerateBuildConfig.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateBuildConfig</span> <span class="keyword">extends</span> <span class="title">BaseTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">generate</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        File destinationDir = getSourceOutputDir();</span><br><span class="line">        FileUtils.cleanOutputDir(destinationDir);</span><br><span class="line">        BuildConfigGenerator generator = <span class="keyword">new</span> BuildConfigGenerator(</span><br><span class="line">                getSourceOutputDir(),</span><br><span class="line">                getBuildConfigPackageName());</span><br><span class="line">        generator</span><br><span class="line">                .addField(</span><br><span class="line">                        <span class="string">"boolean"</span>,</span><br><span class="line">                        <span class="string">"DEBUG"</span>,</span><br><span class="line">                        isDebuggable() ? <span class="string">"Boolean.parseBoolean(\"true\")"</span> : <span class="string">"false"</span>)</span><br><span class="line">                .addField(<span class="string">"String"</span>, <span class="string">"APPLICATION_ID"</span>, <span class="string">'"'</span> + appPackageName.get() + <span class="string">'"'</span>)</span><br><span class="line">                .addField(<span class="string">"String"</span>, <span class="string">"BUILD_TYPE"</span>, <span class="string">'"'</span> + getBuildTypeName() + <span class="string">'"'</span>)</span><br><span class="line">                .addField(<span class="string">"String"</span>, <span class="string">"FLAVOR"</span>, <span class="string">'"'</span> + getFlavorName() + <span class="string">'"'</span>)</span><br><span class="line">                .addField(<span class="string">"int"</span>, <span class="string">"VERSION_CODE"</span>, Integer.toString(getVersionCode()))</span><br><span class="line">                .addField(</span><br><span class="line">                        <span class="string">"String"</span>, <span class="string">"VERSION_NAME"</span>, <span class="string">'"'</span> + Strings.nullToEmpty(getVersionName()) + <span class="string">'"'</span>)</span><br><span class="line">                .addItems(getItems());</span><br><span class="line">        List&lt;String&gt; flavors = getFlavorNamesWithDimensionNames();</span><br><span class="line">        <span class="keyword">int</span> count = flavors.size();</span><br><span class="line">        <span class="keyword">if</span> (count &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; count; i += <span class="number">2</span>) &#123;</span><br><span class="line">                generator.addField(</span><br><span class="line">                        <span class="string">"String"</span>, <span class="string">"FLAVOR_"</span> + flavors.get(i + <span class="number">1</span>), <span class="string">'"'</span> + flavors.get(i) + <span class="string">'"'</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        generator.generate();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">GenerateBuildConfig</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;GenerateBuildConfig&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> GenerateBuildConfig<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">generate</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    File pkgFolder = getFolderPath();</span><br><span class="line">    File buildConfigJava = <span class="keyword">new</span> File(pkgFolder, BUILD_CONFIG_NAME);</span><br><span class="line">    Closer closer = Closer.create();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        FileOutputStream fos = closer.register(<span class="keyword">new</span> FileOutputStream(buildConfigJava));</span><br><span class="line">        OutputStreamWriter out = closer.register(<span class="keyword">new</span> OutputStreamWriter(fos, Charsets.UTF_8));</span><br><span class="line">        JavaWriter writer = closer.register(<span class="keyword">new</span> JavaWriter(out));</span><br><span class="line">        writer.emitJavadoc(<span class="string">"Automatically generated file. DO NOT MODIFY"</span>)</span><br><span class="line">            .emitPackage(mBuildConfigPackageName)</span><br><span class="line">            .beginType(<span class="string">"BuildConfig"</span>, <span class="string">"class"</span>, PUBLIC_FINAL);</span><br><span class="line">        <span class="keyword">for</span> (ClassField field : mFields) &#123;</span><br><span class="line">            emitClassField(writer, field);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (Object item : mItems) &#123;</span><br><span class="line">            <span class="keyword">if</span> (item <span class="keyword">instanceof</span> ClassField) &#123;</span><br><span class="line">                emitClassField(writer, (ClassField) item);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (item <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">                writer.emitSingleLineComment((String) item);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        writer.endType();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> closer.rethrow(e);</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        closer.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Task 内部添加了以下几个字段，以及用户<strong>自定义的字段</strong>，然后生成 BuildConfig.java 。</p>
+<ol>
+<li>DEBUG</li>
+<li>APPLICATION_ID</li>
+<li>BUILD_TYPE</li>
+<li>FLAVOR</li>
+<li>VERSION_CODE</li>
+<li>VERSION_NAME</li>
+<li>FLAVOR_XXX</li>
+</ol>
+<p>自定义 BuildConfig 字段方法如下：</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">buildTypes &#123;</span><br><span class="line">    debug&#123;</span><br><span class="line">        buildConfigField <span class="string">"String"</span>, <span class="string">"Test"</span>, <span class="string">'"Hello, World!"'</span></span><br><span class="line">    &#125;</span><br><span class="line">    release &#123;</span><br><span class="line">        buildConfigField <span class="string">"String"</span>, <span class="string">"Test"</span>, <span class="string">'"Hello, World!"'</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="prepareLintJar"><a href="#prepareLintJar" class="headerlink" title="prepareLintJar"></a>prepareLintJar</h3><p>BasePlugin#createAndroidTasks</p>
+<p>TaskManager#configureCustomLintChecks</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureCustomLintChecks</span><span class="params">(@NonNull TaskFactory tasks)</span> </span>&#123;</span><br><span class="line">    File lintJar = FileUtils.join(globalScope.getIntermediatesDir(), <span class="string">"lint"</span>, FN_LINT_JAR);</span><br><span class="line">    AndroidTask&lt;PrepareLintJar&gt; copyLintTask =</span><br><span class="line">        getAndroidTasks()</span><br><span class="line">        .create(tasks, <span class="keyword">new</span> PrepareLintJar.ConfigAction(globalScope, lintJar));</span><br><span class="line">    globalScope.addTaskOutput(LINT_JAR, lintJar, copyLintTask.getName());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 PrepareLintJar.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">PrepareLintJar</span> <span class="keyword">extends</span> <span class="title">DefaultTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">prepare</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Set&lt;File&gt; files = lintChecks.getFiles();</span><br><span class="line">        <span class="keyword">if</span> (files.size() &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(</span><br><span class="line">                    <span class="string">"Found more than one jar in the '"</span></span><br><span class="line">                            + VariantDependencies.CONFIG_NAME_LINTCHECKS</span><br><span class="line">                            + <span class="string">"' configuration. Only one file is supported. If using a separate Gradle project, make sure compilation dependencies are using compileOnly"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (files.isEmpty()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (outputLintJar.isFile()) &#123;</span><br><span class="line">                FileUtils.delete(outputLintJar);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            FileUtils.mkdirs(outputLintJar.getParentFile());</span><br><span class="line">            Files.copy(Iterables.getOnlyElement(files), outputLintJar);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">PrepareLintJar</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;PrepareLintJar&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> PrepareLintJar<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该 Task 用于处理自定义的 Lint 规则生成的 jar 包，如果有自定义的并且只有一个那么拷贝到目标路径，如果有多个则报错。</p>
+<p>注：自定义 Lint <a href="https://www.jianshu.com/p/6127bd3df9fe?utm_campaign=maleskine&utm_content=note&utm_medium=seo_notes&utm_source=recommendation" target="_blank" rel="noopener">教程</a>。</p>
+<h3 id="generateDebugResValues"><a href="#generateDebugResValues" class="headerlink" title="generateDebugResValues"></a>generateDebugResValues</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createGenerateResValuesTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createGenerateResValuesTask</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    @NonNull TaskFactory tasks,</span></span></span><br><span class="line"><span class="function"><span class="params">    @NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">    AndroidTask&lt;GenerateResValues&gt; generateResValuesTask = androidTasks.create(</span><br><span class="line">        tasks, <span class="keyword">new</span> GenerateResValues.ConfigAction(scope));</span><br><span class="line">    scope.getResourceGenTask().dependsOn(tasks, generateResValuesTask);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 GenerateResValues.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GenerateResValues</span> <span class="keyword">extends</span> <span class="title">BaseTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">generate</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ParserConfigurationException </span>&#123;</span><br><span class="line">        File folder = getResOutputDir();</span><br><span class="line">        List&lt;Object&gt; resolvedItems = getItems();</span><br><span class="line">        <span class="keyword">if</span> (resolvedItems.isEmpty()) &#123;</span><br><span class="line">            FileUtils.cleanOutputDir(folder);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            ResValueGenerator generator = <span class="keyword">new</span> ResValueGenerator(folder);</span><br><span class="line">            generator.addItems(getItems());</span><br><span class="line">            generator.generate();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">GenerateResValues</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;GenerateResValues&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> GenerateResValues<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">generate</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ParserConfigurationException </span>&#123;</span><br><span class="line">    File pkgFolder = getFolderPath();</span><br><span class="line">    File resFile = <span class="keyword">new</span> File(pkgFolder, RES_VALUE_FILENAME_XML);</span><br><span class="line">    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();</span><br><span class="line">    factory.setNamespaceAware(<span class="keyword">true</span>);</span><br><span class="line">    factory.setValidating(<span class="keyword">false</span>);</span><br><span class="line">    factory.setIgnoringComments(<span class="keyword">true</span>);</span><br><span class="line">    DocumentBuilder builder;</span><br><span class="line">    builder = factory.newDocumentBuilder();</span><br><span class="line">    Document document = builder.newDocument();</span><br><span class="line">    Node rootNode = document.createElement(TAG_RESOURCES);</span><br><span class="line">    document.appendChild(rootNode);</span><br><span class="line">    rootNode.appendChild(document.createTextNode(<span class="string">"\n"</span>));</span><br><span class="line">    rootNode.appendChild(document.createComment(<span class="string">"Automatically generated file. DO NOT MODIFY"</span>));</span><br><span class="line">    rootNode.appendChild(document.createTextNode(<span class="string">"\n\n"</span>));</span><br><span class="line">    <span class="keyword">for</span> (Object item : mItems) &#123;</span><br><span class="line">        <span class="keyword">if</span> (item <span class="keyword">instanceof</span> ClassField) &#123;</span><br><span class="line">            ClassField field = (ClassField)item;</span><br><span class="line">            ResourceType type = ResourceType.getEnum(field.getType());</span><br><span class="line">            <span class="keyword">boolean</span> hasResourceTag = (type != <span class="keyword">null</span> &amp;&amp; RESOURCES_WITH_TAGS.contains(type));</span><br><span class="line">            Node itemNode = document.createElement(hasResourceTag ? field.getType() : TAG_ITEM);</span><br><span class="line">            Attr nameAttr = document.createAttribute(ATTR_NAME);</span><br><span class="line">            nameAttr.setValue(field.getName());</span><br><span class="line">            itemNode.getAttributes().setNamedItem(nameAttr);</span><br><span class="line">            <span class="keyword">if</span> (!hasResourceTag) &#123;</span><br><span class="line">                Attr typeAttr = document.createAttribute(ATTR_TYPE);</span><br><span class="line">                typeAttr.setValue(field.getType());</span><br><span class="line">                itemNode.getAttributes().setNamedItem(typeAttr);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (type == ResourceType.STRING) &#123;</span><br><span class="line">                Attr translatable = document.createAttribute(ATTR_TRANSLATABLE);</span><br><span class="line">                translatable.setValue(VALUE_FALSE);</span><br><span class="line">                itemNode.getAttributes().setNamedItem(translatable);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (!field.getValue().isEmpty()) &#123;</span><br><span class="line">                itemNode.appendChild(document.createTextNode(field.getValue()));</span><br><span class="line">            &#125;</span><br><span class="line">            rootNode.appendChild(itemNode);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (item <span class="keyword">instanceof</span> String) &#123;</span><br><span class="line">            rootNode.appendChild(document.createTextNode(<span class="string">"\n"</span>));</span><br><span class="line">            rootNode.appendChild(document.createComment((String) item));</span><br><span class="line">            rootNode.appendChild(document.createTextNode(<span class="string">"\n"</span>));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    String content;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        content = XmlPrettyPrinter.prettyPrint(document, <span class="keyword">true</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        content = XmlUtils.toXml(document);</span><br><span class="line">    &#125;</span><br><span class="line">    Files.write(content, resFile, Charsets.UTF_8);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该 Task 逻辑也很清晰，获取到自定义的 resValue 值，然后创建 generated.xml 将自定义的资源信息写入其中。</p>
+<p>自定义 resValue 方式如下：</p>
+<figure class="highlight groovy"><table><tr><td class="code"><pre><span class="line">buildTypes &#123;</span><br><span class="line">    release &#123;</span><br><span class="line">        resValue <span class="string">"string"</span>, <span class="string">"Test"</span>, <span class="string">"Hello, World!"</span></span><br><span class="line">    &#125;</span><br><span class="line">    debug &#123;</span><br><span class="line">        resValue <span class="string">"string"</span>, <span class="string">"Test"</span>, <span class="string">"Hello, World!"</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终生成的 generated.xml 文件内容如下：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">resources</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Automatically generated file. DO NOT MODIFY --&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- Values from build type: debug --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"Test"</span> <span class="attr">translatable</span>=<span class="string">"false"</span>&gt;</span>Hello, World!<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">resources</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="generateDebugResources"><a href="#generateDebugResources" class="headerlink" title="generateDebugResources"></a>generateDebugResources</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#createAnchorTasks</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createAnchorTasks</span><span class="params">(@NonNull TaskFactory tasks, @NonNull VariantScope scope)</span> </span>&#123;</span><br><span class="line">	scope.setResourceGenTask(androidTasks.create(tasks,</span><br><span class="line">                scope.getTaskName(<span class="string">"generate"</span>, <span class="string">"Resources"</span>),</span><br><span class="line">                Task<span class="class">.<span class="keyword">class</span>,</span></span><br><span class="line"><span class="class">                <span class="title">task</span> -&gt; </span>&#123;</span><br><span class="line">                    variantData.resourceGenTask = task;</span><br><span class="line">                &#125;));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>空实现，啥也没做，就是个锚点，标志着资源处理开始了。</p>
+<h3 id="mergeDebugResources"><a href="#mergeDebugResources" class="headerlink" title="mergeDebugResources"></a><font color='red'>mergeDebugResources</font></h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createMergeResourcesTask</p>
+<p>TaskManager#basicCreateMergeResourcesTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> AndroidTask&lt;MergeResources&gt; <span class="title">basicCreateMergeResourcesTask</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    AndroidTask&lt;MergeResources&gt; mergeResourcesTask =</span><br><span class="line">        androidTasks.create(</span><br><span class="line">        tasks,</span><br><span class="line">        <span class="keyword">new</span> MergeResources.ConfigAction(...));</span><br><span class="line">    <span class="keyword">return</span> scope.getMergeResourcesTask();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 MergeResources.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MergeResources</span> <span class="keyword">extends</span> <span class="title">IncrementalTask</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">doFullTaskAction</span><span class="params">()</span> <span class="keyword">throws</span> IOException, ExecutionException </span>&#123;</span><br><span class="line">        ResourcePreprocessor preprocessor = getPreprocessor();</span><br><span class="line">        File destinationDir = getOutputDir();</span><br><span class="line">        FileUtils.cleanOutputDir(destinationDir);</span><br><span class="line">        List&lt;ResourceSet&gt; resourceSets = getConfiguredResourceSets(preprocessor); <span class="comment">// 1</span></span><br><span class="line">        ResourceMerger merger = <span class="keyword">new</span> ResourceMerger(minSdk);</span><br><span class="line">        <span class="keyword">try</span> (QueueableResourceCompiler resourceCompiler =</span><br><span class="line">                processResources</span><br><span class="line">                        ? makeAapt(...)</span><br><span class="line">                        : QueueableResourceCompiler.NONE) &#123;</span><br><span class="line">            <span class="keyword">for</span> (ResourceSet resourceSet : resourceSets) &#123;</span><br><span class="line">                resourceSet.loadFromFiles(getILogger()); <span class="comment">// 2</span></span><br><span class="line">                merger.addDataSet(resourceSet);</span><br><span class="line">            &#125;</span><br><span class="line">            MergedResourceWriter writer =</span><br><span class="line">                    <span class="keyword">new</span> MergedResourceWriter(...);</span><br><span class="line">            merger.mergeData(writer, <span class="keyword">false</span> <span class="comment">/*doCleanUp*/</span>); <span class="comment">// 3</span></span><br><span class="line">            merger.writeBlobTo(getIncrementalFolder(), writer, <span class="keyword">false</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MergingException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ResourceException(e.getMessage(), e);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            cleanup();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">MergeResources</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;MergeResources&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> MergeResources<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大致流程为：</p>
+<ol>
+<li>获取所有 ResourceSet 实例，其实也就是 App 所有的资源集合，包括自身以及依赖的。</li>
+<li>加载每个 ResourceSet 下面的资源文件，检查并维护进内存中。</li>
+<li>合并多个 ResourceSet 下面的资源信息。</li>
+</ol>
+<p>下面一个个来进行分析。</p>
+<h4 id="获取所有-ResourceSet"><a href="#获取所有-ResourceSet" class="headerlink" title="获取所有 ResourceSet"></a>获取所有 ResourceSet</h4><p>MergeResources#doFullTaskAction</p>
+<p>MergeResources#getConfiguredResourceSets</p>
+<p>MergeResources#computeResourceSetList</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> List&lt;ResourceSet&gt; <span class="title">getConfiguredResourceSets</span><span class="params">(ResourcePreprocessor preprocessor)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (processedInputs == <span class="keyword">null</span>) &#123;</span><br><span class="line">        processedInputs = computeResourceSetList();</span><br><span class="line">        List&lt;ResourceSet&gt; generatedSets = Lists.newArrayListWithCapacity(processedInputs.size());</span><br><span class="line">        <span class="keyword">for</span> (ResourceSet resourceSet : processedInputs) &#123; <span class="comment">// 4</span></span><br><span class="line">            resourceSet.setPreprocessor(preprocessor);</span><br><span class="line">            ResourceSet generatedSet = <span class="keyword">new</span> GeneratedResourceSet(resourceSet);</span><br><span class="line">            resourceSet.setGeneratedSet(generatedSet);</span><br><span class="line">            generatedSets.add(generatedSet);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; generatedSets.size(); ++i) &#123; <span class="comment">// 5</span></span><br><span class="line">            processedInputs.add(<span class="number">2</span> * i, generatedSets.get(i));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> processedInputs;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">List&lt;ResourceSet&gt; <span class="title">computeResourceSetList</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    List&lt;ResourceSet&gt; sourceFolderSets = resSetSupplier.get(); <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">if</span> (libraries != <span class="keyword">null</span>) &#123; <span class="comment">// 2</span></span><br><span class="line">        size += libraries.getArtifacts().size();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">int</span> size = sourceFolderSets.size() + <span class="number">4</span>;</span><br><span class="line">    List&lt;ResourceSet&gt; resourceSetList = Lists.newArrayListWithExpectedSize(size);</span><br><span class="line">    resourceSetList.addAll(sourceFolderSets);</span><br><span class="line">    List&lt;File&gt; generatedResFolders = Lists.newArrayList();</span><br><span class="line">    generatedResFolders.addAll(renderscriptResOutputDir.getFiles());</span><br><span class="line">    generatedResFolders.addAll(generatedResOutputDir.getFiles());</span><br><span class="line">    <span class="keyword">final</span> ResourceSet mainResourceSet = sourceFolderSets.get(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">assert</span> mainResourceSet.getConfigName().equals(BuilderConstants.MAIN);</span><br><span class="line">    mainResourceSet.addSources(generatedResFolders); <span class="comment">// 3</span></span><br><span class="line">    <span class="keyword">return</span> resourceSetList;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在分析代码前首先看看 ResourceSet 相关类图：</p>
+<img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-01/%E6%88%AA%E5%B1%8F2021-02-23%20%E4%B8%8B%E5%8D%884.22.33.png" alt="截屏2021-02-23 下午4.22.33" style="zoom:50%;" />
+
+<p>根据类图可以看到 DataSet 拥有一个 <strong>mSourceFile 字段</strong>，该字段表示的就是该 ResourceSet 所拥有的一系列文件。注意其是个 List ，一般条件下只有一个，但是可能会有多个，稍后第三步就将看到。</p>
+<ol>
+<li>获取应用程序的 ResourceSet 列表，这里会获取到两个实例，其 sourceFile 各只有一个文件夹分别是 src/main/res 以及 src/debug/res。注：因为执行的是 assembleDebug，所以会有 src/debug/res。</li>
+<li>获取应用程序依赖库的 ResourceSet 列表，这里的数量根据依赖而定，不过 sourceFile 一般也是一个，暂时不知道什么情况会出现多个。</li>
+<li>给 mainResourceSet 添加以下两个目录，这两个目录分别是上述处理 RenderScript 以及 ResValues 生成的目录，添加完毕后该 ResourceSet 就会拥有三个 sourceFile。<ul>
+<li>build/generated/res/rs/debug</li>
+<li>build/generated/resValues/debug</li>
+</ul>
+</li>
+<li>为每个 ResourceSet 创建对应的 GeneratedResourceSet ，然后设置给 ResourceSet。</li>
+<li>将每个 GeneratedResourceSet 间隔插入到 ResourceSet 列表中，最终顺序为 A-Generated、A、B-Generated、B 。</li>
+</ol>
+<p><strong><em>看到这又产生疑问了，为什么需要这个 GeneratedResourceSet，这难道不是多此一举吗？</em></strong></p>
+<p>原因是在资源合并过程中会自动生成一些资源（比如后面会说到的 vector 资源的处理），这些资源就被放入对应的 GeneratedResourceSet 中，这又会引出两个问题。</p>
+<ol>
+<li>为什么不直接放入 ResourceSet ？根据注释这是因为如果直接放入其中，如果增量编译失败那么又需要重新去获取 ResourceSet，影响效率，因为才会这么做。</li>
+<li>为什么需要按这种顺序进行插入？因为最终生成资源时会倒序进行处理，这样能保证 GeneratedResourceSet 比起对应的 ResourceSet 优先级低，但是又比原先优先级低于它的 ResourceSet 优先级高。</li>
+</ol>
+<h4 id="加载所有-ResourceSet"><a href="#加载所有-ResourceSet" class="headerlink" title="加载所有 ResourceSet"></a>加载所有 ResourceSet</h4><p>MergeResources#doFullTaskAction</p>
+<p>MergeResources#getConfiguredResourceSets</p>
+<p>ResourcesSet#loadFromFiles</p>
+<p>从上述类图可以看出，ResourceSet 没有重写 loadFromFile ，但是 GeneratedResourceSet 重写了。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DataSet</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">loadFromFiles</span><span class="params">(ILogger logger)</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    List&lt;Message&gt; errors = Lists.newArrayList();</span><br><span class="line">    <span class="keyword">for</span> (File file : mSourceFiles) &#123;</span><br><span class="line">        <span class="keyword">if</span> (file.isDirectory()) &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                readSourceFolder(file, logger); <span class="comment">// 1</span></span><br><span class="line">            &#125; <span class="keyword">catch</span> (MergingException e) &#123;</span><br><span class="line">                errors.addAll(e.getMessages());</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (file.isFile()) &#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    MergingException.throwIfNonEmpty(errors);</span><br><span class="line">    checkItems(); <span class="comment">// 2</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// GeneratedResourceSet</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">loadFromFiles</span><span class="params">(ILogger logger)</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    <span class="comment">// Do nothing, the original set will hand us the generated files.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>读取每个 sourceFile 文件夹。</li>
+<li>检查该 ResourceSet 是否存在重复资源。</li>
+</ol>
+<h5 id="读取-sourceFile-文件夹"><a href="#读取-sourceFile-文件夹" class="headerlink" title="读取 sourceFile 文件夹"></a>读取 sourceFile 文件夹</h5><p>readSourceFolder 方法由 ResourceSet 进行实现。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">readSourceFolder</span><span class="params">(File sourceFolder, ILogger logger)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    List&lt;Message&gt; errors = Lists.newArrayList();</span><br><span class="line">    File[] folders = sourceFolder.listFiles();</span><br><span class="line">    <span class="keyword">if</span> (folders != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (File folder : folders) &#123;</span><br><span class="line">            <span class="keyword">if</span> (folder.isDirectory() &amp;&amp; !isIgnored(folder)) &#123;</span><br><span class="line">                FolderData folderData = getFolderData(folder); <span class="comment">// 1</span></span><br><span class="line">                <span class="keyword">if</span> (folderData != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        parseFolder(sourceFolder, folder, folderData, logger); <span class="comment">// 2</span></span><br><span class="line">                    &#125; <span class="keyword">catch</span> (MergingException e) &#123;</span><br><span class="line">                        errors.addAll(e.getMessages());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    MergingException.throwIfNonEmpty(errors);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>根据文件夹名称解析文件夹类型以及限定信息（- 后面的），生成 FolderData 实例。（细节忽略）</li>
+<li>对每个 sourceFile 下的每个子文件进行读取。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">parseFolder</span><span class="params">(File sourceFolder, File folder, FolderData folderData, ...)</span> </span>&#123;</span><br><span class="line">    File[] files = folder.listFiles();</span><br><span class="line">    <span class="keyword">if</span> (files != <span class="keyword">null</span> &amp;&amp; files.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">for</span> (File file : files) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!file.isFile() || isIgnored(file)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            ResourceFile resourceFile = createResourceFile(file, folderData, logger); <span class="comment">// 1</span></span><br><span class="line">            processNewResourceFile(sourceFolder, resourceFile); <span class="comment">// 2</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>读取每个资源文件，并据此创建 ResourceFile 实例。</li>
+<li><span id = "processNewResourceFile">处理新生成的 ResourceFile 实例。</span></li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> ResourceFile <span class="title">createResourceFile</span><span class="params">(@NonNull File file,</span></span></span><br><span class="line"><span class="function"><span class="params">        @NonNull FolderData folderData, @NonNull ILogger logger)</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (getValidateEnabled()) &#123;</span><br><span class="line">        FileResourceNameValidator.validate(file, folderData.folderType); <span class="comment">// 1</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (folderData.type != <span class="keyword">null</span>) &#123; <span class="comment">// 2</span></span><br><span class="line">        <span class="keyword">if</span> (needsPreprocessing(file)) &#123; <span class="comment">// 3</span></span><br><span class="line">            <span class="keyword">return</span> ResourceFile.generatedFiles(</span><br><span class="line">                    file,</span><br><span class="line">                    getResourceItemsForGeneratedFiles(file),</span><br><span class="line">                    folderData.qualifiers,</span><br><span class="line">                    folderData.folderConfiguration);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ResourceFile( <span class="comment">// 4</span></span><br><span class="line">                    file,</span><br><span class="line">                    <span class="keyword">new</span> ResourceItem(...),</span><br><span class="line">                    folderData.qualifiers,</span><br><span class="line">                    folderData.folderConfiguration);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            ValueResourceParser2 parser =</span><br><span class="line">                    <span class="keyword">new</span> ValueResourceParser2(file, mNamespace, mLibraryName);</span><br><span class="line">            parser.setTrackSourcePositions(mTrackSourcePositions);</span><br><span class="line">            List&lt;ResourceItem&gt; items = parser.parseFile(); <span class="comment">//  5</span></span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ResourceFile(...);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (MergingException e) &#123;</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>校验资源文件后缀名，比如 raw 文件夹，所有文件后缀都可，drawable、mipmap 文件夹，支持后缀为 xml、png、9.png、gif、jpeg、jpg、bmp、webp 文件。</li>
+<li>只有 values 相关文件夹 folderData.type == null ，因此非 values 文件夹下的文件才会进入。</li>
+<li>当 minSdk 小于 21、文件后缀为 xml 、位于 drawable 文件夹、同时根节点为 <strong>vector</strong> 时需要预处理。具体流程为在每个图片质量文件夹中增加一个对应的 png 文件以及在 anydpi 增加一个该 xml 文件。然后创建 ResourceFile 实例返回，该实例文件类型为 GENERATED_FILES 。</li>
+<li>不需要预处理那么直接创建 ResourceFile 实例返回，该实例文件类型为 SINGLE_FILE 。</li>
+<li>如果是 values 文件夹下的文件，需要对每个文件进行解析，然后创建 ResourceFile 实例返回，该实例文件类型为 XML_VALUES。</li>
+</ol>
+<p>主要关注下 values 文件夹下的资源文件的解析。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">List&lt;ResourceItem&gt; <span class="title">parseFile</span><span class="params">()</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    Document document = parseDocument(mFile, mTrackSourcePositions);</span><br><span class="line">    Node rootNode = document.getDocumentElement();</span><br><span class="line">    <span class="keyword">if</span> (rootNode == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> Collections.emptyList();</span><br><span class="line">    &#125;</span><br><span class="line">    NodeList nodes = rootNode.getChildNodes();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> count = nodes.getLength();</span><br><span class="line">    List&lt;ResourceItem&gt; resources = Lists.newArrayListWithExpectedSize(count);</span><br><span class="line">    Map&lt;ResourceType, Set&lt;String&gt;&gt; map = Maps.newEnumMap(ResourceType<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, n = nodes.getLength(); i &lt; n; i++) &#123;</span><br><span class="line">        Node node = nodes.item(i);</span><br><span class="line">        <span class="keyword">if</span> (node.getNodeType() != Node.ELEMENT_NODE) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ResourceItem resource = getResource(node, mFile, mNamespace, mLibraryName);</span><br><span class="line">        <span class="keyword">if</span> (resource != <span class="keyword">null</span>) &#123;</span><br><span class="line">            checkDuplicate(resource, map, mFile);</span><br><span class="line">            resources.add(resource);</span><br><span class="line">            <span class="keyword">if</span> (resource.getType() == ResourceType.DECLARE_STYLEABLE) &#123;</span><br><span class="line">                addStyleableItems(node, resources, map, mFile, mNamespace, mLibraryName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> resources;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读取每一个节点，判断<strong>单个文件中是否存在重复</strong>的，如存在就抛出异常，不存在则存起来，对于 declare-styleable 会将其内部的 attr 节点（需要有 format 属性或者是 enum 或 flag）也加入到 resources 中，然后以此创建 ResourFile 实例。</p>
+<p>回到<a href="#processNewResourceFile">上文</a> ，对每个资源文件处理生成 ResourceFile 实例后还需要调用 <code>processNewResourceFile</code> 进行处理。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">processNewResourceFile</span><span class="params">(File sourceFolder, ResourceFile resourceFile)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (resourceFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">if</span> (resourceFile.getType() == DataFile.FileType.GENERATED_FILES</span><br><span class="line">            &amp;&amp; mGeneratedSet != <span class="keyword">null</span>) &#123;</span><br><span class="line">            mGeneratedSet.processNewDataFile(sourceFolder, resourceFile, <span class="keyword">true</span>); <span class="comment">// 1</span></span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            processNewDataFile(sourceFolder, resourceFile, <span class="keyword">true</span> <span class="comment">/*setTouched*/</span>); <span class="comment">// 2</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">processNewDataFile</span><span class="params">(...)</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    Collection&lt;I&gt; dataItems = dataFile.getItems();</span><br><span class="line">    addDataFile(sourceFolder, dataFile);</span><br><span class="line">    <span class="keyword">for</span> (I dataItem : dataItems) &#123;</span><br><span class="line">        mItems.put(dataItem.getKey(), dataItem);</span><br><span class="line">        <span class="keyword">if</span> (setTouched) &#123;</span><br><span class="line">            dataItem.setTouched();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">addDataFile</span><span class="params">(@NonNull File sourceFile, @NonNull F dataFile)</span> </span>&#123;</span><br><span class="line">    mSourceFileToDataFilesMap.put(sourceFile, dataFile);</span><br><span class="line">    mDataFileMap.put(dataFile.getFile(), dataFile);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>如果该实例文件类型为 GENERATED_FILES 那么由其对应的 GeneratedResourceSet 进行处理。</li>
+<li>如果该实例文件类型非 GENERATED_FILES 那么由当前 ResourceSet 进行处理。</li>
+</ol>
+<p>处理过程就是将相关信息维护到以下三个数据结构中，注意 ListMultimap 与普通 Map 不同 put 时如果遇到相同 key 并不会进行覆盖，而是会在该 key 对应的列表中添加它。</p>
+<ol>
+<li>mSourceFileToDataFilesMap <strong>ListMultimap</strong> sourceFile =&gt; ResourceFile</li>
+<li>mDataFileMap HashMap file =&gt; ResourceFile</li>
+<li>mItems <strong>ListMultimap</strong> key(诸如 attr/cardViewStyle) =&gt; ResourceItem</li>
+</ol>
+<h5 id="检查-ResourceSet-资源"><a href="#检查-ResourceSet-资源" class="headerlink" title="检查 ResourceSet 资源"></a>检查 ResourceSet 资源</h5><p>当处理完该 ResourceSet 下所有的文件时，就会调用 <code>checkItems</code> 来检查是否存在重复。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">checkItems</span><span class="params">()</span> <span class="keyword">throws</span> DuplicateDataException </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!mValidateEnabled) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    Collection&lt;Collection&lt;I&gt;&gt; duplicateCollections = Lists.newArrayList();</span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;String, Collection&lt;I&gt;&gt; entry : mItems.asMap().entrySet()) &#123;</span><br><span class="line">        Collection&lt;I&gt; items = entry.getValue();</span><br><span class="line">        I lastItem = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">for</span> (I item : items) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!item.isRemoved()) &#123;</span><br><span class="line">                <span class="keyword">if</span> (lastItem == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    lastItem = item;</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    duplicateCollections.add(items);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (!duplicateCollections.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> DuplicateDataException(DuplicateDataException.createMessages(duplicateCollections));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>item 的状态不用考虑，现在全是 touched，只有当增量编译的时候才会出现 removed，取出每个 key 对应的 ResourceItem 列表，如果发现列表数大于 1 个，那么后续就会抛出异常。 </p>
+<h4 id="合并多个-ResourceSet-资源"><a href="#合并多个-ResourceSet-资源" class="headerlink" title="合并多个 ResourceSet 资源"></a>合并多个 ResourceSet 资源</h4><p>当资源信息全部读取进内存后，需要进行资源合并，合并后的资源将做为 Apk 的资源。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">mergeData</span><span class="params">(@NonNull MergeConsumer&lt;I&gt; consumer, <span class="keyword">boolean</span> doCleanUp)</span></span></span><br><span class="line"><span class="function">            <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    consumer.start(mFactory);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Set&lt;String&gt; dataItemKeys = Sets.newHashSet();</span><br><span class="line">        <span class="keyword">for</span> (S dataSet : mDataSets) &#123; <span class="comment">// 1</span></span><br><span class="line">            ListMultimap&lt;String, I&gt; map = dataSet.getDataMap();</span><br><span class="line">            dataItemKeys.addAll(map.keySet());</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (String dataItemKey : dataItemKeys) &#123;</span><br><span class="line">            <span class="keyword">if</span> (requiresMerge(dataItemKey)) &#123; <span class="comment">// 2</span></span><br><span class="line">                List&lt;I&gt; items = Lists.newArrayListWithExpectedSize(mDataSets.size());</span><br><span class="line">                <span class="keyword">for</span> (S dataSet : mDataSets) &#123;</span><br><span class="line">                    ListMultimap&lt;String, I&gt; itemMap = dataSet.getDataMap();</span><br><span class="line">                    <span class="keyword">if</span> (itemMap.containsKey(dataItemKey)) &#123;</span><br><span class="line">                        List&lt;I&gt; setItems = itemMap.get(dataItemKey);</span><br><span class="line">                        items.addAll(setItems);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                mergeItems(dataItemKey, items, consumer);</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            I previouslyWritten = <span class="keyword">null</span>;</span><br><span class="line">            I toWrite = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">boolean</span> foundIgnoredItem = <span class="keyword">false</span>;</span><br><span class="line">            <span class="comment">// 高优先级 到 低优先级</span></span><br><span class="line">            setLoop: <span class="keyword">for</span> (<span class="keyword">int</span> i = mDataSets.size() - <span class="number">1</span> ; i &gt;= <span class="number">0</span> ; i--) &#123;</span><br><span class="line">                S dataSet = mDataSets.get(i);</span><br><span class="line">                ListMultimap&lt;String, I&gt; itemMap = dataSet.getDataMap();</span><br><span class="line">                <span class="keyword">if</span> (!itemMap.containsKey(dataItemKey)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                List&lt;I&gt; items = itemMap.get(dataItemKey);</span><br><span class="line">                <span class="keyword">if</span> (items.isEmpty()) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 遇到重复的了</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> ii = items.size() - <span class="number">1</span> ; ii &gt;= <span class="number">0</span> ; ii--) &#123;</span><br><span class="line">                    I item = items.get(ii);</span><br><span class="line">                    <span class="keyword">if</span> (consumer.ignoreItemInMerge(item)) &#123; <span class="comment">// 3</span></span><br><span class="line">                        foundIgnoredItem = <span class="keyword">true</span>;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (item.isWritten()) &#123; <span class="comment">// 忽略，增量编译</span></span><br><span class="line">                        <span class="keyword">assert</span> previouslyWritten == <span class="keyword">null</span>;</span><br><span class="line">                        previouslyWritten = item;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (toWrite == <span class="keyword">null</span> &amp;&amp; !item.isRemoved()) &#123; <span class="comment">// 4</span></span><br><span class="line">                        toWrite = item;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (toWrite != <span class="keyword">null</span> &amp;&amp; previouslyWritten != <span class="keyword">null</span>) &#123; <span class="comment">// 忽略</span></span><br><span class="line">                        <span class="keyword">break</span> setLoop;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 没有重复进行下一个 ResourceSet</span></span><br><span class="line">            <span class="keyword">if</span> (previouslyWritten == <span class="keyword">null</span> &amp;&amp; toWrite == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (toWrite == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">assert</span> previouslyWritten.isRemoved();</span><br><span class="line">                consumer.removeItem(previouslyWritten, <span class="keyword">null</span> <span class="comment">/*replacedBy*/</span>);</span><br><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (previouslyWritten == <span class="keyword">null</span> || previouslyWritten == toWrite) &#123;</span><br><span class="line">                consumer.addItem(toWrite); <span class="comment">// 5</span></span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; </span><br><span class="line">                toWrite.setTouched();</span><br><span class="line">                consumer.addItem(toWrite);</span><br><span class="line">                consumer.removeItem(previouslyWritten, toWrite);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        consumer.end();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (doCleanUp) &#123;</span><br><span class="line">        postMergeCleanUp();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>遍历所有的 ResourceSet 实例，将其内部所有的 ResourceFile 实例（也就是该 App 所有的资源信息）全部加入到 dataItemKeys 中。</p>
+</li>
+<li><p>对于 declare-styleable 资源，需要对其的内部属性进行合并。</p>
+</li>
+<li><p>忽略 declare-styleable 下面的有 format 属性或者 enum、flag 的 attr 资源，因为第二步已经加了。</p>
+</li>
+<li><p><strong>由于是逆序遍历，在多个 ResourceSet 中遇到重复资源了就只会写入优先级最高的那一个。</strong></p>
+</li>
+<li><p>将最终选择资源传递给 consumer 也就是 MergedResourceWriter 进行输出。</p>
+</li>
+</ol>
+<h5 id="合并-declare-styleable"><a href="#合并-declare-styleable" class="headerlink" title="合并 declare-styleable"></a>合并 declare-styleable</h5><p>上面 mergeData 每遍历到一个 declare-styleable 资源，都会编译所有 ResourceSet 的资源，收集相同名称的 declare-styleable 资源，然后调用 mergeItems。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">mergeItems</span><span class="params">(...)</span> <span class="keyword">throws</span> MergingException </span>&#123;</span><br><span class="line">    ResourceItem sourceItem = items.get(<span class="number">0</span>);</span><br><span class="line">    ResourceItem previouslyWrittenItem = getMergedItem(qualifier, itemName);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        DocumentBuilder builder = mFactory.newDocumentBuilder();</span><br><span class="line">        Document document = builder.newDocument();</span><br><span class="line">        Node declareStyleableNode = document.createElementNS(<span class="keyword">null</span>, TAG_DECLARE_STYLEABLE);</span><br><span class="line">        Attr nameAttr = document.createAttribute(ATTR_NAME);</span><br><span class="line">        nameAttr.setValue(itemName);</span><br><span class="line">        declareStyleableNode.getAttributes().setNamedItem(nameAttr);</span><br><span class="line">        Set&lt;String&gt; attrs = Sets.newHashSet();</span><br><span class="line">        <span class="keyword">for</span> (ResourceItem item : items) &#123;</span><br><span class="line">            Node oldDeclareStyleable = item.getValue();</span><br><span class="line">            NodeList children = oldDeclareStyleable.getChildNodes();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; children.getLength(); i++) &#123;</span><br><span class="line">                Node attrNode = children.item(i);</span><br><span class="line">                NamedNodeMap attributes = attrNode.getAttributes();</span><br><span class="line">                nameAttr = (Attr) attributes.getNamedItemNS(<span class="keyword">null</span>, ATTR_NAME);</span><br><span class="line">                <span class="keyword">if</span> (nameAttr == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                String name = nameAttr.getNodeValue();</span><br><span class="line">                <span class="keyword">if</span> (attrs.contains(name)) &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                attrs.add(name);</span><br><span class="line">                Node newAttrNode = NodeUtils.duplicateNode(document, attrNode);</span><br><span class="line">                declareStyleableNode.appendChild(newAttrNode);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        MergedResourceItem newItem = <span class="keyword">new</span> MergedResourceItem(...);</span><br><span class="line">        consumer.addItem(newItem);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ParserConfigurationException e) &#123;</span><br><span class="line">        <span class="keyword">throw</span> MergingException.wrapException(e).build();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>原理大概是遍历所有相同名称的 declare-styleable 资源，收集所有内部的 attr，然后创建一个 MergedResourceItem ，然后传递给 MergedResourceWriter。</p>
+<h5 id="使用-MergedResourceWriter-输出"><a href="#使用-MergedResourceWriter-输出" class="headerlink" title="使用 MergedResourceWriter 输出"></a>使用 MergedResourceWriter 输出</h5><p>可以看到在 mergeData 方法中首先会调用 consumer.start ，然后中间会调用若干次 consumer.addItem，最终调用 consumer.end。跟进下这三个方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(@NonNull DocumentBuilderFactory factory)</span> <span class="keyword">throws</span> ConsumerException </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.start(factory);</span><br><span class="line">    mValuesResMap = ArrayListMultimap.create();</span><br><span class="line">    mQualifierWithDeletedValues = Sets.newHashSet();</span><br><span class="line">    mFactory = factory;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>start 方法没什么特别的就是初始化一些成员属性。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addItem</span><span class="params">(@NonNull <span class="keyword">final</span> ResourceItem item)</span> <span class="keyword">throws</span> ConsumerException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> ResourceFile.FileType type = item.getSourceType();</span><br><span class="line">    <span class="keyword">if</span> (type == ResourceFile.FileType.XML_VALUES) &#123;</span><br><span class="line">        mValuesResMap.put(item.getQualifiers(), item); <span class="comment">// 1</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        File file = item.getFile();</span><br><span class="line">        String folderName = getFolderName(item);</span><br><span class="line">        <span class="keyword">if</span> (type == DataFile.FileType.GENERATED_FILES) &#123;</span><br><span class="line">            FileGenerationParameters workItem = <span class="keyword">new</span> FileGenerationParameters(item, mPreprocessor);</span><br><span class="line">            <span class="keyword">if</span> (workItem.resourceItem.getSource() != <span class="keyword">null</span>) &#123;</span><br><span class="line">                getExecutor().submit(workItem); <span class="comment">// 2</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        mCompileResourceRequests.add(</span><br><span class="line">            <span class="keyword">new</span> CompileResourceRequest(file, getRootFolder(), folderName));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>对于 values 资源，按照限定符进行分开存放。</li>
+<li>如果文件类型为 GENERATED_FILES，那么需要自动生成对应的文件，最终通过 FileGenerationWorkAction 进行生成，不展开了。</li>
+<li>对于非 values 资源，新建个 CompileResourceRequest 实例存放。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">end</span><span class="params">()</span> <span class="keyword">throws</span> ConsumerException </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>.end(); <span class="comment">// 1</span></span><br><span class="line">    Map&lt;Future, String&gt; outstandingRequests = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line">    File tmpDir = <span class="keyword">new</span> File(mTemporaryDirectory, <span class="string">"stripped.dir"</span>);</span><br><span class="line">    <span class="keyword">while</span> (!mCompileResourceRequests.isEmpty()) &#123;</span><br><span class="line">        CompileResourceRequest request = mCompileResourceRequests.poll();</span><br><span class="line">        Future&lt;File&gt; result;</span><br><span class="line">        File fileToCompile = request.getInput();</span><br><span class="line">        result = mResourceCompiler.compile(<span class="keyword">new</span> CompileResourceRequest(...)); <span class="comment">// 2</span></span><br><span class="line">        outstandingRequests.put(result, request.getInput().getAbsolutePath());</span><br><span class="line">        mCompiling.add(result);</span><br><span class="line">    &#125;</span><br><span class="line">    Future&lt;File&gt; first;</span><br><span class="line">    <span class="keyword">while</span> ((first = mCompiling.pollFirst()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 等待每个资源编译完成</span></span><br><span class="line">        File outFile = first.get();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>处理 values 资源，以及等待 vector 生成对应的 png 图片生成完成。</li>
+<li>编译资源，内部就是调用 aapt2 工具进行处理。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">end</span><span class="params">()</span> <span class="keyword">throws</span> ConsumerException </span>&#123;</span><br><span class="line">    postWriteAction();</span><br><span class="line">    getExecutor().await();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">postWriteAction</span><span class="params">()</span> <span class="keyword">throws</span> ConsumerException </span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (String key : mValuesResMap.keySet()) &#123;</span><br><span class="line">        List&lt;ResourceItem&gt; items = mValuesResMap.get(key);</span><br><span class="line">        String folderName = key.isEmpty() ?</span><br><span class="line">                ResourceFolderType.VALUES.getName() :</span><br><span class="line">        ResourceFolderType.VALUES.getName() + RES_QUALIFIER_SEP + key;</span><br><span class="line">        File valuesFolder = <span class="keyword">new</span> File(tmpDir, folderName);</span><br><span class="line">        File outFile = <span class="keyword">new</span> File(valuesFolder, folderName + DOT_XML);</span><br><span class="line">        FileUtils.mkdirs(valuesFolder);</span><br><span class="line">        DocumentBuilder builder = mFactory.newDocumentBuilder();</span><br><span class="line">        Document document = builder.newDocument();</span><br><span class="line">        <span class="keyword">final</span> String publicTag = ResourceType.PUBLIC.getName();</span><br><span class="line">        List&lt;Node&gt; publicNodes = <span class="keyword">null</span>;</span><br><span class="line">        Node rootNode = document.createElement(TAG_RESOURCES);</span><br><span class="line">        document.appendChild(rootNode);</span><br><span class="line">        Collections.sort(items);</span><br><span class="line">        <span class="keyword">for</span> (ResourceItem item : items) &#123;</span><br><span class="line">            Node nodeValue = item.getValue();</span><br><span class="line">            rootNode.appendChild(document.createTextNode(<span class="string">"\n    "</span>));</span><br><span class="line">            ResourceFile source = item.getSource();</span><br><span class="line">            Node adoptedNode = NodeUtils.adoptNode(document, nodeValue);</span><br><span class="line">            <span class="keyword">if</span> (source != <span class="keyword">null</span>) &#123;</span><br><span class="line">                XmlUtils.attachSourceFile(</span><br><span class="line">                    adoptedNode, <span class="keyword">new</span> SourceFile(source.getFile()));</span><br><span class="line">            &#125;</span><br><span class="line">            rootNode.appendChild(adoptedNode);</span><br><span class="line">        &#125;</span><br><span class="line">        rootNode.appendChild(document.createTextNode(<span class="string">"\n"</span>)); </span><br><span class="line">        <span class="keyword">final</span> String content;</span><br><span class="line">        Files.write(content, outFile, Charsets.UTF_8); <span class="comment">// 1</span></span><br><span class="line">        CompileResourceRequest request = <span class="keyword">new</span> CompileResourceRequest(...);</span><br><span class="line">        mResourceCompiler.compile(request).get(); <span class="comment">// 2</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>在每个限定文件夹下生成 values.xml 。比如 values/values.xml、values-v23/values.xml 等等。</li>
+<li>使用 aapt2 编译生成的每个 values.xml 文件。</li>
+</ol>
+<p>至此该 Task 处理完毕，其重要内容就是把所有资源按优先级进行合并，将所有的 values 资源合并生成 values.xml 然后，然后使用 aapt2 进行编译。</p>
+<h3 id="createDebugCompatibleScreenManifests"><a href="#createDebugCompatibleScreenManifests" class="headerlink" title="createDebugCompatibleScreenManifests"></a>createDebugCompatibleScreenManifests</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#createMergeApkManifestsTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">createMergeApkManifestsTask</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">            @NonNull TaskFactory tasks, @NonNull VariantScope variantScope)</span> </span>&#123;</span><br><span class="line">    AndroidTask&lt;CompatibleScreensManifest&gt; csmTask =</span><br><span class="line">        androidTasks.create(tasks,</span><br><span class="line">        <span class="keyword">new</span> CompatibleScreensManifest.ConfigAction(variantScope, screenSizes));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 CompatibleScreensManifest.ConfigAction。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CompatibleScreensManifest</span> <span class="keyword">extends</span> <span class="title">DefaultAndroidTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">generateAll</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        outputScope.parallelForEach(</span><br><span class="line">                VariantScope.TaskOutputType.COMPATIBLE_SCREEN_MANIFEST, <span class="keyword">this</span>::generate);</span><br><span class="line">        outputScope.save(</span><br><span class="line">                ImmutableList.of(VariantScope.TaskOutputType.COMPATIBLE_SCREEN_MANIFEST),</span><br><span class="line">                outputFolder);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> File <span class="title">generate</span><span class="params">(ApkData apkData)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        String density = apkData.getFilter(com.android.build.OutputFile.FilterType.DENSITY);</span><br><span class="line">        <span class="keyword">if</span> (density == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        StringBuilder content = <span class="keyword">new</span> StringBuilder();</span><br><span class="line">        content.append(<span class="string">"&lt;?xml version=\"1.0\" encoding=\"utf-8\"?&gt;\n"</span>)</span><br><span class="line">                .append(<span class="string">"&lt;manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"</span>)</span><br><span class="line">                .append(<span class="string">"    package=\"\"&gt;\n"</span>)</span><br><span class="line">                .append(<span class="string">"\n"</span>);</span><br><span class="line">        <span class="keyword">if</span> (minSdkVersion.get() != <span class="keyword">null</span>) &#123;</span><br><span class="line">            content.append(<span class="string">"    &lt;uses-sdk android:minSdkVersion=\""</span>)</span><br><span class="line">                    .append(minSdkVersion.get())</span><br><span class="line">                    .append(<span class="string">"\"/&gt;\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        content.append(<span class="string">"    &lt;compatible-screens&gt;\n"</span>);</span><br><span class="line">        density = convert(density, Density.XXHIGH, Density.XXXHIGH);</span><br><span class="line">        <span class="keyword">for</span> (String size : getScreenSizes()) &#123;</span><br><span class="line">            content.append(</span><br><span class="line">                    <span class="string">"        &lt;screen android:screenSize=\""</span>).append(size).append(<span class="string">"\" "</span></span><br><span class="line">                    + <span class="string">"android:screenDensity=\""</span>).append(density).append(<span class="string">"\" /&gt;\n"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        content.append(</span><br><span class="line">                <span class="string">"    &lt;/compatible-screens&gt;\n"</span> +</span><br><span class="line">                <span class="string">"&lt;/manifest&gt;"</span>);</span><br><span class="line">        File splitFolder = <span class="keyword">new</span> File(outputFolder, apkData.getDirName());</span><br><span class="line">        FileUtils.mkdirs(splitFolder);</span><br><span class="line">        File manifestFile = <span class="keyword">new</span> File(splitFolder, SdkConstants.ANDROID_MANIFEST_XML);</span><br><span class="line">        Files.write(content.toString(), manifestFile, Charsets.UTF_8);</span><br><span class="line">        <span class="keyword">return</span> manifestFile;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">CompatibleScreensManifest</span>&gt; </span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;CompatibleScreensManifest&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> CompatibleScreensManifest<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 Task 主要是配合 splits 分包的，由于一般情况下载 Google Play 发布时才可能用到，暂时先不关注。具体可以看下<a href="https://developer.android.com/studio/build/configure-apk-splits" target="_blank" rel="noopener">这里</a>。</p>
+<h3 id="processDebugManifest"><a href="#processDebugManifest" class="headerlink" title="processDebugManifest"></a><font color='red'>processDebugManifest</font></h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#createMergeApkManifestsTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">protected</span> AndroidTask&lt;? extends ManifestProcessorTask&gt; createMergeManifestTask(...) &#123;</span><br><span class="line">        <span class="keyword">final</span> File reportFile = computeManifestReportFile(variantScope);</span><br><span class="line">        AndroidTask&lt;MergeManifests&gt; mergeManifestsAndroidTask =</span><br><span class="line">                androidTasks.create(tasks, <span class="keyword">new</span> MergeManifests.ConfigAction(</span><br><span class="line">                      variantScope, optionalFeatures.build(), reportFile)</span><br><span class="line">                );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>很明显这个 Task 是用于合并清单文件的，代码逻辑很复杂暂时就先不看了，先根据 <a href="https://developer.android.com/studio/build/manifest-merge?hl=zh-cn" target="_blank" rel="noopener">官方文档</a> 了解下原理。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-02/manifest-merger_2x.png" alt="img"></p>
+<p>首先会将所有清单文件按优先级排序，然后将优先级最低的合并到优先级第二低的，然后再合并到第三低的，依次类推，直到合并到优先级最高的清单文件中。</p>
+<p>清单文件优先级如下：</p>
+<ol>
+<li><p>构建变体的清单文件，以 demoDebug（productFlavor = demo，buildType = debug）为例。</p>
+<p> a. src/demoDebug/AndroidManifest.xml</p>
+<p> b. src/demo/AndroidManifest.xml</p>
+<p> c. src/debug/AndroidManifest.xml</p>
+</li>
+<li><p>应用程序的主清单文件</p>
+</li>
+<li><p>依赖库中的清单文件（先依赖的优先级高）</p>
+</li>
+</ol>
+<p>如果优先级较低的清单中的某个元素与优先级较高的清单中的所有元素都不匹配，则会将该元素添加到合并后的清单中。如果有匹配的元素，则合并工具会尝试将每个元素的所有属性组合到同一元素中。对于属性合并规则，官方文档又提供了下表来进行描述。</p>
+<table>
+  <tbody><tr>
+    <th scope="col">高优先级属性</th>
+    <th scope="col">低优先级属性</th>
+    <th scope="col">属性的合并结果</th>
+  </tr>
+  <tr>
+    <td rowspan="2">没有值</td>
+    <td>没有值</td>
+    <td>没有值（使用默认值）</td>
+  </tr>
+  <tr>
+    <!-- rowspan -->
+    <td>值 B</td>
+    <td>值 B</td>
+  </tr>
+  <tr>
+    <td rowspan="3">值 A</td>
+    <td>没有值</td>
+    <td>值 A</td>
+  </tr>
+  <tr>
+    <!-- rowspan -->
+    <td>值 A</td>
+    <td>值 A</td>
+  </tr>
+  <tr>
+    <!-- rowspan -->
+    <td>值 B</td>
+    <td><b>冲突错误</b> - 您必须添加<a href="#merge_rule_markers">合并规则标记</a></td>
+  </tr>
+</tbody></table>
+
+<p>大部分属性合并都是按上表，不过以下情况有些特殊；</p>
+<ol>
+<li><code>&lt;manifest&gt;</code> 元素中的属性绝不会合并在一起，只会使用优先级最高的清单中的属性，也就是说会抛弃低优先级（例如库文件中的清单文件）的该元素属性。</li>
+<li><code>&lt;uses-feature&gt;</code> 和 <code>&lt;uses-library&gt;</code> 元素中的 <code>android:required</code> 属性使用 OR 合并，也就是说只要有一个为 true，那么最终就是 true。</li>
+<li>绝不会在清单之间匹配 <code>&lt;intent-filter&gt;</code> 元素。每个该元素都被视为唯一的元素，并添加到合并后的清单中的共同父元素中。</li>
+</ol>
+<p><strong><em>总结下其实就是读取低优先级的清单文件的每个元素，在高优先级的清单文件中查找是否存在该元素，如果不存在那么就直接新增，如果存在那么进行属性合并，整个低优先级清单文件都合并到高优先级的清单文件中后，再与更高优先级的进行合并。</em></strong></p>
+<h3 id="splitsDiscoveryTaskDebug"><a href="#splitsDiscoveryTaskDebug" class="headerlink" title="splitsDiscoveryTaskDebug"></a>splitsDiscoveryTaskDebug</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createApkProcessResTask</p>
+<p>TaskManager#createProcessResTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> AndroidTask&lt;ProcessAndroidResources&gt; <span class="title">createProcessResTask</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">	AndroidTask&lt;SplitsDiscovery&gt; splitsDiscoveryAndroidTask = androidTasks.create(</span><br><span class="line">        tasks, <span class="keyword">new</span> SplitsDiscovery.ConfigAction(scope, splitListOutputFile));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SplitsDiscovery</span> <span class="keyword">extends</span> <span class="title">BaseTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">taskAction</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Set&lt;File&gt; mergedResourcesFolderFiles =</span><br><span class="line">                mergedResourcesFolders != <span class="keyword">null</span> ? mergedResourcesFolders.getFiles() : <span class="keyword">null</span>;</span><br><span class="line">        Collection&lt;String&gt; resConfigs = resourceConfigs;</span><br><span class="line">        <span class="keyword">if</span> (resConfigAuto) &#123;</span><br><span class="line">            resConfigs = discoverListOfResourceConfigsNotDensities();</span><br><span class="line">        &#125;</span><br><span class="line">        SplitList.save(</span><br><span class="line">                getPersistedList(),</span><br><span class="line">                getFilters(mergedResourcesFolderFiles, DiscoverableFilterType.DENSITY),</span><br><span class="line">                getFilters(mergedResourcesFolderFiles, DiscoverableFilterType.LANGUAGE),</span><br><span class="line">                getFilters(ImmutableList.of(), DiscoverableFilterType.ABI),</span><br><span class="line">                resConfigs);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">SplitsDiscovery</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;SplitsDiscovery&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> SplitsDiscovery<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 Task 也是 split 分包相关的，暂时忽略。</p>
+<h3 id="processDebugResources"><a href="#processDebugResources" class="headerlink" title="processDebugResources"></a>processDebugResources</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>TaskManager#createApkProcessResTask</p>
+<p>TaskManager#createProcessResTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> AndroidTask&lt;ProcessAndroidResources&gt; <span class="title">createProcessResTask</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">	AndroidTask&lt;ProcessAndroidResources&gt; processAndroidResources =</span><br><span class="line">                androidTasks.create(tasks, createProcessAndroidResourcesConfigAction(...));</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">protected</span> ProcessAndroidResources.<span class="function">ConfigAction <span class="title">createProcessAndroidResourcesConfigAction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ProcessAndroidResources.ConfigAction(</span><br><span class="line">        scope,</span><br><span class="line">        symbolLocation,</span><br><span class="line">        symbolWithPackageName,</span><br><span class="line">        resPackageOutputFolder,</span><br><span class="line">        useAaptToGenerateLegacyMultidexMainDexProguardRules,</span><br><span class="line">        sourceTaskOutputType,</span><br><span class="line">        baseName,</span><br><span class="line">        isLibrary());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部代码很复杂，大致做的内容就是将前面编译后的资源以及合并后的清单文件做为输入源使用 aapt2 工具进行链接 resources-debug.ap_ 文件。<img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-03/%E6%88%AA%E5%B1%8F2021-03-03%20%E4%B8%8A%E5%8D%8812.09.29.png" alt="截屏2021-03-03 上午12.09.29"></p>
+<p>其实这就是 apk 中所有资源，将 ap_ 修改为 apk 就可以看到熟悉的 res 文件夹、resource.arsc 文件、AndroidManifest.xml 文件。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-03/%E6%88%AA%E5%B1%8F2021-03-03%20%E4%B8%8A%E5%8D%8812.12.26.png" alt="截屏2021-03-03 上午12.12.26"></p>
+<h3 id="javaPreCompileDebug"><a href="#javaPreCompileDebug" class="headerlink" title="javaPreCompileDebug"></a>javaPreCompileDebug</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#addCompileTask</p>
+<p>ApplicationTaskManager#createJavacTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> AndroidTask&lt;? extends JavaCompile&gt; createJavacTask(</span><br><span class="line">            <span class="meta">@NonNull</span> <span class="keyword">final</span> TaskFactory tasks,</span><br><span class="line">            <span class="meta">@NonNull</span> <span class="keyword">final</span> VariantScope scope) &#123;</span><br><span class="line">        File processorListFile =</span><br><span class="line">                FileUtils.join(</span><br><span class="line">                        globalScope.getIntermediatesDir(),</span><br><span class="line">                        <span class="string">"javaPrecompile"</span>,</span><br><span class="line">                        scope.getDirName(),</span><br><span class="line">                        <span class="string">"annotationProcessors.json"</span>);</span><br><span class="line">        AndroidTask&lt;JavaPreCompileTask&gt; preCompileTask =</span><br><span class="line">                androidTasks.create(</span><br><span class="line">                        tasks, <span class="keyword">new</span> JavaPreCompileTask.ConfigAction(scope, processorListFile));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>具体看下 JavaPreCompileTask.ConfigAction 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JavaPreCompileTask</span> <span class="keyword">extends</span> <span class="title">BaseTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@TaskAction</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">preCompile</span><span class="params">()</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">        Set&lt;String&gt; classNames = Sets.newHashSet();</span><br><span class="line">        classNames.addAll(</span><br><span class="line">                convertArtifactsToNames(</span><br><span class="line">                        collectAnnotationProcessors(annotationProcessorConfiguration)));</span><br><span class="line">        classNames.addAll(annotationProcessorOptions.getClassNames());</span><br><span class="line">        <span class="keyword">if</span> (dataBindingEnabled) &#123;</span><br><span class="line">            classNames.add(DATA_BINDING_SPEC);</span><br><span class="line">        &#125;</span><br><span class="line">        FileUtils.deleteIfExists(processorListFile);</span><br><span class="line">        Gson gson = <span class="keyword">new</span> GsonBuilder().create();</span><br><span class="line">        <span class="keyword">try</span> (FileWriter writer = <span class="keyword">new</span> FileWriter(processorListFile)) &#123;</span><br><span class="line">            gson.toJson(classNames, writer);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">ConfigAction</span> <span class="keyword">implements</span> <span class="title">TaskConfigAction</span>&lt;<span class="title">JavaPreCompileTask</span>&gt; </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> Class&lt;JavaPreCompileTask&gt; <span class="title">getType</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> JavaPreCompileTask<span class="class">.<span class="keyword">class</span></span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>获取所有 AnnotationProcessor 类名，然后写入</p>
+<p>build/intermediates/javaPrecompile/debug/annotationProcessors.json 中。</p>
+<h4 id="获取-AnnotationProcessor"><a href="#获取-AnnotationProcessor" class="headerlink" title="获取 AnnotationProcessor"></a>获取 AnnotationProcessor</h4><p>JavaPreCompileTask#collectAnnotationProcessors</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> List&lt;ResolvedArtifactResult&gt; <span class="title">collectAnnotationProcessors</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    ArtifactCollection configuration)</span> </span>&#123;</span><br><span class="line">    List&lt;ResolvedArtifactResult&gt; processors = Lists.newArrayList();</span><br><span class="line">    <span class="keyword">for</span> (ResolvedArtifactResult artifact : configuration) &#123;</span><br><span class="line">        File file = artifact.getFile();</span><br><span class="line">        <span class="keyword">if</span> (!file.exists()) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (file.isDirectory()) &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">new</span> File(file, PROCESSOR_SERVICES).exists()) &#123;</span><br><span class="line">                processors.add(artifact);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">try</span> (JarFile jarFile = <span class="keyword">new</span> JarFile(file)) &#123;</span><br><span class="line">                JarEntry entry = jarFile.getJarEntry(PROCESSOR_SERVICES);</span><br><span class="line">                <span class="keyword">if</span> (entry != <span class="keyword">null</span>) &#123;</span><br><span class="line">                    processors.add(artifact);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">catch</span> (IOException iox) &#123;&#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> processors;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在所有的 classpath 中寻找文件 <code>resources/META-INF.services/javax.annotation.processing.Processor</code> 文件，该文件中会将该库所声明的所有注解处理器类全名列出来。如需学习注解处理器的基本使用，可以参考 <a href="https://www.jianshu.com/p/8e46db1e0c96" target="_blank" rel="noopener">这篇文章</a>。</p>
+<h3 id="compileDebugJavaWithJavac"><a href="#compileDebugJavaWithJavac" class="headerlink" title="compileDebugJavaWithJavac"></a>compileDebugJavaWithJavac</h3><p>ApplicationTaskManager#createTasksForVariantScope</p>
+<p>ApplicationTaskManager#addCompileTask</p>
+<p>ApplicationTaskManager#createJavacTask</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> AndroidTask&lt;? extends JavaCompile&gt; createJavacTask(...) &#123;</span><br><span class="line">    AndroidTask&lt;? extends JavaCompile&gt; javacTask =</span><br><span class="line">                androidTasks.create(tasks, <span class="keyword">new</span> JavaCompileConfigAction(scope, outputFolder));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/07/19/Gradle%20%E6%8F%92%E4%BB%B6%E7%BC%96%E5%86%99/" rel="next" title="Gradle 插件开发">
+                <i class="fa fa-chevron-left"></i> Gradle 插件开发
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/" rel="prev" title="桌面打包工具">
+                桌面打包工具 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流程"><span class="nav-number">2.</span> <span class="nav-text">流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码"><span class="nav-number">3.</span> <span class="nav-text">源码</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#preBuild"><span class="nav-number">3.1.</span> <span class="nav-text">preBuild</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#preDebugBuild"><span class="nav-number">3.2.</span> <span class="nav-text">preDebugBuild</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compileDebugAidl"><span class="nav-number">3.3.</span> <span class="nav-text">compileDebugAidl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compileDebugRenderscript"><span class="nav-number">3.4.</span> <span class="nav-text">compileDebugRenderscript</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkDebugManifest"><span class="nav-number">3.5.</span> <span class="nav-text">checkDebugManifest</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#generateDebugBuildConfig"><span class="nav-number">3.6.</span> <span class="nav-text">generateDebugBuildConfig</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#prepareLintJar"><span class="nav-number">3.7.</span> <span class="nav-text">prepareLintJar</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#generateDebugResValues"><span class="nav-number">3.8.</span> <span class="nav-text">generateDebugResValues</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#generateDebugResources"><span class="nav-number">3.9.</span> <span class="nav-text">generateDebugResources</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#mergeDebugResources"><span class="nav-number">3.10.</span> <span class="nav-text">mergeDebugResources</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取所有-ResourceSet"><span class="nav-number">3.10.1.</span> <span class="nav-text">获取所有 ResourceSet</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加载所有-ResourceSet"><span class="nav-number">3.10.2.</span> <span class="nav-text">加载所有 ResourceSet</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#读取-sourceFile-文件夹"><span class="nav-number">3.10.2.1.</span> <span class="nav-text">读取 sourceFile 文件夹</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#检查-ResourceSet-资源"><span class="nav-number">3.10.2.2.</span> <span class="nav-text">检查 ResourceSet 资源</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#合并多个-ResourceSet-资源"><span class="nav-number">3.10.3.</span> <span class="nav-text">合并多个 ResourceSet 资源</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#合并-declare-styleable"><span class="nav-number">3.10.3.1.</span> <span class="nav-text">合并 declare-styleable</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用-MergedResourceWriter-输出"><span class="nav-number">3.10.3.2.</span> <span class="nav-text">使用 MergedResourceWriter 输出</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#createDebugCompatibleScreenManifests"><span class="nav-number">3.11.</span> <span class="nav-text">createDebugCompatibleScreenManifests</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#processDebugManifest"><span class="nav-number">3.12.</span> <span class="nav-text">processDebugManifest</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#splitsDiscoveryTaskDebug"><span class="nav-number">3.13.</span> <span class="nav-text">splitsDiscoveryTaskDebug</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#processDebugResources"><span class="nav-number">3.14.</span> <span class="nav-text">processDebugResources</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#javaPreCompileDebug"><span class="nav-number">3.15.</span> <span class="nav-text">javaPreCompileDebug</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#获取-AnnotationProcessor"><span class="nav-number">3.15.1.</span> <span class="nav-text">获取 AnnotationProcessor</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#compileDebugJavaWithJavac"><span class="nav-number">3.16.</span> <span class="nav-text">compileDebugJavaWithJavac</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

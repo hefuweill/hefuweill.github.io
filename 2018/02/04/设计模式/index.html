@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言设计模式是一套代码设计经验的总结，使用它是为了可重用代码，让代码更容易被他人理解，保证代码的可靠性、程序的重用性。一共有 23 种设计模式，本文主要记录下常见的几个。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="设计模式">
+<meta property="og:url" content="http://yoursite.com/2018/02/04/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言设计模式是一套代码设计经验的总结，使用它是为了可重用代码，让代码更容易被他人理解，保证代码的可靠性、程序的重用性。一共有 23 种设计模式，本文主要记录下常见的几个。">
+<meta property="article:published_time" content="2018-02-04T09:15:16.000Z">
+<meta property="article:modified_time" content="2020-05-15T05:58:23.540Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/02/04/设计模式/"/>
+
+
+
+
+
+  <title>设计模式 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-设计模式" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/02/04/%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">设计模式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2018-02-04T17:15:16+08:00">
+                2018-02-04
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>设计模式是一套代码设计经验的总结，使用它是为了可重用代码，让代码更容易被他人理解，保证代码的可靠性、程序的重用性。一共有 23 种设计模式，本文主要记录下常见的几个。<a id="more"></a></p>
+<h2 id="单例设计模式"><a href="#单例设计模式" class="headerlink" title="单例设计模式"></a>单例设计模式</h2><p>使用单例模式需要满足以下条件：</p>
+<ol>
+<li>构造器私有化。</li>
+<li>通过一个静态方法或者枚举返回单例类实例。</li>
+<li>确保单例类对象有且只有一个，尤其在多线程情况下。</li>
+<li>确保单例类对象在反序列化时不会重新构建对象(只在实现序列化接口时需要)，当实现了序列化接口需要在 readResolve 方法内部返回那个静态变量，因为静态变量不会被序列化，所以直接返回相当于对象没变。</li>
+</ol>
+<h3 id="饿汉模式"><a href="#饿汉模式" class="headerlink" title="饿汉模式"></a>饿汉模式</h3><p>加载类就进行初始化，可能会用不到导致资源浪费。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">A</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> A a = <span class="keyword">new</span> A();</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">A</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> A <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> a;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="懒汉模式"><a href="#懒汉模式" class="headerlink" title="懒汉模式"></a>懒汉模式</h3><p>每次调用 getInstance 都是同步的，效率低下，不推荐用。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">B</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> B b;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">B</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">static</span> B <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (b == <span class="keyword">null</span>) &#123;</span><br><span class="line">            b = <span class="keyword">new</span> B();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> b;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="双重校验锁"><a href="#双重校验锁" class="headerlink" title="双重校验锁"></a>双重校验锁</h3><p>DCL 一般可以使用。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">C</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 1.可见性，一个线程改了另一个线程就能读到最新的值 2.禁止指令重排序</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> C c;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">C</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> C <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span>(C<span class="class">.<span class="keyword">class</span>) </span>&#123;</span><br><span class="line">                <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    <span class="comment">// 1.分配内存 2.调用构造器初始化成员变量 3. 将堆中的地址赋值给c，其中如果不设置volatile后两个操作可能会反着调用</span></span><br><span class="line">                    c = <span class="keyword">new</span> C();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="静态内部类"><a href="#静态内部类" class="headerlink" title="静态内部类"></a>静态内部类</h3><p>推荐使用。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">D</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">D</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> D <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> DHolder.d;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">DHolder</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> D d = <span class="keyword">new</span> D();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="枚举单例"><a href="#枚举单例" class="headerlink" title="枚举单例"></a>枚举单例</h3><p>推荐使用。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">enum</span> E &#123;</span><br><span class="line">    INSTANCE;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomeThing</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"单例内部的方法"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="简单工厂设计模式"><a href="#简单工厂设计模式" class="headerlink" title="简单工厂设计模式"></a>简单工厂设计模式</h2><ol>
+<li><p>对实现了同一接口的类进行实例的创建，拥有三种角色，一个工厂类，一个基类，若干个基类的派生类(或实现类) 。</p>
+</li>
+<li><p>使用场景是工厂类负责创建的对象比较少，用户只需要知道传给工厂类的参数就行了，而不需关系具体创建。</p>
+</li>
+<li><p>优点: 用户根据参数获得实例，避免了直接实例化类，降低了耦合性。</p>
+</li>
+<li><p>缺点: 简单工厂需要知道其所有要生成的类型，当类型过多是不适合使用，并且如果需求变动比如我要添加微博分享，那么就得修改工厂类，违背了开闭原则。</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">share</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QQShareChannel</span> <span class="keyword">implements</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">share</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WXShareChannel</span> <span class="keyword">implements</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">share</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShareChannelFactory</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> QQ = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> WX = <span class="number">2</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ShareChannel <span class="title">createShareChannel</span><span class="params">(<span class="keyword">int</span> type)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (type == QQ) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> QQShareChannel();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type == WX) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> WXShareChannel();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShareChannelFactoryOptimized</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> &lt;T extends ShareChannel&gt; <span class="function">ShareChannel <span class="title">createShareChannel</span><span class="params">(Class&lt;T&gt; clazz)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> clazz.newInstance();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="工厂方法设计模式"><a href="#工厂方法设计模式" class="headerlink" title="工厂方法设计模式"></a>工厂方法设计模式</h2><ol>
+<li><p>拥有四种角色，抽象工厂类、具体工厂类、基类(或接口)、实现类，把简单工厂的实现修改一下。</p>
+</li>
+<li><p>比如微信分享 WXAPIFactory.createWXAPI()、钉钉分享 DDShareApiFactory.createDDShareApi() 都是使用了工厂方法设计模式。</p>
+</li>
+<li><p>对比简单工厂模式，当需求改变需要增加微博分享时我们只需要创建一个 WBShareChannel 就行了，没有违背开闭原则。</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">share</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ShareChannelFactory</span> </span>&#123;</span><br><span class="line">    <span class="function">ShareChannel <span class="title">createChannelFactory</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">QQShareChannel</span> <span class="keyword">implements</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">share</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">QQShareChannelFactory</span> <span class="keyword">implements</span> <span class="title">ShareChannelFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> ShareChannel <span class="title">createChannelFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> QQShareChannel();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WXShareChannel</span> <span class="keyword">implements</span> <span class="title">ShareChannel</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">share</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">WXShareChannelFactory</span> <span class="keyword">implements</span> <span class="title">ShareChannelFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> ShareChannel <span class="title">createChannelFactory</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> WXShareChannel();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="建造者设计模式"><a href="#建造者设计模式" class="headerlink" title="建造者设计模式"></a>建造者设计模式</h2><ol>
+<li>创建一个复杂对象时使用，通过 Builder 类一步一步创建，对比构建器，其参数可选，并且可以无序。</li>
+<li>比如 Android 中的 AlertDialog 其组成非常复杂，比如可以只设置 Title、Message，也可以只设置 Title，有很多种可选的设置。分享功能需要很多的参数，而很多参数都是可选的就可以使用建造者模式。</li>
+<li>其主要的缺点就是产生了多余的类。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShareParams</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> String title;</span><br><span class="line">    <span class="keyword">private</span> String content;</span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="keyword">private</span> String imageUrl;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">ShareParams</span><span class="params">(Builder builder)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.title = builder.title;</span><br><span class="line">        <span class="keyword">this</span>.content = builder.content;</span><br><span class="line">        <span class="keyword">this</span>.url = builder.url;</span><br><span class="line">        <span class="keyword">this</span>.imageUrl = builder.imageUrl;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Builder</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String title;</span><br><span class="line">        <span class="keyword">private</span> String content;</span><br><span class="line">        <span class="keyword">private</span> String url;</span><br><span class="line">        <span class="keyword">private</span> String imageUrl;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTitle</span><span class="params">(String title)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.title = title;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setContent</span><span class="params">(String content)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.content = content;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUrl</span><span class="params">(String url)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.url = url;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setImageUrl</span><span class="params">(String imageUrl)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.imageUrl = imageUrl;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> ShareParams <span class="title">build</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ShareParams(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="代理设计模式"><a href="#代理设计模式" class="headerlink" title="代理设计模式"></a>代理设计模式</h2><p>代理设计模式包括静态代理以及动态代理。</p>
+<h3 id="静态代理"><a href="#静态代理" class="headerlink" title="静态代理"></a>静态代理</h3><ol>
+<li>在符合开闭原则的情况下对目标对象进行功能扩展，防止与真实对象接触降低耦合性。</li>
+<li>接口一旦发生改变，代理类也得发生改变。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">BuyTicket</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">buyTicket</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RealBuyTicket</span> <span class="keyword">implements</span> <span class="title">BuyTicket</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyTicket</span><span class="params">()</span> </span>&#123; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ProxyBuyTicket</span> <span class="keyword">implements</span> <span class="title">BuyTicket</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> BuyTicket buyTicket;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ProxyBuyTicket</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.buyTicket = <span class="keyword">new</span> RealBuyTicket();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">buyTicket</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        buyTicket.buyTicket();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="动态代理"><a href="#动态代理" class="headerlink" title="动态代理"></a>动态代理</h3><p>相对于静态代理其代理类不用在代码中写死，但是必须要有一个接口才能进行代理，因为 java 不支持多继承。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DynamicProxy</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        BuyTicket buyTicket = (BuyTicket) Proxy.newProxyInstance(DynamicProxy.class.getClassLoader(), new Class[]&#123; MyInvocationHandler.class &#125;, new MyInvocationHandler(new RealBuyTicket()));</span><br><span class="line">        buyTicket.buyTicket();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MyInvocationHandler</span> <span class="keyword">implements</span> <span class="title">InvocationHandler</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> BuyTicket buyTicket;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyInvocationHandler</span><span class="params">(BuyTicket buyTicket)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.buyTicket = buyTicket;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> Object <span class="title">invoke</span><span class="params">(Object proxy, Method method, Object[] args)</span> <span class="keyword">throws</span> Throwable </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (method.getName().equals(<span class="string">"buy"</span>)) &#123;</span><br><span class="line">                method.invoke(buyTicket);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="装饰模式"><a href="#装饰模式" class="headerlink" title="装饰模式"></a>装饰模式</h2><ol>
+<li>与装饰模式不同的是，代理模式一般实际类对象都在代理类内部创建（对外隐藏），而装饰模式一般是外界传入的实际类对象。</li>
+<li>优点 可以在不改变被装饰类的情况下加强类的功能，或者类似 Android 里面的 ContextWrap 类，使其子类 Activity、Service 不必包含复杂的实现逻辑(比如 startActivity )。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ContextImpl</span> <span class="keyword">implements</span> <span class="title">Context</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startActivity</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"真正启动 Activity "</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ContextWrap</span> <span class="keyword">implements</span> <span class="title">Context</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Context context;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ContextWrap</span><span class="params">(Context context)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.context = context;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">startActivity</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// do something</span></span><br><span class="line">        context.startActivity();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="外观模式"><a href="#外观模式" class="headerlink" title="外观模式"></a>外观模式</h2><ol>
+<li>一般在封装 SDK 或者 API 时用到，暴露给客户端外观类(该类把子系统的功能进行结合)供客户端使用。</li>
+<li>优点：客户端无需关心具体的子系统的实现，直接与外观类进行交互，降低了耦合性，这样即使具体的子系统的内容发生改变，用户也不会感知到；同时由于客户端只能使用外观类的功能，而不能使用子系统的其他功能所以加强了安全性。</li>
+<li>缺点：不符合开闭原则，如果业务发生变更那么可能要直接修改外观类。</li>
+<li>假设用户有一台手机，手机有打电话系统和拍照系统，手机的外观类是 MobilePhone ，用户只能调用该类中的方法去执行操作，无法调用 CallManager.privateFunction 方法，因此加强了安全性。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MobilePhone</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> CallManager callManager;</span><br><span class="line">    <span class="keyword">private</span> CameraManager cameraManager;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 用户拥有一个手机,拿它去拍照,打电话</span></span><br><span class="line">        MobilePhone phone = <span class="keyword">new</span> MobilePhone();</span><br><span class="line">        phone.takePhotos();</span><br><span class="line">        phone.call();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MobilePhone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        callManager = <span class="keyword">new</span> CallManager();</span><br><span class="line">        cameraManager = <span class="keyword">new</span> CameraManager();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        callManager.call();</span><br><span class="line">        callManager.hangup();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">takePhotos</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        cameraManager.open();</span><br><span class="line">        cameraManager.takePhotos();</span><br><span class="line">        cameraManager.close();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 专门用来打电话的子功能块</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CallManager</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">call</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"开始通话"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">hangup</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"结束通话"</span>);</span><br><span class="line">        System.out.println(<span class="string">"挂断电话"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">privateFunction</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"内部才能调用的功能"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CameraManager</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">open</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"打开相机"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">takePhotos</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"拍照"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"关闭相机"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="享元设计模式"><a href="#享元设计模式" class="headerlink" title="享元设计模式"></a>享元设计模式</h2><ol>
+<li>池技术的重要实现技术，可以减少重复对象的创建，降低程序内存的占用，提高性能，一般拥有着以下三个角色<ol>
+<li>抽象享元角色，同时定义出对象的外部状态和内部状态的接口。</li>
+<li>具体享元角色，实例的抽象享元角色的业务。</li>
+<li>享元工厂，负责管理对象池和创建享元对象(一般内部用 Map、SpareArray 实现)，如下面示例中的 Ticket 抽象类就是抽象享元角色，内部的 from、to 属于内部状态，level 属于外部状态会随着外界状态变化而变化，TrainTicket 属于具体享元角色，TicketFactory 属于享元工厂。</li>
+</ol>
+</li>
+<li>其实就是缓存的一种，比如 Java 中的 String 一旦常量池有了就不会重新创建、Android 中的 Message 通过一个链表来缓存、Volley 里面的 ByteArrayPool、OkHttp 里面的连接池。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FlyWeight</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">Ticket</span> </span>&#123;</span><br><span class="line">        <span class="keyword">protected</span> String from;</span><br><span class="line">        <span class="keyword">protected</span> String to;</span><br><span class="line">        <span class="keyword">protected</span> SeatLevel level;</span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">float</span> price;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Ticket</span><span class="params">(String from, String to, SeatLevel level, <span class="keyword">float</span> price)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.from = from;</span><br><span class="line">            <span class="keyword">this</span>.to = to;</span><br><span class="line">            <span class="keyword">this</span>.level = level;</span><br><span class="line">            <span class="keyword">this</span>.price = price;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">showTicketInfo</span><span class="params">()</span></span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Ticket ticket1 = TicketFactory.getTicket(<span class="string">"杭州东"</span>, <span class="string">"绍兴北"</span>, SeatLevel.SECOND_CLASS_SEAT);</span><br><span class="line">        ticket1.showTicketInfo();</span><br><span class="line">        Ticket ticket2 = TicketFactory.getTicket(<span class="string">"杭州东"</span>, <span class="string">"绍兴北"</span>, SeatLevel.FIRST_CLASS_SEAT);</span><br><span class="line">        ticket2.showTicketInfo();</span><br><span class="line">        Ticket ticket3 = TicketFactory.getTicket(<span class="string">"杭州东"</span>, <span class="string">"绍兴北"</span>, SeatLevel.SECOND_CLASS_SEAT);</span><br><span class="line">        ticket3.showTicketInfo();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TrainTicket</span> <span class="keyword">extends</span> <span class="title">Ticket</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">TrainTicket</span><span class="params">(String from, String to, SeatLevel level, <span class="keyword">float</span> price)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">super</span>(from, to, level, price);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getFrom</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> from;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setFrom</span><span class="params">(String from)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.from = from;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getTo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> to;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setTo</span><span class="params">(String to)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.to = to;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> SeatLevel <span class="title">getLevel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> level;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setLevel</span><span class="params">(SeatLevel level)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.level = level;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">getPrice</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> price;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPrice</span><span class="params">(<span class="keyword">float</span> price)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.price = price;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">showTicketInfo</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            System.out.println(<span class="string">"从"</span> + from + <span class="string">" 到"</span> + to + <span class="string">"的火车票"</span> + level + <span class="string">"价格为"</span> + price);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> SeatLevel &#123;</span><br><span class="line">        BUSINESS_CLASS_SEAT(<span class="string">"商务座"</span>),</span><br><span class="line">        FIRST_CLASS_SEAT(<span class="string">"一等座"</span>),</span><br><span class="line">        SECOND_CLASS_SEAT(<span class="string">"二等座"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> String desc;</span><br><span class="line"></span><br><span class="line">        SeatLevel(String desc) &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">TicketFactory</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> Map&lt;String, Ticket&gt; map = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Ticket <span class="title">getTicket</span><span class="params">(String from, String to, SeatLevel level)</span> </span>&#123;</span><br><span class="line">            String key = from + to + level;</span><br><span class="line">            <span class="keyword">if</span> (map.containsKey(key)) &#123;</span><br><span class="line">                <span class="keyword">return</span> map.get(key);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                Ticket ticket = <span class="keyword">new</span> TrainTicket(from, to, level, queryPrice(from, to, level));</span><br><span class="line">                map.put(key, ticket);</span><br><span class="line">                <span class="keyword">return</span> ticket;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">float</span> <span class="title">queryPrice</span><span class="params">(String from, String to, SeatLevel level)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">float</span>) (Math.random() * <span class="number">200</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="策略设计模式"><a href="#策略设计模式" class="headerlink" title="策略设计模式"></a>策略设计模式</h2><ol>
+<li>针对同一类型的问题拥有多种解决方式，仅仅具体行为有差异，或者有多个派生自同一个类的实现类又需要通过 if-else、switch 判断使用哪个的。</li>
+<li>优点， Context 类只依赖于抽象类 ISort，不依赖与具体实现，Context 只需要知道它操作的是一个 ISort 类就行了 ，遵守了开闭原则，当添加了新的策略时不需要修改 Context 类。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ISort</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] numbers)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SortUtils</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> BUBBLE_SORT = <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> CHOOSE_SORT = <span class="number">2</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span>[] array = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">4</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>&#125;;</span><br><span class="line">        sort(array, BUBBLE_SORT);</span><br><span class="line">        sort(array, CHOOSE_SORT);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] array, <span class="keyword">int</span> type)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (type == BUBBLE_SORT) &#123;</span><br><span class="line">            <span class="keyword">new</span> BubbleSort().sort(array);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (type == CHOOSE_SORT) &#123;</span><br><span class="line">            <span class="keyword">new</span> SelectionSort().sort(array);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 使用了策略模式，当需要添加新的排序算法是不需要改变Context类，遵守了开闭原则</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Context</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ISort mISort;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setISort</span><span class="params">(ISort iSort)</span> </span>&#123;</span><br><span class="line">        mISort = iSort;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Context strategy = <span class="keyword">new</span> Context();</span><br><span class="line">        <span class="keyword">int</span>[] array = <span class="keyword">new</span> <span class="keyword">int</span>[]&#123;<span class="number">4</span>, <span class="number">2</span>, <span class="number">1</span>, <span class="number">5</span>&#125;;</span><br><span class="line">        strategy.setISort(<span class="keyword">new</span> BubbleSort());</span><br><span class="line">        strategy.sort(array);</span><br><span class="line">        System.out.println(Arrays.toString(array));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">sort</span><span class="params">(<span class="keyword">int</span>[] array)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (mISort == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException();</span><br><span class="line">        &#125;</span><br><span class="line">        mISort.sort(array);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="模板方法设计模式"><a href="#模板方法设计模式" class="headerlink" title="模板方法设计模式"></a>模板方法设计模式</h2><ol>
+<li><p>主要有两种角色， 一个抽象父类，多个派生自该抽象父类的子类。</p>
+</li>
+<li><p>某个方法有些步骤是固定的，有些步骤是不固定的，就可以使用该模式，下面以 BaseActivity 为例。</p>
+</li>
+<li><p>优点 将不变的行为搬移到超类，去除了子类中的重复代码。</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BaseActivity</span> <span class="keyword">extends</span> <span class="title">AppCompatActivity</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">(@Nullable Bundle savedInstanceState)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onCreate(savedInstanceState);</span><br><span class="line">        <span class="comment">// 步骤一</span></span><br><span class="line">        initData();</span><br><span class="line">        <span class="comment">// 步骤二</span></span><br><span class="line">        initView();</span><br><span class="line">        <span class="comment">// 步骤三</span></span><br><span class="line">        initEvent();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 设置监听事件，需要可重写</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initEvent</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 抽象方法，子类必须实现用于设置该Activity的视图</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">initView</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 初始化数据，如果需要初始化的话，可以重写该方法</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">initData</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="观察者设计模式"><a href="#观察者设计模式" class="headerlink" title="观察者设计模式"></a>观察者设计模式</h2><ol>
+<li>拥有4种角色，一个 Observable 接口或类、一个 Observer 接口、一个 Observable 的派生类、多个Observer 接口的实现类。</li>
+<li>优点 观察者与被观察者是抽象耦合易于扩展。</li>
+<li>缺点 由于通知观察者是顺序通知的，如果一个观察者做的事情比较多造成了卡顿，那么就会影响其他后面的观察者。</li>
+<li>下面的代码微信公众号是被观察者，用户是观察者，其中 hfw、cbw 订阅了该微信公众号，而 ym 没有订阅，所以 ym 不会收到该微信公众号的推送(调用 update)。</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ObserverPattern</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        User hfw = <span class="keyword">new</span> User(<span class="string">"hfw"</span>);</span><br><span class="line">        User cbw = <span class="keyword">new</span> User(<span class="string">"cbw"</span>);</span><br><span class="line">        User ym = <span class="keyword">new</span> User(<span class="string">"ym"</span>);</span><br><span class="line">        WXOfficialAccounts accounts = <span class="keyword">new</span> WXOfficialAccounts();</span><br><span class="line">        accounts.addObserver(hfw);</span><br><span class="line">        accounts.addObserver(cbw);</span><br><span class="line">        <span class="comment">// 公众号拥有者向公众号中发布了一篇文章</span></span><br><span class="line">        Article article = <span class="keyword">new</span> Article();</span><br><span class="line">        article.setText(<span class="string">"Hello, World"</span>);</span><br><span class="line">        article.setPublicTime(<span class="keyword">new</span> Date().toLocaleString());</span><br><span class="line">        accounts.addArticle(article);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">WXOfficialAccounts</span> <span class="keyword">extends</span> <span class="title">Observable</span> </span>&#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addArticle</span><span class="params">(Article article)</span> </span>&#123;</span><br><span class="line">            notifyObservers(article);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">User</span> <span class="keyword">implements</span> <span class="title">Observer</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String mName;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">User</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">            mName = name;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span> </span>&#123;</span><br><span class="line">            System.out.println(mName + <span class="string">" 接受到了文章"</span> + arg);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Article</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> String publicTime;</span><br><span class="line">        <span class="keyword">private</span> String text;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getPublicTime</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> publicTime;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPublicTime</span><span class="params">(String publicTime)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.publicTime = publicTime;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getText</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> text;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setText</span><span class="params">(String text)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.text = text;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> publicTime + <span class="string">" "</span> + text;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Observable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;Observer&gt; list;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Observable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        list = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">addObserver</span><span class="params">(Observer o)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (o == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> NullPointerException();</span><br><span class="line">        <span class="keyword">if</span> (!list.contains(o)) &#123;</span><br><span class="line">            list.add(o);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">synchronized</span> <span class="keyword">void</span> <span class="title">deleteObserver</span><span class="params">(Observer o)</span> </span>&#123;</span><br><span class="line">        list.remove(o);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">notifyObservers</span><span class="params">(Object arg)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = list.size()-<span class="number">1</span>; i&gt;=<span class="number">0</span>; i--)</span><br><span class="line">            ((Observer)list.get(i)).update(<span class="keyword">this</span>, arg);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Observer</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">update</span><span class="params">(Observable o, Object arg)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/01/20/%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/" rel="next" title="七种常见的排序算法">
+                <i class="fa fa-chevron-left"></i> 七种常见的排序算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/02/13/HTTP%20%E5%9F%BA%E7%A1%80/" rel="prev" title="Http 基础">
+                Http 基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">46</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例设计模式"><span class="nav-number">2.</span> <span class="nav-text">单例设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#饿汉模式"><span class="nav-number">2.1.</span> <span class="nav-text">饿汉模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#懒汉模式"><span class="nav-number">2.2.</span> <span class="nav-text">懒汉模式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#双重校验锁"><span class="nav-number">2.3.</span> <span class="nav-text">双重校验锁</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#静态内部类"><span class="nav-number">2.4.</span> <span class="nav-text">静态内部类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#枚举单例"><span class="nav-number">2.5.</span> <span class="nav-text">枚举单例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单工厂设计模式"><span class="nav-number">3.</span> <span class="nav-text">简单工厂设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#工厂方法设计模式"><span class="nav-number">4.</span> <span class="nav-text">工厂方法设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#建造者设计模式"><span class="nav-number">5.</span> <span class="nav-text">建造者设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代理设计模式"><span class="nav-number">6.</span> <span class="nav-text">代理设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#静态代理"><span class="nav-number">6.1.</span> <span class="nav-text">静态代理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#动态代理"><span class="nav-number">6.2.</span> <span class="nav-text">动态代理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#装饰模式"><span class="nav-number">7.</span> <span class="nav-text">装饰模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#外观模式"><span class="nav-number">8.</span> <span class="nav-text">外观模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#享元设计模式"><span class="nav-number">9.</span> <span class="nav-text">享元设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#策略设计模式"><span class="nav-number">10.</span> <span class="nav-text">策略设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板方法设计模式"><span class="nav-number">11.</span> <span class="nav-text">模板方法设计模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者设计模式"><span class="nav-number">12.</span> <span class="nav-text">观察者设计模式</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

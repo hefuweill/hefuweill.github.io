@@ -367,7 +367,7 @@
 
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>学习过程中一直很好奇，Application 实例是在哪创建的？Activity 实例是在哪创建的？Activity 的生命周期又是在哪调用的？Activity 内部界面绘制究竟在哪个时机，为什么 onCreate、onStart、onResume 都取不到 View 的宽高？应用程序启动时的白屏是怎么回事，怎么才能不显示？为了解决这些问题，下载编译了 AOSP 源码，阅读了这部分源码，本文基于 Android 7.1。<a id="more"></a></p>
-<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>下载 AOSP 源码参考<a href http: source.android.com source downloading.html"">官网</a>，在线阅读源码使用<a href http: androidxref.com "">AndroidXRef</a> 。</p>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><p>下载 AOSP 源码参考<a href=""http://source.android.com/source/downloading.html"">官网</a>，在线阅读源码使用<a href=""http://androidxref.com/"">AndroidXRef</a> 。</p>
 <h2 id="Launcher"><a href="#Launcher" class="headerlink" title="Launcher"></a>Launcher</h2><p>当用户点击桌面上应用图标时会执行 Launcher.onClick 方法，省略后代码如下：</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// packages/apps/Launcher3/src/android/launcher3/Launcher.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">    Object tag = v.getTag();</span><br><span class="line">    <span class="keyword">if</span> (tag <span class="keyword">instanceof</span> AppInfo) &#123;</span><br><span class="line">        startAppShortcutOrInfoActivity(v);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">startAppShortcutOrInfoActivity</span><span class="params">(View v)</span> </span>&#123;</span><br><span class="line">    Object tag = v.getTag();</span><br><span class="line">    <span class="keyword">if</span> (tag <span class="keyword">instanceof</span> AppInfo) &#123;</span><br><span class="line">        intent = ((AppInfo) tag).intent;</span><br><span class="line">    &#125;</span><br><span class="line">    startActivitySafely(v, intent, tag);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startActivitySafely</span><span class="params">(View v, Intent intent, Object tag)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> success = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        success = startActivity(v, intent, tag);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (ActivityNotFoundException e) &#123;</span><br><span class="line">        Toast.makeText(<span class="keyword">this</span>, R.string.activity_not_found, Toast.LENGTH_SHORT).show();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> success;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">startActivity</span><span class="params">(View v, Intent intent, Object tag)</span> </span>&#123;</span><br><span class="line">	intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);</span><br><span class="line">    startActivity(intent, optsBundle);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -598,12 +598,21 @@
               
                 <a href="/archives/%7C%7C%20archive">
               
-                  <span class="site-state-item-count">31</span>
+                  <span class="site-state-item-count">46</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
             
 
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
             
 
             
@@ -655,7 +664,7 @@
 
     <footer id="footer" class="footer">
       <div class="footer-inner">
-        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2020</span>
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
   <span class="with-love">
     <i class="fa fa-user"></i>
   </span>
