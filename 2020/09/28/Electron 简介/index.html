@@ -117,16 +117,23 @@
 
 
 
-<meta name="description" content="前言本文主要用于记录 Base64 编码的基本概念、原理以及其在实际开发中的作用。">
+<meta name="description" content="前言最近要写桌面打包工具，其基于 Electron 进行开发，因此需要先了解下 Electron，本文主要记录下 Electron 的基础知识。">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Base64 编码">
-<meta property="og:url" content="http://yoursite.com/2020/06/28/Base64%20%E7%BC%96%E7%A0%81/index.html">
+<meta property="og:title" content="Electron 简介">
+<meta property="og:url" content="http://yoursite.com/2020/09/28/Electron%20%E7%AE%80%E4%BB%8B/index.html">
 <meta property="og:site_name" content="何富威的博客">
-<meta property="og:description" content="前言本文主要用于记录 Base64 编码的基本概念、原理以及其在实际开发中的作用。">
-<meta property="article:published_time" content="2020-06-28T11:52:23.000Z">
-<meta property="article:modified_time" content="2021-02-08T03:22:36.510Z">
+<meta property="og:description" content="前言最近要写桌面打包工具，其基于 Electron 进行开发，因此需要先了解下 Electron，本文主要记录下 Electron 的基础知识。">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615168205163-037e2c44-be3a-4583-8aa0-ce541cb9ebf7.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615170214095-5fca6b80-0c6e-44d4-9116-70b0037b5357.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615170927862-30a0f009-c5ba-4a48-812f-d8f7d9481a28.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615172391128-3a22d22a-f487-4363-adb5-3285278744d6.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615172887342-038a6d0f-171e-45d1-a676-1aed22abda8d.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="og:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615173313137-eaccd92d-311a-4720-a441-cdee8f1efeb7.png?x-oss-process=image%252Fresize%252Cw_1500">
+<meta property="article:published_time" content="2020-09-28T07:22:00.000Z">
+<meta property="article:modified_time" content="2021-03-09T03:14:36.663Z">
 <meta property="article:author" content="何富威">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.nlark.com/yuque/0/2021/png/168137/1615168205163-037e2c44-be3a-4583-8aa0-ce541cb9ebf7.png?x-oss-process=image%252Fresize%252Cw_1500">
 
 
 
@@ -156,13 +163,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2020/06/28/Base64 编码/"/>
+  <link rel="canonical" href="http://yoursite.com/2020/09/28/Electron 简介/"/>
 
 
 
 
 
-  <title>Base64 编码 | 何富威的博客</title>
+  <title>Electron 简介 | 何富威的博客</title>
   
 
 
@@ -299,7 +306,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/06/28/Base64%20%E7%BC%96%E7%A0%81/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/09/28/Electron%20%E7%AE%80%E4%BB%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="何富威">
@@ -316,7 +323,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Base64 编码</h1>
+          <h1 class="post-title" itemprop="name headline">Electron 简介</h1>
         
 
         <div class="post-meta">
@@ -328,8 +335,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-06-28T19:52:23+08:00">
-                2020-06-28
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-28T15:22:00+08:00">
+                2020-09-28
               </time>
             
 
@@ -351,8 +358,8 @@
               
               
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/%E5%9F%BA%E7%A1%80/" itemprop="url" rel="index">
-                    <span itemprop="name">基础</span>
+                  <a href="/categories/%E5%B7%A5%E5%85%B7/" itemprop="url" rel="index">
+                    <span itemprop="name">工具</span>
                   </a>
                 </span>
 
@@ -388,443 +395,45 @@
       
 
       
-        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>本文主要用于记录 Base64 编码的基本概念、原理以及其在实际开发中的作用。<a id="more"></a></p>
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>Base64 <strong>编码</strong>算法是用于将<strong>二进制数据</strong>转换成由 <strong>64 个可读字符</strong>组成的字符串的编码算法，长度不定。</p>
-<p>注1：编码的定义为将数据从一种格式转换为另一种格式，并且还能转换为原格式的一种转换方式。</p>
-<p>注2：广义上的二进制数据，表示的是任何计算机的数据，狭义上的二进制数据表示的是除文本以外的所有数据比如：图片、音乐、视频等。对于 Base64 编码而言其代表的是<strong>广义</strong>的。</p>
-<p>注3：64 个字符分别是 A ~ Z、a ~ z、0 ~ 9、+、/ 。</p>
-<h2 id="编码原理"><a href="#编码原理" class="headerlink" title="编码原理"></a>编码原理</h2><p>Base64 编码会将中的二进制数据每六位替换为一个字符，比如原文为 Man，其对应 3 个字节，如下图：</p>
-<table class="table3">
-<tbody><tr>
-<th scope="row">文本
-</th>
-<td colspan="8" align="center"><b>M</b>
-</td>
-<td colspan="8" align="center"><b>a</b>
-</td>
-<td colspan="8" align="center"><b>n</b>
-</td></tr>
-<tr>
-<th scope="row">ASCII编码
-</th>
-<td colspan="8" align="center">77
-</td>
-<td colspan="8" align="center">97
-</td>
-<td colspan="8" align="center">110
-</td></tr>
-<tr>
-<th scope="row">二进制位
-</th>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>1</td>
-<td>0
-</td></tr>
-<tr>
-<th scope="row">索引
-</th>
-<td colspan="6" align="center">19
-</td>
-<td colspan="6" align="center">22
-</td>
-<td colspan="6" align="center">5
-</td>
-<td colspan="6" align="center">46
-</td></tr>
-<tr>
-<th scope="row">Base64编码
-</th>
-<td colspan="6" align="center"><b>T</b>
-</td>
-<td colspan="6" align="center"><b>W</b>
-</td>
-<td colspan="6" align="center"><b>F</b>
-</td>
-<td colspan="6" align="center"><b>u</b>
-</td></tr></tbody>
-</table>
-
-<p>那么为什么 19 就对应于 T、22 就对应于 W 呢？其实它拥有一个码表，根据码表一一替换，如下图：</p>
-<table style="text-align:center">
-<tbody><tr>
-<th scope="col">数值</th>
-<th scope="col">字符
-</th>
-<td rowspan="18">&nbsp;
-</td>
-<th scope="col">数值</th>
-<th scope="col">字符
-</th>
-<td rowspan="18">&nbsp;
-</td>
-<th scope="col">数值</th>
-<th scope="col">字符
-</th>
-<td rowspan="18">&nbsp;
-</td>
-<th scope="col">数值</th>
-<th scope="col">字符
-</th></tr>
-<tr>
-<td>0</td>
-<td>A</td>
-<td>16</td>
-<td>Q</td>
-<td>32</td>
-<td>g</td>
-<td>48</td>
-<td>w
-</td></tr>
-<tr>
-<td>1</td>
-<td>B</td>
-<td>17</td>
-<td>R</td>
-<td>33</td>
-<td>h</td>
-<td>49</td>
-<td>x
-</td></tr>
-<tr>
-<td>2</td>
-<td>C</td>
-<td>18</td>
-<td>S</td>
-<td>34</td>
-<td>i</td>
-<td>50</td>
-<td>y
-</td></tr>
-<tr>
-<td>3</td>
-<td>D</td>
-<td>19</td>
-<td>T</td>
-<td>35</td>
-<td>j</td>
-<td>51</td>
-<td>z
-</td></tr>
-<tr>
-<td>4</td>
-<td>E</td>
-<td>20</td>
-<td>U</td>
-<td>36</td>
-<td>k</td>
-<td>52</td>
-<td>0
-</td></tr>
-<tr>
-<td>5</td>
-<td>F</td>
-<td>21</td>
-<td>V</td>
-<td>37</td>
-<td>l</td>
-<td>53</td>
-<td>1
-</td></tr>
-<tr>
-<td>6</td>
-<td>G</td>
-<td>22</td>
-<td>W</td>
-<td>38</td>
-<td>m</td>
-<td>54</td>
-<td>2
-</td></tr>
-<tr>
-<td>7</td>
-<td>H</td>
-<td>23</td>
-<td>X</td>
-<td>39</td>
-<td>n</td>
-<td>55</td>
-<td>3
-</td></tr>
-<tr>
-<td>8</td>
-<td>I</td>
-<td>24</td>
-<td>Y</td>
-<td>40</td>
-<td>o</td>
-<td>56</td>
-<td>4
-</td></tr>
-<tr>
-<td>9</td>
-<td>J</td>
-<td>25</td>
-<td>Z</td>
-<td>41</td>
-<td>p</td>
-<td>57</td>
-<td>5
-</td></tr>
-<tr>
-<td>10</td>
-<td>K</td>
-<td>26</td>
-<td>a</td>
-<td>42</td>
-<td>q</td>
-<td>58</td>
-<td>6
-</td></tr>
-<tr>
-<td>11</td>
-<td>L</td>
-<td>27</td>
-<td>b</td>
-<td>43</td>
-<td>r</td>
-<td>59</td>
-<td>7
-</td></tr>
-<tr>
-<td>12</td>
-<td>M</td>
-<td>28</td>
-<td>c</td>
-<td>44</td>
-<td>s</td>
-<td>60</td>
-<td>8
-</td></tr>
-<tr>
-<td>13</td>
-<td>N</td>
-<td>29</td>
-<td>d</td>
-<td>45</td>
-<td>t</td>
-<td>61</td>
-<td>9
-</td></tr>
-<tr>
-<td>14</td>
-<td>O</td>
-<td>30</td>
-<td>e</td>
-<td>46</td>
-<td>u</td>
-<td>62</td>
-<td>+
-</td></tr>
-<tr>
-<td>15</td>
-<td>P</td>
-<td>31</td>
-<td>f</td>
-<td>47</td>
-<td>v</td>
-<td>63</td>
-<td>/
-</td></tr></tbody>
-</table>
-
-<p>不过这只是在一般情况下，如果要编码的字节数不能被 3 整除，最后会多出 1 个或 2 个字节，这时候的处理方式为先使用 0 补足，使其能够被 3 整除，然后再进行 Base64 的编码。在编码后的Base64文本后加上一个或两个 <code>=</code> 号，代表补足的字节数，如下图所示：</p>
-<table class="table3">
-<tbody><tr>
-<th scope="row">文本（1 Byte）
-</th>
-<td colspan="8" align="center"><b>A</b>
-</td>
-<td colspan="8" align="center"><i></i>
-</td>
-<td colspan="8" align="center"><i></i>
-</td></tr>
-<tr>
-<th scope="row">二进制位
-</th>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i>
-</td></tr>
-<tr>
-<th scope="row">二进制位（补0）
-</th>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td><b>0</b></td>
-<td><b>0</b></td>
-<td><b>0</b></td>
-<td><b>0</b></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0<i></i>
-</td></tr>
-<tr>
-<th scope="row">Base64编码
-</th>
-<td colspan="6" align="center"><b>Q</b>
-</td>
-<td colspan="6" align="center"><b>Q</b>
-</td>
-<td colspan="6" align="center">=<i></i>
-</td>
-<td colspan="6" align="center">=<i></i>
-</td></tr>
-<tr>
-<th scope="row">文本（2 Byte）
-</th>
-<td colspan="8" align="center"><b>B</b>
-</td>
-<td colspan="8" align="center"><b>C</b>
-</td>
-<td colspan="8" align="center"><i></i>
-</td></tr>
-<tr>
-<th scope="row">二进制位
-</th>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td>0<i></i></td>
-<td>0<i></i></td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0
-</td></tr>
-<tr>
-<th scope="row">二进制位（补0）
-</th>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>1</td>
-<td>1</td>
-<td><b>0</b></td>
-<td><b>0</b></td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0</td>
-<td>0
-</td></tr>
-<tr>
-<th scope="row">Base64编码
-</th>
-<td colspan="6" align="center"><b>Q</b>
-</td>
-<td colspan="6" align="center"><b>k</b>
-</td>
-<td colspan="6" align="center"><b>M</b>
-</td>
-<td colspan="6" align="center">=<i></i>
-</td></tr></tbody>
-</table>
-
-<p>很明显如果原字节数与 3 的模为 1，也就是多余 8 位，Base64 会将其补足  24 位，因此最终会多两个 <code>=</code> 号，如果模为 2，也就是多余 16 位 Base64 将其补足 24 位，因此最终会多一个 <code>=</code> 号。</p>
-<style>
-    .table3 th:nth-of-type(1){
-        width: 20%;
-    }
-    .table3 th:nth-of-type(2){
-        width: 20%;
-    }
-    .table3 th:nth-of-type(3){
-        width: 60%;
-    }
-    td, th {
-        text-align:center;
-        border: 1px solid gray;
-    }
-</style>
-
-<h2 id="基本用途"><a href="#基本用途" class="headerlink" title="基本用途"></a>基本用途</h2><p>用于在只能接收文本信息的地方传输二进制数据，比如客户端通过 WebView 传输视频给 H5，或者 IM 聊天发送图片给对方（也可以客户端先上传图片再发送 url 给对方）。</p>
-<h2 id="性能对比"><a href="#性能对比" class="headerlink" title="性能对比"></a>性能对比</h2><p>Base64 编码不提供安全性，因为算法是固定的，人人都可以获取到源数据。</p>
-<p>Base64 编码是低效的，只在<strong>非用不可</strong>的情况下使用，原因是其将 3/4 个字节转换为 1 个字节，增加了传输成本以及运算成本。</p>
-<h2 id="扩展知识"><a href="#扩展知识" class="headerlink" title="扩展知识"></a>扩展知识</h2><p>Base64 编码还有一个相近的编码那就是 Base58 编码主要用于生成比特币的钱包地址，其去除了 O、0、I、l、+、\，其中前面 4 个字符是由于其太相似了容易搞混，最后去除 +、\ 是由于不方便双击复制文本。</p>
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近要写桌面打包工具，其基于 Electron 进行开发，因此需要先了解下 Electron，本文主要记录下 Electron 的基础知识。<a id="more"></a></p>
+<h2 id="什么是-Electron？"><a href="#什么是-Electron？" class="headerlink" title="什么是 Electron？"></a>什么是 Electron？</h2><p>Electron 是一个能让你使用 JavaScript, HTML 和 CSS 来创建桌面应用程序的框架。 开发完毕后可以打包在 macOS、Windows 和 Linux 上直接运行，或者通过 Mac App Store 或微软商店进行分发。</p>
+<h2 id="为什么它如此重要？"><a href="#为什么它如此重要？" class="headerlink" title="为什么它如此重要？"></a>为什么它如此重要？</h2><p>通常来说，每个操作系统的桌面应用都由各自的原生语言进行编写，这意味着需要 3 个团队分别为该应用编写相应版本。而 Electron 则允许你用 Web 语言编写一次即可。</p>
+<ul>
+<li><strong>原生语言</strong>：指的是用于开发主流操作系统应用的原生语言的对应关系（大多数情况下）：Mac 对应 Objective C、Linux 对应 C、Windows 对应 C++。</li>
+</ul>
+<h2 id="它由什么组成？"><a href="#它由什么组成？" class="headerlink" title="它由什么组成？"></a>它由什么组成？</h2><p>Electron 结合了 Chromium、Node.js 和用于调用操作系统本地功能的 API（如打开文件窗口、通知、图标等）。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615168205163-037e2c44-be3a-4583-8aa0-ce541cb9ebf7.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<h2 id="开发体验如何"><a href="#开发体验如何" class="headerlink" title="开发体验如何"></a>开发体验如何</h2><p>基于 Electron 的开发就像在开发网页，而且能够无缝地 <strong>使用 Node</strong>。或者说：在构建一个 Node 应用的同时，通过 HTML 和 CSS 构建界面。另外，你只需为一个浏览器（<strong>最新的 Chrome</strong>）进行设计（即无需考虑兼容性等）</p>
+<ul>
+<li><strong>使用 Node</strong>：这还不是全部！除了完整的 Node API，你还可以使用托管在 npm 上超过 350,000 个的模块。</li>
+<li><strong>一个浏览器</strong>：并非所有浏览器都提供一致的样式，Web 设计师和开发者经常因此而不得不花费更多的精力，让网站在不同浏览器上表现一致。</li>
+<li><strong>最新的 Chrome</strong>：可使用超过 90% 的 ES2015 特性和其它很酷的特性（如 CSS 变量）。</li>
+</ul>
+<h2 id="两个进程"><a href="#两个进程" class="headerlink" title="两个进程"></a>两个进程</h2><p>Electron 有两种进程：『主进程』和『渲染进程』。部分模块只能在两者之一上运行，而有些则无限制。主进程更多地充当幕后角色，而渲染进程则是应用程序的各个窗口。</p>
+<h3 id="主进程"><a href="#主进程" class="headerlink" title="主进程"></a>主进程</h3><p>主进程会执行一个名为 main.js 的文件，该文件是每个 Electron 应用的入口。它控制了应用的生命周期（从打开到关闭）。它既能<strong>调用原生元素</strong>，也能创建新的（多个）渲染进程。另外，Node API 是内置其中的。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615170214095-5fca6b80-0c6e-44d4-9116-70b0037b5357.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<p><strong>调用原生元素</strong>：打开 diglog 和其它操作系统的交互均是资源密集型操作（注：出于安全考虑，渲染进程是不能直接访问本地资源的），因此都需要在主进程完成</p>
+<h3 id="渲染进程"><a href="#渲染进程" class="headerlink" title="渲染进程"></a>渲染进程</h3><p>渲染进程是应用的一个浏览器窗口。与主进程不同，它能存在多个并且<strong>相互独立</strong>（它也能是<strong>隐藏的</strong>）。主窗口通常被命名为 index.html 。它们就像典型的 HTML 文件，但 Electron 赋予了它们完整的 Node API。因此这也是它与浏览器的区别。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615170927862-30a0f009-c5ba-4a48-812f-d8f7d9481a28.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<ul>
+<li><strong>相互独立</strong>：每个渲染进程都是独立的，这意味着某个渲染进程的崩溃，也不会影响其余渲染进程。</li>
+<li><strong>隐藏</strong>：可隐藏窗口，可以在后台运行代码。</li>
+</ul>
+<h3 id="把它们想象成这样"><a href="#把它们想象成这样" class="headerlink" title="把它们想象成这样"></a>把它们想象成这样</h3><p>Chrome（或其他浏览器）的每个标签页（tab）及其页面，就好比 Electron 中的一个单独渲染进程。即使关闭所有标签页，Chrome 依然存在，这好比 Electron 的主进程，能打开新的窗口或关闭这个应用。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615172391128-3a22d22a-f487-4363-adb5-3285278744d6.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<h3 id="相互通讯"><a href="#相互通讯" class="headerlink" title="相互通讯"></a>相互通讯</h3><p>由于主进程和渲染进程各自负责不同的任务，而对于需要协同完成的任务，它们需要相互通讯。<strong>IPC</strong>就为此而生，它提供了进程间的通讯。但它只能在主进程与渲染进程之间传递信息（即渲染进程之间不能进行直接通讯）。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615172887342-038a6d0f-171e-45d1-a676-1aed22abda8d.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<ul>
+<li><strong>IPC</strong>：主进程和渲染进程各自拥有一个 IPC 模块。</li>
+</ul>
+<h2 id="汇总"><a href="#汇总" class="headerlink" title="汇总"></a>汇总</h2><p>Electron 应用就像 Node 应用，它也依赖一个 package.json 文件。该文件定义了哪个文件作为主进程，并因此让 Electron 知道从何启动应用。然后主进程能创建渲染进程，并能使用 IPC 让两者间进行消息传递。</p>
+<p><img src="https://cdn.nlark.com/yuque/0/2021/png/168137/1615173313137-eaccd92d-311a-4720-a441-cdee8f1efeb7.png?x-oss-process=image%2Fresize%2Cw_1500" alt="image.png"></p>
+<ul>
+<li><strong>package.json 文件</strong>：这是一个常见的 Node 应用文件，它包含了关于项目的元数据和一系列依赖。 </li>
+</ul>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ol>
+<li>Essential Electron <a href="http://jlord.us/essential-electron/" target="_blank" rel="noopener">http://jlord.us/essential-electron/</a></li>
+</ol>
 
       
     </div>
@@ -849,8 +458,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/06/23/%E7%AC%AC%E4%B8%89%E6%96%B9%E7%99%BB%E5%BD%95/" rel="next" title="第三方登录">
-                <i class="fa fa-chevron-left"></i> 第三方登录
+              <a href="/2020/08/07/Android%20%E6%9E%84%E5%BB%BA%E6%89%93%E5%8C%85%E6%B5%81%E7%A8%8B/" rel="next" title="Android 构建打包流程">
+                <i class="fa fa-chevron-left"></i> Android 构建打包流程
               </a>
             
           </div>
@@ -859,8 +468,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/06/30/WebSocket%20%E8%81%8A%E5%A4%A9/" rel="prev" title="WebSocket 聊天">
-                WebSocket 聊天 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/" rel="prev" title="桌面打包工具">
+                桌面打包工具 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -988,7 +597,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编码原理"><span class="nav-number">3.</span> <span class="nav-text">编码原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本用途"><span class="nav-number">4.</span> <span class="nav-text">基本用途</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能对比"><span class="nav-number">5.</span> <span class="nav-text">性能对比</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#扩展知识"><span class="nav-number">6.</span> <span class="nav-text">扩展知识</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是-Electron？"><span class="nav-number">2.</span> <span class="nav-text">什么是 Electron？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么它如此重要？"><span class="nav-number">3.</span> <span class="nav-text">为什么它如此重要？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#它由什么组成？"><span class="nav-number">4.</span> <span class="nav-text">它由什么组成？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#开发体验如何"><span class="nav-number">5.</span> <span class="nav-text">开发体验如何</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#两个进程"><span class="nav-number">6.</span> <span class="nav-text">两个进程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#主进程"><span class="nav-number">6.1.</span> <span class="nav-text">主进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#渲染进程"><span class="nav-number">6.2.</span> <span class="nav-text">渲染进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#把它们想象成这样"><span class="nav-number">6.3.</span> <span class="nav-text">把它们想象成这样</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相互通讯"><span class="nav-number">6.4.</span> <span class="nav-text">相互通讯</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#汇总"><span class="nav-number">7.</span> <span class="nav-text">汇总</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考"><span class="nav-number">8.</span> <span class="nav-text">参考</span></a></li></ol></div>
             
 
           </div>
