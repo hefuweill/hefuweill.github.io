@@ -127,9 +127,10 @@
 <meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/game.png">
 <meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/channel.png">
 <meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/pack.png">
-<meta property="og:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/%E6%97%B6%E5%BA%8F%E5%9B%BE.jpg">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-09/%E6%88%AA%E5%B1%8F2021-03-09%20%E4%B8%8A%E5%8D%8811.04.42.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-09/%E6%97%B6%E5%BA%8F%E5%9B%BE.jpg">
 <meta property="article:published_time" content="2020-09-30T13:22:00.000Z">
-<meta property="article:modified_time" content="2021-03-07T14:23:37.525Z">
+<meta property="article:modified_time" content="2021-03-09T03:04:53.776Z">
 <meta property="article:author" content="何富威">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="http://yoursite.com/2020/09/30/%E6%A1%8C%E9%9D%A2%E6%89%93%E5%8C%85%E5%B7%A5%E5%85%B7/login.png">
@@ -412,8 +413,10 @@
 
 </li>
 </ol>
-<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>原理如以下时序图所示</p>
-<img src="时序图.jpg" alt="" style="zoom:40%;" />
+<h2 id="基本原理"><a href="#基本原理" class="headerlink" title="基本原理"></a>基本原理</h2><p>整体架构图如下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-09/%E6%88%AA%E5%B1%8F2021-03-09%20%E4%B8%8A%E5%8D%8811.04.42.png" alt="截屏2021-03-09 上午11.04.42"></p>
+<p>整体时序图如下：</p>
+<img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-03-09/%E6%97%B6%E5%BA%8F%E5%9B%BE.jpg" alt="时序图" style="zoom:33%;" />
 
 <h2 id="打包原理"><a href="#打包原理" class="headerlink" title="打包原理"></a>打包原理</h2><p>JS 层主要完成资源准备，比如下载闪屏图、渠道插件 SDK 资源等，以及结果处理，Python 脚本在打包过程中会适时的写文件更新进度，JS 只需开启一个定时器一直读取进度即可，等到脚本只需完成，判断下进度是否为 100，即可判断打包是否成功。这里只关注下打包流程。</p>
 <p>打包流程如下（参考 U8 SDK）：</p>
