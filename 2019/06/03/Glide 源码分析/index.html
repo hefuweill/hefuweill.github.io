@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next gemini use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+      
+    
+
+    
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Microsoft YaHei:300,300italic,400,400italic,700,700italic|Microsoft YaHei:300,300italic,400,400italic,700,700italic|Ma Shan Zheng:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon.ico?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/favicon.ico?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="前言以前对 Glide 的认知一直停留在一行代码就可以完成图片加载，现在就来尝试探索下这一行代码下，内部到底做了些什么。本文基于Glide 4.8.0。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Glide 源码分析">
+<meta property="og:url" content="http://yoursite.com/2019/06/03/Glide%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="何富威的博客">
+<meta property="og:description" content="前言以前对 Glide 的认知一直停留在一行代码就可以完成图片加载，现在就来尝试探索下这一行代码下，内部到底做了些什么。本文基于Glide 4.8.0。">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-03/Screen%20Shot%202021-05-26%20at%203.51.57%20PM.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%80.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%8C1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%89.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E5%9B%9B1.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%94.png">
+<meta property="article:published_time" content="2019-06-03T13:28:23.000Z">
+<meta property="article:modified_time" content="2021-06-04T06:56:58.249Z">
+<meta property="article:author" content="何富威">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-03/Screen%20Shot%202021-05-26%20at%203.51.57%20PM.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":true,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/06/03/Glide 源码分析/"/>
+
+
+
+
+
+  <title>Glide 源码分析 | 何富威的博客</title>
+  
+
+
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?8dd458e5cf03e833389caa5705955567";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+<meta name="generator" content="Hexo 4.2.0"></head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">何富威的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/06/03/Glide%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="何富威">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="何富威的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Glide 源码分析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-03T21:28:23+08:00">
+                2019-06-03
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category" >
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index">
+                    <span itemprop="name">Android</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>以前对 Glide 的认知一直停留在一行代码就可以完成图片加载，现在就来尝试探索下这一行代码下，内部到底做了些什么。本文基于Glide 4.8.0。<a id="more"></a></p>
+<p>查阅官方文档发现 Glide 主要有以下优点：</p>
+<ol>
+<li>调用方便，一行代码</li>
+<li>无代码侵入，直接使用 ImageView 即可</li>
+<li>扩展性强，快速集成 OkHttp 等等</li>
+<li>支持 Gif 图片加载</li>
+<li>生命周期及网络连接变化时自动管理请求</li>
+</ol>
+<h2 id="基本使用"><a href="#基本使用" class="headerlink" title="基本使用"></a>基本使用</h2><p>使用 Glide 加载网络图片可以简单使用以下一行代码搞定。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Glide.with(<span class="keyword">this</span>).load(URL).into(imageView)</span><br></pre></td></tr></table></figure>
+
+<p>如果需要指定默认图、错误图等，那么可以新建一个 RequestOptions 进行设置。</p>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="keyword">val</span> options = RequestOptions().apply &#123;</span><br><span class="line">    placeholder(R.drawable.ic_placeholder)</span><br><span class="line">    error(R.drawable.ic_error)</span><br><span class="line">&#125;</span><br><span class="line">Glide.with(<span class="keyword">this</span>).load(URL).apply(options).into(imageView)</span><br></pre></td></tr></table></figure>
+
+<p>还有很多其它用法就不展开了。</p>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>在分析源码前，需要先了解以下几个类，以便于后续进行分析。</p>
+<h3 id="Target"><a href="#Target" class="headerlink" title="Target"></a>Target</h3><p>Glide 通知外界加载过程的接口，主要有四个回调方法 onLoadStarted、onResourceReady、onLoadCleared、onLoadFailed 。</p>
+<h3 id="Encoder"><a href="#Encoder" class="headerlink" title="Encoder"></a>Encoder</h3><p>编码器，用于将数据写入到某种持久化数据存储中。</p>
+<h3 id="Decoder"><a href="#Decoder" class="headerlink" title="Decoder"></a>Decoder</h3><p>解码器，用于从某种持久化数据存储中读取数据。</p>
+<h3 id="Transcoder"><a href="#Transcoder" class="headerlink" title="Transcoder"></a>Transcoder</h3><p>转码器，用于将一种资源类型转换为另一种资源类型，比如 Bitmap 转换为 BitmapDrawable 等等。</p>
+<h3 id="Transformation"><a href="#Transformation" class="headerlink" title="Transformation"></a>Transformation</h3><p>资源转换，不同于转码器，这个属于同种资源转换，比如进行裁减等等。</p>
+<h3 id="DataRewinder"><a href="#DataRewinder" class="headerlink" title="DataRewinder"></a>DataRewinder</h3><p>倒带器（类似磁带回放），用于将数据的读取位置进行重置。比如读取了图片头后，又需要将其编码存储到文件中，这时就需要重置。</p>
+<h3 id="ModelLoaderFactory"><a href="#ModelLoaderFactory" class="headerlink" title="ModelLoaderFactory"></a>ModelLoaderFactory</h3><p>数据模型加载器工厂，用于构建具体的数据模型加载器，基本都以对应 ModelLoader 类的内部类存在。</p>
+<h3 id="ModelLoader"><a href="#ModelLoader" class="headerlink" title="ModelLoader"></a>ModelLoader</h3><p>数据模型加载器，用于将任意复杂的数据模型转换为具体的数据类型，比如将 String 转换为 InputSteam 等。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ModelLoader</span>&lt;<span class="title">Model</span>, <span class="title">Data</span>&gt; </span>&#123;</span><br><span class="line">  <span class="comment">// 用于构建 LoadData 实例，如果无法构建那么返回 null</span></span><br><span class="line">  <span class="function">LoadData&lt;Data&gt; <span class="title">buildLoadData</span><span class="params">(@NonNull Model model, <span class="keyword">int</span> width, <span class="keyword">int</span> height,</span></span></span><br><span class="line"><span class="function"><span class="params">      @NonNull Options options)</span></span>;</span><br><span class="line">  <span class="comment">// 如果当前的 ModelLoader 可以处理该数据源那么返回 true，否则返回 false</span></span><br><span class="line">  <span class="function"><span class="keyword">boolean</span> <span class="title">handles</span><span class="params">(@NonNull Model model)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="LoadData"><a href="#LoadData" class="headerlink" title="LoadData"></a>LoadData</h3><p>加载资源的 Key 和用于加载该资源的 DataFetcher 包装对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LoadData</span>&lt;<span class="title">Data</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> Key sourceKey;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> List&lt;Key&gt; alternateKeys;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">final</span> DataFetcher&lt;Data&gt; fetcher;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LoadData</span><span class="params">(Key sourceKey, DataFetcher&lt;Data&gt; fetcher)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(sourceKey, Collections.&lt;Key&gt;emptyList(), fetcher);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">LoadData</span><span class="params">(Key sourceKey, List&lt;Key&gt; alternateKeys, DataFetcher&lt;Data&gt; fetcher)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.sourceKey = Preconditions.checkNotNull(sourceKey);</span><br><span class="line">        <span class="keyword">this</span>.alternateKeys = Preconditions.checkNotNull(alternateKeys);</span><br><span class="line">        <span class="keyword">this</span>.fetcher = Preconditions.checkNotNull(fetcher);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DecodePath"><a href="#DecodePath" class="headerlink" title="DecodePath"></a>DecodePath</h3><p>一条解码路径，dataClass =&gt; resourcesClass =&gt; transcodeClass，如 ByteBuffer =&gt; GifDrawable =&gt; Drawable。</p>
+<h3 id="LoadPath"><a href="#LoadPath" class="headerlink" title="LoadPath"></a>LoadPath</h3><p>多条解码路径（内部保证 dataClass、resourcesClass、transcodeClass 一致），内部包含若干个 DecodePath。</p>
+<h3 id="RequestManager"><a href="#RequestManager" class="headerlink" title="RequestManager"></a>RequestManager</h3><p>请求管理器，控制当前 Activity 或者当前应用所有请求的加载与暂停（会根据生命周期或者网络连接变化进行控制），每个 Activity 都可以拥有一个实例，应用级还可以拥有一个实例。</p>
+<h3 id="RequestManagerRetriever"><a href="#RequestManagerRetriever" class="headerlink" title="RequestManagerRetriever"></a>RequestManagerRetriever</h3><p>请求管理器寻回者，用于新建一个 RequestManager 实例或者从 Activity 和 Fragment 中寻回已经存在的实例。</p>
+<h3 id="RequestBuilder"><a href="#RequestBuilder" class="headerlink" title="RequestBuilder"></a>RequestBuilder</h3><p>一个泛型类，可以处理泛型资源类型的选项设置和开始加载，也就是构建 Request。</p>
+<h3 id="Request"><a href="#Request" class="headerlink" title="Request"></a>Request</h3><p>请求其用于加载资源到 Target ，一共就三个子类：</p>
+<ol>
+<li><p>SingleRequest 对应普通的请求</p>
+</li>
+<li><p>ThumbnailRequestCoordinator 对应带缩略图的请求</p>
+</li>
+<li><p>ErrorRequestCoordinator 对应带错误请求的请求</p>
+</li>
+</ol>
+<h3 id="Engine"><a href="#Engine" class="headerlink" title="Engine"></a>Engine</h3><p>负责开始加载以及管理缓存（两级内存缓存以及磁盘缓存）</p>
+<h2 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h2><h3 id="Glide-with"><a href="#Glide-with" class="headerlink" title="Glide.with"></a>Glide.with</h3><p>Glide.with 提供了好多个重载方法，这里以参数为 FragmentActivity 的方法为例。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-03/Screen%20Shot%202021-05-26%20at%203.51.57%20PM.png" alt="Glide.with"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> RequestManager <span class="title">with</span><span class="params">(@NonNull FragmentActivity activity)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getRetriever(activity).get(activity);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Glide-getRetriever"><a href="#Glide-getRetriever" class="headerlink" title="Glide.getRetriever"></a>Glide.getRetriever</h4><p>该方法用于获取到一个 RequestManagerRetriever 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> RequestManagerRetriever <span class="title">getRetriever</span><span class="params">(@Nullable Context context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> get(context).getRequestManagerRetriever();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Glide <span class="title">get</span><span class="params">(@NonNull Context context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (glide == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">synchronized</span> (Glide<span class="class">.<span class="keyword">class</span>) </span>&#123;</span><br><span class="line">            <span class="keyword">if</span> (glide == <span class="keyword">null</span>) &#123;</span><br><span class="line">                checkAndInitializeGlide(context);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> glide;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">checkAndInitializeGlide</span><span class="params">(@NonNull Context context)</span> </span>&#123;</span><br><span class="line">    initializeGlide(context, <span class="keyword">new</span> GlideBuilder());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于最初 Glide 实例还未创建，因此会执行 checkAndInitializeGlide 方法创建 Glide 实例并进行初始化。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">initializeGlide</span><span class="params">(@NonNull Context context, @NonNull GlideBuilder builder)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 获取注册的所有 GlideModule（APT 生成的或者清单文件中的），调用它们的 applyOptions 方法。</span></span><br><span class="line">    ...</span><br><span class="line">    Glide glide = builder.build(applicationContext);</span><br><span class="line">    <span class="comment">// 获取注册的所有 GlideModule（APT 生成的或者清单文件中的），调用它们的 registerComponent 方法。</span></span><br><span class="line">    ...</span><br><span class="line">    Glide.glide = glide;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里会涉及到<strong><em>自定义 GlideModule</em></strong>，这个可以根据官方文档编写，这里不关注，先跟主线，该方法核心就是 GlideBuilder.build 创建 Glide 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">Glide <span class="title">build</span><span class="params">(@NonNull Context context)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (sourceExecutor == <span class="keyword">null</span>) sourceExecutor = GlideExecutor.newSourceExecutor();</span><br><span class="line">    <span class="keyword">if</span> (diskCacheExecutor == <span class="keyword">null</span>) diskCacheExecutor = GlideExecutor.newDiskCacheExecutor();</span><br><span class="line">    <span class="keyword">if</span> (animationExecutor == <span class="keyword">null</span>) animationExecutor = GlideExecutor.newAnimationExecutor();</span><br><span class="line">    <span class="keyword">if</span> (memorySizeCalculator == <span class="keyword">null</span>) memorySizeCalculator = <span class="keyword">new</span> MemorySizeCalculator.Builder(context).build();</span><br><span class="line">    <span class="keyword">if</span> (connectivityMonitorFactory == <span class="keyword">null</span>) connectivityMonitorFactory = <span class="keyword">new</span> DefaultConnectivityMonitorFactory();</span><br><span class="line">    <span class="keyword">if</span> (bitmapPool == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">int</span> size = memorySizeCalculator.getBitmapPoolSize();</span><br><span class="line">        <span class="keyword">if</span> (size &gt; <span class="number">0</span>) bitmapPool = <span class="keyword">new</span> LruBitmapPool(size);</span><br><span class="line">        <span class="keyword">else</span> bitmapPool = <span class="keyword">new</span> BitmapPoolAdapter();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (arrayPool == <span class="keyword">null</span>) arrayPool = <span class="keyword">new</span> LruArrayPool(memorySizeCalculator.getArrayPoolSizeInBytes());</span><br><span class="line">    <span class="keyword">if</span> (memoryCache == <span class="keyword">null</span>) memoryCache = <span class="keyword">new</span> LruResourceCache(memorySizeCalculator.getMemoryCacheSize());</span><br><span class="line">    <span class="keyword">if</span> (diskCacheFactory == <span class="keyword">null</span>) diskCacheFactory = <span class="keyword">new</span> InternalCacheDiskCacheFactory(context);</span><br><span class="line">    <span class="keyword">if</span> (engine == <span class="keyword">null</span>) engine = <span class="keyword">new</span> Engine(...); </span><br><span class="line">    RequestManagerRetriever requestManagerRetriever = <span class="keyword">new</span> RequestManagerRetriever(requestManagerFactory);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Glide(...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果自定义 GlideModule 中没有单独设置那么 sourceExecutor、diskCacheExecutor 等都使用默认值。这里创建了 Engine、RequestManagerRetriever 实例，最终创建了 Glide 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Glide(...) &#123;</span><br><span class="line">    registry = <span class="keyword">new</span> Registry(); <span class="comment">// 创建注册表</span></span><br><span class="line">	<span class="comment">// 注册 ImageHeaderParser、Encoder、ResourceEncoder、ResourceDecoder</span></span><br><span class="line">    <span class="comment">// Transcoder、ModelLoaderFactory、DataRewinder</span></span><br><span class="line">	...</span><br><span class="line">    <span class="comment">// 新建 ImageViewTargetFactory 用于创建 BitmapImageViewTarget 或者 DrawableImageViewTarget 实例</span></span><br><span class="line">    ImageViewTargetFactory imageViewTargetFactory = <span class="keyword">new</span> ImageViewTargetFactory(); </span><br><span class="line">    <span class="comment">// 新建 GlideContext 用于后续获取 Glide 组件</span></span><br><span class="line">    glideContext = <span class="keyword">new</span> GlideContext(...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注册表类 Registry 内部还包含了很多个注册表，结构如下。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Registry</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ModelLoaderRegistry modelLoaderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> EncoderRegistry encoderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ResourceDecoderRegistry decoderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ResourceEncoderRegistry resourceEncoderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> DataRewinderRegistry dataRewinderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> TranscoderRegistry transcoderRegistry;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> ImageHeaderParserRegistry imageHeaderParserRegistry;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部七个注册表分别对应 Glide 实例创建时注册的七种类型。注册表输入如下：</p>
+<h5 id="ModelLoaderRegistry"><a href="#ModelLoaderRegistry" class="headerlink" title="ModelLoaderRegistry"></a>ModelLoaderRegistry</h5><table>
+<thead>
+<tr>
+<th><strong>ModelClass</strong></th>
+<th><strong>DataClass</strong></th>
+<th><strong>ModelLoaderFactory</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bitmap</td>
+<td>Bitmap</td>
+<td>UnitModelLoader.Factory</td>
+</tr>
+<tr>
+<td>GifDecoder</td>
+<td>GifDecoder</td>
+<td>UnitModelLoader.Factory</td>
+</tr>
+<tr>
+<td>File</td>
+<td>ByteBuffer</td>
+<td>ByteBufferFileLoader.Factory</td>
+</tr>
+<tr>
+<td>File</td>
+<td>InputStream</td>
+<td>FileLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>File</td>
+<td>ParcelFileDescriptor</td>
+<td>FileLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>File</td>
+<td>File</td>
+<td>UnitModelLoader.Factory</td>
+</tr>
+<tr>
+<td>int</td>
+<td>InputStream</td>
+<td>ResourceLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>int</td>
+<td>ParcelFileDescriptor</td>
+<td>ResourceLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>int</td>
+<td>Uri</td>
+<td>ResourceLoader.UriFactory</td>
+</tr>
+<tr>
+<td>int</td>
+<td>AssetFileDescriptor</td>
+<td>ResourceLoader.AssetFileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>InputStream</td>
+<td>ResourceLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>ParcelFileDescriptor</td>
+<td>ResourceLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>Uri</td>
+<td>ResourceLoader.UriFactory</td>
+</tr>
+<tr>
+<td>Integer</td>
+<td>AssetFileDescriptor</td>
+<td>ResourceLoader.AssetFileDescriptorFactory</td>
+</tr>
+<tr>
+<td>String</td>
+<td>InputStream</td>
+<td>DataUrlLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>String</td>
+<td>InputStream</td>
+<td>StringLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>String</td>
+<td>ParcelFileDescriptor</td>
+<td>StringLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>String</td>
+<td>AssetFileDescriptor</td>
+<td>StringLoader.AssetFileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>DataUrlLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>HttpUriLoader.Factory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>AssetUriLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>MediaStoreImageThumbLoader.Factory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>MediaStoreVideoThumbLoader.Factory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>UriLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>InputStream</td>
+<td>UrlUriLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>ParcelFileDescriptor</td>
+<td>AssetUriLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>ParcelFileDescriptor</td>
+<td>UriLoader.FileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>AssetFileDescriptor</td>
+<td>UriLoader.AssetFileDescriptorFactory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>File</td>
+<td>MediaStoreFileLoader.Factory</td>
+</tr>
+<tr>
+<td>Uri</td>
+<td>Uri</td>
+<td>UnitModelLoader.Factory</td>
+</tr>
+<tr>
+<td>URL</td>
+<td>InputStream</td>
+<td>UrlLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>GlideUrl</td>
+<td>InputStream</td>
+<td>HttpGlideUrlLoader.Factory</td>
+</tr>
+<tr>
+<td>byte[]</td>
+<td>InputStream</td>
+<td>ByteArrayLoader.StreamFactory</td>
+</tr>
+<tr>
+<td>byte[]</td>
+<td>ByteBuffer</td>
+<td>ByteArrayLoader.ByteBufferFactory</td>
+</tr>
+</tbody></table>
+<h5 id="EncoderRegistry"><a href="#EncoderRegistry" class="headerlink" title="EncoderRegistry"></a>EncoderRegistry</h5><table>
+<thead>
+<tr>
+<th>DataClass</th>
+<th>Encoder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ByteBuffer</td>
+<td>ByteBufferEncoder</td>
+</tr>
+<tr>
+<td>InputSteam</td>
+<td>SteamEncoder</td>
+</tr>
+</tbody></table>
+<h5 id="ResourceEncoderRegistry"><a href="#ResourceEncoderRegistry" class="headerlink" title="ResourceEncoderRegistry"></a>ResourceEncoderRegistry</h5><table>
+<thead>
+<tr>
+<th>DateClass</th>
+<th>ResourceEncoder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bitmap</td>
+<td>BitmapEncoder</td>
+</tr>
+<tr>
+<td>InputSteam</td>
+<td>BitmapDrawableEncoder</td>
+</tr>
+<tr>
+<td>GifDrawable</td>
+<td>GifDrawableEncoder</td>
+</tr>
+</tbody></table>
+<h5 id="ResourceDecoderRegistry"><a href="#ResourceDecoderRegistry" class="headerlink" title="ResourceDecoderRegistry"></a>ResourceDecoderRegistry</h5><table>
+<thead>
+<tr>
+<th>Bucket</th>
+<th>DataClass</th>
+<th>ResourceClass</th>
+<th>ResourceDecoder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Bitmap</td>
+<td>ByteBuffer</td>
+<td>Bitmap</td>
+<td>ByteBufferBitmapDecoder</td>
+</tr>
+<tr>
+<td>Bitmap</td>
+<td>InputSteam</td>
+<td>Bitmap</td>
+<td>StreamBitmapDecoder</td>
+</tr>
+<tr>
+<td>Bitmap</td>
+<td>ParcelFileDescriptor</td>
+<td>Bitmap</td>
+<td>VideoDecoder</td>
+</tr>
+<tr>
+<td>Bitmap</td>
+<td>AssetFileDescriptor</td>
+<td>Bitmap</td>
+<td>VideoDecoder</td>
+</tr>
+<tr>
+<td>Bitmap</td>
+<td>ByteBuffer</td>
+<td>Bitmap</td>
+<td>ByteBufferBitmapDecoder</td>
+</tr>
+<tr>
+<td>BitmapDrawable</td>
+<td>ByteBuffer</td>
+<td>BitmapDrawable</td>
+<td>BitmapDrawableDecoder</td>
+</tr>
+<tr>
+<td>BitmapDrawable</td>
+<td>InputStream</td>
+<td>BitmapDrawable</td>
+<td>BitmapDrawableDecoder</td>
+</tr>
+<tr>
+<td>BitmapDrawable</td>
+<td>ParcelFileDescriptor</td>
+<td>BitmapDrawable</td>
+<td>BitmapDrawableDecoder</td>
+</tr>
+<tr>
+<td>Gif</td>
+<td>InputSteam</td>
+<td>GifDrawable</td>
+<td>StreamGifDecoder</td>
+</tr>
+<tr>
+<td>Gif</td>
+<td>ByteBuffer</td>
+<td>GifDrawable</td>
+<td>ByteBufferGifDecoder</td>
+</tr>
+<tr>
+<td>legacy_append</td>
+<td>Uri</td>
+<td>Drawable</td>
+<td>ResourceDrawableDecoder</td>
+</tr>
+<tr>
+<td>legacy_append</td>
+<td>Uri</td>
+<td>Bitmap</td>
+<td>ResourceBitmapDecoder</td>
+</tr>
+<tr>
+<td>legacy_append</td>
+<td>File</td>
+<td>File</td>
+<td>FileDecoder</td>
+</tr>
+<tr>
+<td>legacy_append</td>
+<td>Drawable</td>
+<td>Drawable</td>
+<td>UnitDrawableDecoder</td>
+</tr>
+</tbody></table>
+<h5 id="DataRewinderRegistry"><a href="#DataRewinderRegistry" class="headerlink" title="DataRewinderRegistry"></a>DataRewinderRegistry</h5><table>
+<thead>
+<tr>
+<th align="left">DataClass</th>
+<th align="left">DataRewinder</th>
+<th align="left">DataRewinder.Factory</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">InputStream</td>
+<td align="left">InputStreamRewinder</td>
+<td align="left">InputStreamRewinder.Factory</td>
+</tr>
+<tr>
+<td align="left">ByteBuffer</td>
+<td align="left">ByteBufferRewinder</td>
+<td align="left">ByteBufferRewinder.Factory</td>
+</tr>
+</tbody></table>
+<h5 id="TranscoderRegistry"><a href="#TranscoderRegistry" class="headerlink" title="TranscoderRegistry"></a>TranscoderRegistry</h5><table>
+<thead>
+<tr>
+<th align="left">ResourceClass</th>
+<th align="left">TranscodeClass</th>
+<th align="left">ResourceTranscoder</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Bitmap</td>
+<td align="left">BitmapDrawable</td>
+<td align="left">BitmapDrawableTranscoder</td>
+</tr>
+<tr>
+<td align="left">Bitmap</td>
+<td align="left">byte[]</td>
+<td align="left">BitmapBytesTranscoder</td>
+</tr>
+<tr>
+<td align="left">Drawable</td>
+<td align="left">byte[]</td>
+<td align="left">DrawableBytesTranscoder</td>
+</tr>
+<tr>
+<td align="left">GifDrawable</td>
+<td align="left">byte[]</td>
+<td align="left">GifDrawableBytesTranscoder</td>
+</tr>
+</tbody></table>
+<h5 id="ImageHeaderParserRegistry"><a href="#ImageHeaderParserRegistry" class="headerlink" title="ImageHeaderParserRegistry"></a>ImageHeaderParserRegistry</h5><table>
+<thead>
+<tr>
+<th align="left">ImageHeaderParser</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">DefaultImageHeaderParser</td>
+</tr>
+<tr>
+<td align="left">ExifInterfaceImageHeaderParser</td>
+</tr>
+</tbody></table>
+<p>至此 getRetriever 方法结束了，返回一个新建的 RequestManagerRetriever 实例。</p>
+<h4 id="RequestManagerRetriever-get"><a href="#RequestManagerRetriever-get" class="headerlink" title="RequestManagerRetriever.get"></a>RequestManagerRetriever.get</h4><p>该方法用于获取到一个 RequestManager 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RequestManager <span class="title">get</span><span class="params">(@NonNull FragmentActivity activity)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Util.isOnBackgroundThread()) &#123;</span><br><span class="line">        <span class="keyword">return</span> get(activity.getApplicationContext());</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        FragmentManager fm = activity.getSupportFragmentManager();</span><br><span class="line">        <span class="keyword">return</span> supportFragmentGet(</span><br><span class="line">            activity, fm, <span class="comment">/*parentHint=*/</span> <span class="keyword">null</span>, isActivityVisible(activity));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果当前在子线程执行，那么直接当做 Application 进行处理，否则调用 supportFragmentGet 尝试去获取一个 RequestManager。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> RequestManager <span class="title">supportFragmentGet</span><span class="params">(Context context, FragmentManager fm, </span></span></span><br><span class="line"><span class="function"><span class="params">                                          Fragment parentHint, <span class="keyword">boolean</span> isParentVisible)</span> </span>&#123;</span><br><span class="line">    SupportRequestManagerFragment current =</span><br><span class="line">        getSupportRequestManagerFragment(fm, parentHint, isParentVisible);</span><br><span class="line">    RequestManager requestManager = current.getRequestManager();</span><br><span class="line">    <span class="keyword">if</span> (requestManager == <span class="keyword">null</span>) &#123;</span><br><span class="line">        Glide glide = Glide.get(context);</span><br><span class="line">        requestManager = factory.build(...);</span><br><span class="line">        current.setRequestManager(requestManager);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> requestManager;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里会涉及到通过监听生命周期来达到开启暂停加载图片，具体细节如下。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> SupportRequestManagerFragment <span class="title">getSupportRequestManagerFragment</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    SupportRequestManagerFragment current = fm.findFragmentByTag(FRAGMENT_TAG);</span><br><span class="line">    <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 需要缓存的原因是 commitAllowingStateLoss 不是立即执行的，而是会发送一个消息</span></span><br><span class="line">        <span class="comment">// 到主线程，移除缓存的消息由于再其后发送，因此一旦添加 Fragment 添加完成缓存就会被移除</span></span><br><span class="line">        current = <span class="keyword">this</span>.pendingSupportRequestManagerFragments.get(fm); <span class="comment">// 从缓存取，防止创建多个</span></span><br><span class="line">        <span class="keyword">if</span> (current == <span class="keyword">null</span>) &#123;</span><br><span class="line">            current = <span class="keyword">new</span> SupportRequestManagerFragment();</span><br><span class="line">            current.setParentFragmentHint(parentHint);</span><br><span class="line">            <span class="keyword">if</span> (isParentVisible) &#123;</span><br><span class="line">                current.getGlideLifecycle().onStart();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">this</span>.pendingSupportRequestManagerFragments.put(fm, current); <span class="comment">// 放入缓存</span></span><br><span class="line">            fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();</span><br><span class="line">            <span class="keyword">this</span>.handler.obtainMessage(<span class="number">2</span>, fm).sendToTarget(); <span class="comment">// 移除缓存</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> current;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>get 方法其实就是向当前 Activity 添加一个看不见的 SupportRequestManagerFragment，主要看下该 Fragment 内部实现。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SupportRequestManagerFragment</span> <span class="keyword">extends</span> <span class="title">Fragment</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SupportRequestManagerFragment</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>(<span class="keyword">new</span> ActivityFragmentLifecycle());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SupportRequestManagerFragment</span><span class="params">(ActivityFragmentLifecycle lifecycle)</span> </span>&#123;</span><br><span class="line">      <span class="keyword">this</span>.lifecycle = lifecycle;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStart();</span><br><span class="line">        lifecycle.onStart();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onStop();</span><br><span class="line">        lifecycle.onStop();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.onDestroy();</span><br><span class="line">        lifecycle.onDestroy();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ActivityFragmentLifecycle</span> <span class="keyword">implements</span> <span class="title">Lifecycle</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 弱引用 Set</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> Set&lt;LifecycleListener&gt; lifecycleListeners =</span><br><span class="line">        Collections.newSetFromMap(<span class="keyword">new</span> WeakHashMap&lt;LifecycleListener, Boolean&gt;());</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isStarted;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">boolean</span> isDestroyed;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">addListener</span><span class="params">(@NonNull LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.add(listener);</span><br><span class="line">        <span class="keyword">if</span> (isDestroyed) &#123;</span><br><span class="line">            listener.onDestroy();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isStarted) &#123;</span><br><span class="line">            listener.onStart();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            listener.onStop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">removeListener</span><span class="params">(@NonNull LifecycleListener listener)</span> </span>&#123;</span><br><span class="line">        lifecycleListeners.remove(listener);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        isStarted = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) &#123;</span><br><span class="line">            lifecycleListener.onStart();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        isStarted = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) &#123;</span><br><span class="line">            lifecycleListener.onStop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        isDestroyed = <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">for</span> (LifecycleListener lifecycleListener : Util.getSnapshot(lifecycleListeners)) &#123;</span><br><span class="line">            lifecycleListener.onDestroy();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SupportRequestManagerFragment 重写了 Fragment 的生命周期方法，增加调用 ActivityFragmentLifecycle 对应方法，进而通知 LifecycleListener，不过问题来了，addListener、removeListener 在哪里调用了？经过查询只会在 RequestManager 中被调用。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RequestManager</span> </span>&#123;</span><br><span class="line">    RequestManager(...) &#123;</span><br><span class="line">        connectivityMonitor =</span><br><span class="line">            factory.build(</span><br><span class="line">            context.getApplicationContext(),</span><br><span class="line">            <span class="keyword">new</span> RequestManagerConnectivityListener(requestTracker));</span><br><span class="line">        <span class="keyword">if</span> (Util.isOnBackgroundThread()) &#123;</span><br><span class="line">            mainHandler.post(addSelfToLifecycle);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            lifecycle.addListener(<span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        lifecycle.removeListener(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也就是每当 Fragment 生命周期变化时，都会通知与之绑定的 RequestManager 因此也就可以根据生命周期控制加载和暂停。</p>
+<h3 id="RequestManager-load"><a href="#RequestManager-load" class="headerlink" title="RequestManager.load"></a>RequestManager.load</h3><p>RequestManager.load 有以下好几个重载方法，这里以参数为 String 的方法为例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RequestBuilder&lt;Drawable&gt; <span class="title">load</span><span class="params">(@Nullable String string)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> asDrawable().load(string);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> RequestBuilder&lt;Drawable&gt; <span class="title">asDrawable</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> as(Drawable<span class="class">.<span class="keyword">class</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> &lt;ResourceType&gt; <span class="function">RequestBuilder&lt;ResourceType&gt; <span class="title">as</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    @NonNull Class&lt;ResourceType&gt; resourceClass)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> RequestBuilder&lt;&gt;(glide, <span class="keyword">this</span>, resourceClass, context);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>asDrawable 内部会创建一个 RequestBuilder 实例返回。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> RequestBuilder&lt;TranscodeType&gt; <span class="title">load</span><span class="params">(@Nullable String string)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> loadGeneric(string);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> RequestBuilder&lt;TranscodeType&gt; <span class="title">loadGeneric</span><span class="params">(@Nullable Object model)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.model = model;</span><br><span class="line">    isModelSet = <span class="keyword">true</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>loadGeneric <strong><em>将数据源（这里是请求地址）进行存储</em></strong>，然后就返回自身。</p>
+<h3 id="RequestBuilder-into"><a href="#RequestBuilder-into" class="headerlink" title="RequestBuilder.into"></a>RequestBuilder.into</h3><p>into 方法有以下好几个重载方法：</p>
+<p>![Screen Shot 2021-05-25 at 6.12.39 PM](/Users/hefuwei/Library/Application Support/typora-user-images/Screen Shot 2021-05-25 at 6.12.39 PM.png)</p>
+<p>暂时只关注下参数为 ImageView 类型的方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ViewTarget&lt;ImageView, TranscodeType&gt; <span class="title">into</span><span class="params">(@NonNull ImageView view)</span> </span>&#123;</span><br><span class="line">    RequestOptions requestOptions = <span class="keyword">this</span>.requestOptions;</span><br><span class="line">    <span class="keyword">if</span> (!requestOptions.isTransformationSet()</span><br><span class="line">        &amp;&amp; requestOptions.isTransformationAllowed()</span><br><span class="line">        &amp;&amp; view.getScaleType() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 根据不同的 View.getScaleType 创建对应的 RequestOptions</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> into(</span><br><span class="line">        glideContext.buildImageViewTarget(view, transcodeClass), <span class="keyword">null</span>, requestOptions);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>接着调用 GlideContext.buildImageViewTarget 创建 Target 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;X&gt; <span class="function">ViewTarget&lt;ImageView, X&gt; <span class="title">buildImageViewTarget</span><span class="params">(ImageView imageView, Class&lt;X&gt; transcodeClass)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> imageViewTargetFactory.buildTarget(imageView, transcodeClass);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> &lt;Z&gt; <span class="function">ViewTarget&lt;ImageView, Z&gt; <span class="title">buildTarget</span><span class="params">(ImageView view, Class&lt;Z&gt; clazz)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Bitmap<span class="class">.<span class="keyword">class</span>.<span class="title">equals</span>(<span class="title">clazz</span>)) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (ViewTarget&lt;ImageView, Z&gt;) <span class="keyword">new</span> BitmapImageViewTarget(view);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (Drawable<span class="class">.<span class="keyword">class</span>.<span class="title">isAssignableFrom</span>(<span class="title">clazz</span>)) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> (ViewTarget&lt;ImageView, Z&gt;) <span class="keyword">new</span> DrawableImageViewTarget(view);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(</span><br><span class="line">            <span class="string">"Unhandled class: "</span> + clazz + <span class="string">", try .as*(Class).transcode(ResourceTranscoder)"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里由于前面调用了 asDrawable 因此 transcodeClass 为 Drawable，最终会创建一个 DrawableImageViewTarget 返回。继续跟进 into 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;Y extends Target&lt;TranscodeType&gt;&gt; <span class="function">Y <span class="title">into</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    Y target, RequestListener&lt;TranscodeType&gt; targetListener, RequestOptions options)</span> </span>&#123;</span><br><span class="line">    Request request = buildRequest(target, targetListener, options);</span><br><span class="line">    Request previous = target.getRequest();</span><br><span class="line">    requestManager.clear(target);</span><br><span class="line">    target.setRequest(request);</span><br><span class="line">    requestManager.track(target, request);</span><br><span class="line">    <span class="keyword">return</span> target;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>buildRequest 用于构建 Request 实例。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Request <span class="title">buildRequest</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> buildRequestRecursive(...);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Request <span class="title">buildRequestRecursive</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// TODO 设置错误请求，暂时忽略</span></span><br><span class="line">    Request mainRequest =</span><br><span class="line">        buildThumbnailRequestRecursive(...);</span><br><span class="line">    <span class="keyword">return</span> mainRequest;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Request <span class="title">buildThumbnailRequestRecursive</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// TODO 设置缩略图请求，暂时忽略</span></span><br><span class="line">    <span class="keyword">return</span> obtainRequest(...);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Request <span class="title">obtainRequest</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> SingleRequest.obtain(...);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到如果没有设置错误请求或者缩略图，那么最终创建的就是 SingleRequest 实例，初始状态为 PENDING。</p>
+<p>track 主要用于追踪 Target、Request 以及开启请求。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">track</span><span class="params">(@NonNull Target&lt;?&gt; target, @NonNull Request request)</span> </span>&#123;</span><br><span class="line">    targetTracker.track(target);</span><br><span class="line">    requestTracker.runRequest(request);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">runRequest</span><span class="params">(Request request)</span> </span>&#123;</span><br><span class="line">    requests.add(request);</span><br><span class="line">    <span class="keyword">if</span> (!isPaused) &#123;</span><br><span class="line">        request.begin();</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        request.clear();</span><br><span class="line">        pendingRequests.add(request);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果当前 RequestManager 没有暂停，那么开始请求，否则添加了等待队列中去，等待后续开始。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">begin</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    status = Status.WAITING_FOR_SIZE;</span><br><span class="line">    <span class="keyword">if</span> (Util.isValidDimensions(overrideWidth, overrideHeight)) &#123;</span><br><span class="line">        onSizeReady(overrideWidth, overrideHeight);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        target.getSize(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> ((status == Status.RUNNING || status == Status.WAITING_FOR_SIZE)</span><br><span class="line">        &amp;&amp; canNotifyStatusChanged()) &#123;</span><br><span class="line">        target.onLoadStarted(getPlaceholderDrawable()); <span class="comment">// 展示占位图片</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果长宽已经被指定，那么直接调用 onSizeReady 继续下个流程。如果没有被指定，那么首先获取大小，获取后也会再调用 onSizeReady 继续下个流程。</p>
+<p>接着如果图片正在加载，或者正在等待获取大小（<strong><em>获取大小方法为如果 View 还没进行测量，就设置一个 onPreDrawListener 等待测量完成后计算，如果设置了 wrap_content 那么会按照屏幕大小加载</em></strong>）回调 onLoadStarted 展示占位图片。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSizeReady</span><span class="params">(<span class="keyword">int</span> width, <span class="keyword">int</span> height)</span> </span>&#123;</span><br><span class="line">    status = Status.RUNNING;</span><br><span class="line">    <span class="keyword">float</span> sizeMultiplier = requestOptions.getSizeMultiplier();</span><br><span class="line">    <span class="keyword">this</span>.width = maybeApplySizeMultiplier(width, sizeMultiplier); <span class="comment">// 决定最终需要的宽</span></span><br><span class="line">    <span class="keyword">this</span>.height = maybeApplySizeMultiplier(height, sizeMultiplier); <span class="comment">// 决定最终需要的高</span></span><br><span class="line">    loadStatus = engine.load(<span class="comment">///);</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当加载的尺寸确定了以后就设置当前 Request 状态为 Running ，然后使用 Engine 去加载该图片。注：上面也说过 Engine 主要负责开启加载以及管理活动的或缓存的资源。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;R&gt; <span class="function">LoadStatus <span class="title">load</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// cb 回调为 SingleRequest 对象</span></span><br><span class="line">    EngineKey key = keyFactory.buildKey(model, signature, width, height, transformations,</span><br><span class="line">                                        resourceClass, transcodeClass, options); <span class="comment">// 构建缓存 key，注意长宽也是组成成分</span></span><br><span class="line">    EngineResource&lt;?&gt; active = loadFromActiveResources(key, isMemoryCacheable); <span class="comment">// 从正活跃的资源中获取</span></span><br><span class="line">    <span class="keyword">if</span> (active != <span class="keyword">null</span>) &#123;</span><br><span class="line">        cb.onResourceReady(active, DataSource.MEMORY_CACHE); <span class="comment">// 回调加载成功</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    EngineResource&lt;?&gt; cached = loadFromCache(key, isMemoryCacheable); <span class="comment">// 从内存缓存中获取</span></span><br><span class="line">    <span class="keyword">if</span> (cached != <span class="keyword">null</span>) &#123;</span><br><span class="line">        cb.onResourceReady(cached, DataSource.MEMORY_CACHE); <span class="comment">// 回调加载成功</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    EngineJob&lt;?&gt; current = jobs.get(key, onlyRetrieveFromCache);</span><br><span class="line">    <span class="keyword">if</span> (current != <span class="keyword">null</span>) &#123; <span class="comment">// 找到相同的任务了，那么不再重新开始加载，只是添加一个回调</span></span><br><span class="line">        current.addCallback(cb);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> LoadStatus(cb, current);</span><br><span class="line">    &#125;</span><br><span class="line">    EngineJob&lt;R&gt; engineJob = engineJobFactory.build(...);</span><br><span class="line">    DecodeJob&lt;R&gt; decodeJob = decodeJobFactory.build(...);</span><br><span class="line">    jobs.put(key, engineJob);</span><br><span class="line">    engineJob.addCallback(cb);</span><br><span class="line">    engineJob.start(decodeJob);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> LoadStatus(cb, engineJob);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先从正活跃的资源缓存中获取资源，如果获取不到再从内存缓存中获取资源，还是获取不到则创建 EngineJob 实例前去加载。由于前面两级内存缓存还没内容，因此先看 EngineJob.start 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">start</span><span class="params">(DecodeJob&lt;R&gt; decodeJob)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.decodeJob = decodeJob;</span><br><span class="line">    GlideExecutor executor = decodeJob.willDecodeFromCache() <span class="comment">// 选择合适的执行器，默认支持磁盘缓存，因此选择 diskCacheExecutor，该执行器会在 Glide 初始化时创建</span></span><br><span class="line">        ? diskCacheExecutor</span><br><span class="line">        : getActiveSourceExecutor();</span><br><span class="line">    executor.execute(decodeJob);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终在线程池中执行了 DecodeJob ，跟进其 run 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    DataFetcher&lt;?&gt; localFetcher = currentFetcher;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (isCancelled) &#123; <span class="comment">// 如果已经被取消了就回调 EngineJob.onLoadFailed 通知其加载失败</span></span><br><span class="line">            notifyFailed();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        runWrapped();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        <span class="comment">// ignore it.</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部就简单处理了下取消的情况，然后又调用了 runWrapped。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">runWrapped</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (runReason) &#123;</span><br><span class="line">        <span class="keyword">case</span> INITIALIZE:</span><br><span class="line">            stage = getNextStage(Stage.INITIALIZE); </span><br><span class="line">            currentGenerator = getNextGenerator();</span><br><span class="line">            runGenerators();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> SWITCH_TO_SOURCE_SERVICE:</span><br><span class="line">            runGenerators();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> DECODE_DATA:</span><br><span class="line">            decodeFromRetrievedData();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> DataFetcherGenerator <span class="title">getNextGenerator</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (stage) &#123;</span><br><span class="line">        <span class="keyword">case</span> RESOURCE_CACHE:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> ResourceCacheGenerator(decodeHelper, <span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">case</span> DATA_CACHE:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> DataCacheGenerator(decodeHelper, <span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">case</span> SOURCE:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> SourceGenerator(decodeHelper, <span class="keyword">this</span>);</span><br><span class="line">        <span class="keyword">case</span> FINISHED:</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">runGenerators</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">boolean</span> isStarted = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!isCancelled &amp;&amp; currentGenerator != <span class="keyword">null</span></span><br><span class="line">           &amp;&amp; !(isStarted = currentGenerator.startNext())) &#123;</span><br><span class="line">        stage = getNextStage(stage);</span><br><span class="line">        currentGenerator = getNextGenerator();</span><br><span class="line">        <span class="keyword">if</span> (stage == Stage.SOURCE) &#123;</span><br><span class="line">            reschedule();</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>runWrapped 为 DecodeJob 的控制中枢，它决定了每一步需要执行的操作。</p>
+<h4 id="RESOURCE-CACHE"><a href="#RESOURCE-CACHE" class="headerlink" title="RESOURCE_CACHE"></a>RESOURCE_CACHE</h4><p>初始时 runReason 为 INITIALZIE，获取到的 nextStage 为 RESOURCE_CACHE 表明从磁盘缓存中读取转化过的资源，对应ResourceCacheGenerator 类。根据 runGenerators 的逻辑，跟进其 startNext 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    List&lt;Key&gt; sourceIds = helper.getCacheKeys();</span><br><span class="line">    List&lt;Class&lt;?&gt;&gt; resourceClasses = helper.getRegisteredResourceClasses();</span><br><span class="line">    <span class="keyword">while</span> (modelLoaders == <span class="keyword">null</span> || !hasNextModelLoader()) &#123;</span><br><span class="line">        resourceClassIndex++;</span><br><span class="line">        <span class="keyword">if</span> (resourceClassIndex &gt;= resourceClasses.size()) &#123;</span><br><span class="line">            sourceIdIndex++;</span><br><span class="line">            <span class="keyword">if</span> (sourceIdIndex &gt;= sourceIds.size()) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 首次由于没有缓存，这里返回 false</span></span><br><span class="line">            &#125;</span><br><span class="line">            resourceClassIndex = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Key sourceId = sourceIds.get(sourceIdIndex);</span><br><span class="line">        Class&lt;?&gt; resourceClass = resourceClasses.get(resourceClassIndex);</span><br><span class="line">        Transformation&lt;?&gt; transformation = helper.getTransformation(resourceClass);</span><br><span class="line">        currentKey = <span class="keyword">new</span> ResourceCacheKey(...);</span><br><span class="line">        cacheFile = helper.getDiskCache().get(currentKey); <span class="comment">// 从磁盘缓存中读取转化后的图片文件</span></span><br><span class="line">        <span class="keyword">if</span> (cacheFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">            sourceKey = sourceId;</span><br><span class="line">            modelLoaders = helper.getModelLoaders(cacheFile);</span><br><span class="line">            modelLoaderIndex = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    loadData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">        ModelLoader&lt;File, ?&gt; modelLoader = modelLoaders.get(modelLoaderIndex++);</span><br><span class="line">        loadData = modelLoader.buildLoadData(cacheFile,</span><br><span class="line">                                             helper.getWidth(), helper.getHeight(), helper.getOptions());</span><br><span class="line">        <span class="keyword">if</span> (loadData != <span class="keyword">null</span> &amp;&amp; helper.hasLoadPath(loadData.fetcher.getDataClass())) &#123;</span><br><span class="line">            started = <span class="keyword">true</span>;</span><br><span class="line">            loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法主要是从磁盘缓存中查询是否存在转换后的图片资源，如果存在再进行解码，这里先跳过，后续分析缓存的时候再看。首次该方法由于没有缓存，最终会返回 false。接着会进入下一步。</p>
+<h5 id="DecodeHelp-getCacheKeys"><a href="#DecodeHelp-getCacheKeys" class="headerlink" title="DecodeHelp.getCacheKeys"></a>DecodeHelp.getCacheKeys</h5><p>getCacheKeys 用于获取该数据源类型所有可能的缓存 Key。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function">List&lt;Key&gt; <span class="title">getCacheKeys</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    List&lt;LoadData&lt;?&gt;&gt; loadData = getLoadData();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = loadData.size(); i &lt; size; i++) &#123;</span><br><span class="line">        LoadData&lt;?&gt; data = loadData.get(i);</span><br><span class="line">        <span class="keyword">if</span> (!cacheKeys.contains(data.sourceKey)) &#123;</span><br><span class="line">            cacheKeys.add(data.sourceKey);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>; j &lt; data.alternateKeys.size(); j++) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!cacheKeys.contains(data.alternateKeys.get(j))) &#123;</span><br><span class="line">                cacheKeys.add(data.alternateKeys.get(j));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> cacheKeys;</span><br><span class="line">&#125;</span><br><span class="line">List&lt;LoadData&lt;?&gt;&gt; getLoadData() &#123;</span><br><span class="line">    List&lt;ModelLoader&lt;Object, ?&gt;&gt; modelLoaders = glideContext.getRegistry().getModelLoaders(model);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = modelLoaders.size(); i &lt; size; i++) &#123;</span><br><span class="line">        ModelLoader&lt;Object, ?&gt; modelLoader = modelLoaders.get(i);</span><br><span class="line">        LoadData&lt;?&gt; current =</span><br><span class="line">            modelLoader.buildLoadData(model, width, height, options);</span><br><span class="line">        <span class="keyword">if</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">            loadData.add(current);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> loadData;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先从注册表中获取所有支持该数据源转换的 ModelLoader ，然后分别让它们去构建 LoadData，最后获取所有构建完成的 LoadData.sourceKey 返回。由于一个 ModelLoader 可以会依赖于另一个 ModelLoader 因此<strong><em>获取所有支持该数据源转换的 ModelLoader 较为复杂</em></strong>。具体细节代码如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Registry.java</span></span><br><span class="line"><span class="keyword">public</span> &lt;Model&gt; List&lt;ModelLoader&lt;Model, ?&gt;&gt; getModelLoaders(<span class="meta">@NonNull</span> Model model) &#123;</span><br><span class="line">    List&lt;ModelLoader&lt;Model, ?&gt;&gt; result = modelLoaderRegistry.getModelLoaders(model);</span><br><span class="line">    <span class="keyword">if</span> (result.isEmpty()) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> NoModelLoaderAvailableException(model);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>实际是从 ModelLoaderRegistry 中去获取所有支持该类型的 ModelLoader。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;A&gt; List&lt;ModelLoader&lt;A, ?&gt;&gt; getModelLoaders(<span class="meta">@NonNull</span> A model) &#123;</span><br><span class="line">    List&lt;ModelLoader&lt;A, ?&gt;&gt; modelLoaders = getModelLoadersForClass(getClass(model));</span><br><span class="line">    <span class="keyword">int</span> size = modelLoaders.size();</span><br><span class="line">    <span class="keyword">boolean</span> isEmpty = <span class="keyword">true</span>;</span><br><span class="line">    List&lt;ModelLoader&lt;A, ?&gt;&gt; filteredLoaders = Collections.emptyList();</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; size; i++) &#123;</span><br><span class="line">        ModelLoader&lt;A, ?&gt; loader = modelLoaders.get(i);</span><br><span class="line">        <span class="keyword">if</span> (loader.handles(model)) &#123;</span><br><span class="line">            <span class="keyword">if</span> (isEmpty) &#123;</span><br><span class="line">                filteredLoaders = <span class="keyword">new</span> ArrayList&lt;&gt;(size - i);</span><br><span class="line">                isEmpty = <span class="keyword">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            filteredLoaders.add(loader);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> filteredLoaders;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码意思很简单，首先获取所有支持该数据源类型的 ModelLoader 列表，然后过滤支持当前数据源的 ModelLoader，为什么需要过滤？原因是有些 ModelLoader 虽然说支持数据源类型为 String，但是它对这个字符串也有着要求，比如其只支持以 data:image 开头的字符串，那么其实核心还是在 getModelLoadersForClass 这个方法中。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">synchronized</span> &lt;A&gt; List&lt;ModelLoader&lt;A, ?&gt;&gt; getModelLoadersForClass(Class&lt;A&gt; modelClass) &#123;</span><br><span class="line">    List&lt;ModelLoader&lt;A, ?&gt;&gt; loaders = cache.get(modelClass);</span><br><span class="line">    <span class="keyword">if</span> (loaders == <span class="keyword">null</span>) &#123;</span><br><span class="line">        loaders = Collections.unmodifiableList(multiModelLoaderFactory.build(modelClass));</span><br><span class="line">        cache.put(modelClass, loaders);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> loaders;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里有一层缓存，不过初始时并不存在，因此会通过 MultiModelLoaderFactory 去获取支持该数据源类型的 ModelLoader。</p>
+<p><strong><em>注册关系为 Registry =&gt; ModelLoaderRegistry =&gt; MultiModelLoaderFactory，所有注册的 ModelLoaderFactory 其实都在 MultiModelLoaderFactory 里面。</em></strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">synchronized</span> &lt;Model&gt; List&lt;ModelLoader&lt;Model, ?&gt;&gt; build(<span class="meta">@NonNull</span> Class&lt;Model&gt; modelClass) &#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        List&lt;ModelLoader&lt;Model, ?&gt;&gt; loaders = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">for</span> (Entry&lt;?, ?&gt; entry : entries) &#123;</span><br><span class="line">            <span class="comment">// 避免出现死循环，最后导致栈溢出</span></span><br><span class="line">            <span class="keyword">if</span> (alreadyUsedEntries.contains(entry)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (entry.handles(modelClass)) &#123;</span><br><span class="line">                alreadyUsedEntries.add(entry);</span><br><span class="line">                loaders.add(<span class="keyword">this</span>.&lt;Model, Object&gt;build(entry)); <span class="comment">// 1</span></span><br><span class="line">                alreadyUsedEntries.remove(entry);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> loaders;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        alreadyUsedEntries.clear();</span><br><span class="line">        <span class="keyword">throw</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码其实就是过滤所有支持该数据源的 ModelLoader，但是<strong><em>复杂就在于上述注释一处，某些 ModelLoaderFactory 在构建具体的 ModelLoader 实例时又会去调用 MultiModelLoaderFactory 的以下一个重载 build 方法，这里以 StringLoader.StreamFactory 举例说明。</em></strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">StreamFactory</span> <span class="keyword">implements</span> <span class="title">ModelLoaderFactory</span>&lt;<span class="title">String</span>, <span class="title">InputStream</span>&gt; </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> ModelLoader&lt;String, InputStream&gt; <span class="title">build</span><span class="params">(MultiModelLoaderFactory multiFactory)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> StringLoader&lt;&gt;(multiFactory.build(Uri<span class="class">.<span class="keyword">class</span>, <span class="title">InputStream</span>.<span class="title">class</span>))</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码又会去寻找所有支持将 Uri 转换为 InputSteam 的 ModelLoader，那么继续跟进另一个 build 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">synchronized</span> &lt;Model, Data&gt; <span class="function">ModelLoader&lt;Model, Data&gt; <span class="title">build</span><span class="params">(Class&lt;Model&gt; modelClass,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                                 Class&lt;Data&gt; dataClass)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        List&lt;ModelLoader&lt;Model, Data&gt;&gt; loaders = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">        <span class="keyword">boolean</span> ignoredAnyEntries = <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">for</span> (Entry&lt;?, ?&gt; entry : entries) &#123;</span><br><span class="line">            <span class="keyword">if</span> (alreadyUsedEntries.contains(entry)) &#123;</span><br><span class="line">                ignoredAnyEntries = <span class="keyword">true</span>;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (entry.handles(modelClass, dataClass)) &#123;</span><br><span class="line">                alreadyUsedEntries.add(entry);</span><br><span class="line">                loaders.add(<span class="keyword">this</span>.&lt;Model, Data&gt;build(entry));</span><br><span class="line">                alreadyUsedEntries.remove(entry);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (loaders.size() &gt; <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> factory.build(loaders, throwableListPool);</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (loaders.size() == <span class="number">1</span>) &#123;</span><br><span class="line">            <span class="keyword">return</span> loaders.get(<span class="number">0</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (ignoredAnyEntries) &#123;</span><br><span class="line">                <span class="keyword">return</span> emptyModelLoader();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> NoModelLoaderAvailableException(modelClass, dataClass);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Throwable t) &#123;</span><br><span class="line">        alreadyUsedEntries.clear();</span><br><span class="line">        <span class="keyword">throw</span> t;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>大体上与一开始的 build 方法类似，不同点只在于最终如果查询到多个 ModelLoader 那么会封装成一个 MultiModelLoader 进行返回。这里可能会递归调用。举个例子，如果起始时数据源类型为 String，那么最终就会寻找到如下 ModelLoader 集。</p>
+<p>String</p>
+<p>=&gt; DataUrlLoader（String =&gt; InputSteam）</p>
+<p>=&gt; StringLoader（String =&gt; InputSteam Recur to <strong><em>Uri =&gt; InputSteam</em></strong>）</p>
+<p>​        =&gt; DataUrlLoader（Uri =&gt; InputSteam）</p>
+<p>​        =&gt; HttpUriLoader（Uri =&gt; InputSteam Recur to <strong><em>GlideUrl =&gt; InputSteam</em></strong>）</p>
+<p>​             =&gt; HttpGlideUrlLoader（GlideUrl =&gt; InputSteam）</p>
+<p>​        =&gt; AssetUriLoader（Uri =&gt; InputSteam）</p>
+<p>​        =&gt; MediaStoreImageThumbLoader（Uri =&gt; InputSteam）</p>
+<p>​        =&gt; MediaStoreVideoThumbLoader（Uri =&gt; InputSteam）</p>
+<p>​        =&gt; UriLoader（Uri =&gt; InputSteam）</p>
+<p>​        =&gt; UrlUriLoader（Uri =&gt; InputSteam Recur to <strong><em>GlideUrl =&gt; InputSteam</em></strong>）</p>
+<p>​              =&gt; HttpGlideUrlLoader（GlideUrl =&gt; InputSteam）</p>
+<p>=&gt; StringLoader（String  =&gt;  ParcelFileDescriptor Recur to <strong><em>Uri =&gt; ParcelFileDescriptor</em></strong>）</p>
+<p>​        =&gt; AssetUriLoader（Uri =&gt; ParcelFileDescriptor）</p>
+<p>​        =&gt; UriLoader（Uri =&gt; ParcelFileDescriptor）</p>
+<p>=&gt; StringLoader（String =&gt; AssetFileDescriptor Recur to <strong><em>Uri =&gt; AssetFileDescriptor</em></strong>）</p>
+<p>​        =&gt; UriLoader（Uri =&gt; AssetFileDescriptor）</p>
+<p>过滤完所有 ModelLoader 以后就会分别调用其 buildLoadData 方法前去构建 LoadData。例子中最终只会返回一个 LoadData 其 key 为 url，fetcher 为 MultiFetcher 内部包含两个 HttpUrlFetcher，因为根据上文 StringLoader =&gt; HttpUriLoader =&gt; HttpGlideLoader 以及 StringLoader =&gt; UrlUriLoader =&gt; HttpGlideUrlLoader 都满足需求。</p>
+<p><strong><em>最终返回 [url]。</em></strong></p>
+<h5 id="DecodeHelper-getRegisteredResourceClasses"><a href="#DecodeHelper-getRegisteredResourceClasses" class="headerlink" title="DecodeHelper.getRegisteredResourceClasses"></a>DecodeHelper.getRegisteredResourceClasses</h5><p>getRegisteredResourceClasses 用于获取所有能转换为目标资源类型的类型</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> &lt;Model, TResource, Transcode&gt; List&lt;Class&lt;?&gt;&gt; getRegisteredResourceClasses(</span><br><span class="line">    List&lt;Class&lt;?&gt;&gt; result = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Class&lt;?&gt;&gt; dataClasses = modelLoaderRegistry.getDataClasses(modelClass); <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">for</span> (Class&lt;?&gt; dataClass : dataClasses) &#123;</span><br><span class="line">        List&lt;? extends Class&lt;?&gt;&gt; registeredResourceClasses =</span><br><span class="line">            decoderRegistry.getResourceClasses(dataClass, resourceClass); <span class="comment">// 2</span></span><br><span class="line">        <span class="keyword">for</span> (Class&lt;?&gt; registeredResourceClass : registeredResourceClasses) &#123;</span><br><span class="line">            List&lt;Class&lt;Transcode&gt;&gt; registeredTranscodeClasses = transcoderRegistry</span><br><span class="line">                .getTranscodeClasses(registeredResourceClass, transcodeClass); <span class="comment">// 3</span></span><br><span class="line">            <span class="keyword">if</span> (!registeredTranscodeClasses.isEmpty() &amp;&amp; !result.contains(registeredResourceClass)) &#123;</span><br><span class="line">                result.add(registeredResourceClass);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法挺复杂的主要工作包括：</p>
+<ol>
+<li>获取当前输入源能转换成的所有类型，对于 String 类型根据 ModelLoader 注册表，可以得出一共可以转换为 InputSteam、ParcelFileDescriptor、AccessFileDescriptor 三种。</li>
+<li>对于每种可转换类型，分别获取解码后获得的资源类型，根据 ResourceDecoder 注册表，InputSteam 可以被解码成 GifDrawable、 Bitmap、BitmapDrawable；ParcelFileDescriptor 可以被解码成 Bitmap、BitmapDrawable；AccessFileDescriptor 可以被解码成 Bitmap。</li>
+<li>对于每种解码后资源类型，查询其是否能被转码成目标类型，对于可以转换的（包括强转或者使用转码器）加入到 Result 中进行返回。</li>
+</ol>
+<p><strong><em>最终返回 GifDrawable、Bitmap 以及 BitmapDrawable。</em></strong></p>
+<h4 id="DATA-CACHE"><a href="#DATA-CACHE" class="headerlink" title="DATA_CACHE"></a>DATA_CACHE</h4><p>DATA_CACHE 表明从磁盘缓存中读取原始图片资源，对应 DataCacheGenerator 类。根据 runGenerators 的逻辑，跟进其 startNext 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (modelLoaders == <span class="keyword">null</span> || !hasNextModelLoader()) &#123;</span><br><span class="line">        sourceIdIndex++;</span><br><span class="line">        <span class="keyword">if</span> (sourceIdIndex &gt;= cacheKeys.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>; <span class="comment">// 首次由于没有缓存，这里返回 false</span></span><br><span class="line">        &#125;</span><br><span class="line">        Key sourceId = cacheKeys.get(sourceIdIndex);</span><br><span class="line">        Key originalKey = <span class="keyword">new</span> DataCacheKey(sourceId, helper.getSignature());</span><br><span class="line">        cacheFile = helper.getDiskCache().get(originalKey); <span class="comment">// 从磁盘缓存中读取缓存的原始图片文件</span></span><br><span class="line">        <span class="keyword">if</span> (cacheFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>.sourceKey = sourceId;</span><br><span class="line">            modelLoaders = helper.getModelLoaders(cacheFile);</span><br><span class="line">            modelLoaderIndex = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    loadData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">        ModelLoader&lt;File, ?&gt; modelLoader = modelLoaders.get(modelLoaderIndex++);</span><br><span class="line">        loadData = modelLoader.buildLoadData(cacheFile, helper.getWidth(), helper.getHeight(),</span><br><span class="line">                                      helper.getOptions());</span><br><span class="line">        <span class="keyword">if</span> (loadData != <span class="keyword">null</span> &amp;&amp; helper.hasLoadPath(loadData.fetcher.getDataClass())) &#123;</span><br><span class="line">            started = <span class="keyword">true</span>;</span><br><span class="line">            loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个方法主要是从磁盘缓存中查询是否存在原始图片资源，如果存在再进行解码，这里先跳过，后续分析缓存的时候再看。首次进入该方法由于没有缓存，最终会返回 false。接着会进入下一步。</p>
+<h4 id="SOURCE"><a href="#SOURCE" class="headerlink" title="SOURCE"></a>SOURCE</h4><p>DATA_CACHE 表明从数据源处获取图片资源，对应 SourceGenerator 类。根据 runGenerators 的逻辑，跟进其 startNext 方法（这里会进行 reschedule 流程，不过还是会调用）。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ... <span class="comment">// 下面会分析，这里跳过</span></span><br><span class="line">    loadData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">        loadData = helper.getLoadData().get(loadDataListIndex++);</span><br><span class="line">        <span class="keyword">if</span> (loadData != <span class="keyword">null</span></span><br><span class="line">            &amp;&amp; (helper.getDiskCacheStrategy().isDataCacheable(loadData.fetcher.getDataSource())</span><br><span class="line">                || helper.hasLoadPath(loadData.fetcher.getDataClass()))) &#123;</span><br><span class="line">            started = <span class="keyword">true</span>;</span><br><span class="line">            loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>终于到了加载资源的地方了，前面说过这里只有一个 LoadData ，该 LoadData 中会存在一个 MultiFetcher，最里面就是两个 HttpUrlFetcher（Why？），直接看 HttpUrlFetcher.loadData 方法看看其是如何加载资源的。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// HttpUrlFetcher.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">loadData</span><span class="params">(Priority priority, DataCallback&lt;? <span class="keyword">super</span> InputStream&gt; callback)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> startTime = LogTime.getLogTime();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        InputStream result = loadDataWithRedirects(glideUrl.toURL(), <span class="number">0</span>, <span class="keyword">null</span>, glideUrl.getHeaders());</span><br><span class="line">        callback.onDataReady(result);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        callback.onLoadFailed(e);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> InputStream <span class="title">loadDataWithRedirects</span><span class="params">(URL url, <span class="keyword">int</span> redirects, URL lastUrl, Map&lt;String, String&gt; headers)</span> </span>&#123;</span><br><span class="line">    urlConnection = connectionFactory.build(url);</span><br><span class="line">    <span class="keyword">for</span> (Map.Entry&lt;String, String&gt; headerEntry : headers.entrySet()) &#123;</span><br><span class="line">        urlConnection.addRequestProperty(headerEntry.getKey(), headerEntry.getValue());</span><br><span class="line">    &#125;</span><br><span class="line">    ... <span class="comment">// 设置 urlconnection</span></span><br><span class="line">    urlConnection.connect();</span><br><span class="line">    stream = urlConnection.getInputStream();</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> statusCode = urlConnection.getResponseCode();</span><br><span class="line">    <span class="keyword">if</span> (isHttpOk(statusCode)) &#123;</span><br><span class="line">        <span class="keyword">return</span> getStreamForSuccessfulRequest(urlConnection);</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (isHttpRedirect(statusCode)) &#123;</span><br><span class="line">        ... <span class="comment">// 重定向处理</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> HttpException(statusCode);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终就是通过 HttpUrlConnection 发起请求获取到 InputSteam（响应体），回调 SourceGenerator 的 onDataReady 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataReadyInternal</span><span class="params">(Object data)</span> </span>&#123;</span><br><span class="line">    DiskCacheStrategy diskCacheStrategy = helper.getDiskCacheStrategy();</span><br><span class="line">    <span class="keyword">if</span> (data != <span class="keyword">null</span> &amp;&amp; diskCacheStrategy.isDataCacheable(loadData.fetcher.getDataSource())) &#123; <span class="comment">// 默认允许缓存</span></span><br><span class="line">        dataToCache = data;</span><br><span class="line">        cb.reschedule(); </span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        cb.onDataFetcherReady(...);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里又调用了 reschedule ，最终又会重新调用一次 SourceGenerator.startNext 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (dataToCache != <span class="keyword">null</span>) &#123;</span><br><span class="line">        Object data = dataToCache;</span><br><span class="line">        dataToCache = <span class="keyword">null</span>;</span><br><span class="line">        cacheData(data);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (sourceCacheGenerator != <span class="keyword">null</span> &amp;&amp; sourceCacheGenerator.startNext()) &#123; <span class="comment">// cacheData 方法调用完后就不为空了</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ... <span class="comment">// 上面已经分析过</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cacheData</span><span class="params">(Object dataToCache)</span> </span>&#123;</span><br><span class="line">    Encoder&lt;Object&gt; encoder = helper.getSourceEncoder(dataToCache);</span><br><span class="line">    DataCacheWriter&lt;Object&gt; writer = <span class="keyword">new</span> DataCacheWriter&lt;&gt;(encoder, dataToCache, helper.getOptions());</span><br><span class="line">    originalKey = <span class="keyword">new</span> DataCacheKey(loadData.sourceKey, helper.getSignature());</span><br><span class="line">    helper.getDiskCache().put(originalKey, writer);</span><br><span class="line">    sourceCacheGenerator = <span class="keyword">new</span> DataCacheGenerator(Collections.singletonList(loadData.sourceKey), helper, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本次进来是 dataToCache 已经不为空了（已经是刚刚请求回来的 InputSteam 了），调用 cacheData 将其缓存下来，而缓存流程为首先获取到编码器，通过查询注册表，编码器对应类为 SteamEncoder ，接着调用 DiskLruCacheWrapper.put 进行缓存。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">put</span><span class="params">(Key key, Writer writer)</span> </span>&#123;</span><br><span class="line">    String safeKey = safeKeyGenerator.getSafeKey(key);</span><br><span class="line">    DiskLruCache diskCache = getDiskCache();</span><br><span class="line">    Value current = diskCache.get(safeKey);</span><br><span class="line">    <span class="keyword">if</span> (current != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    DiskLruCache.Editor editor = diskCache.edit(safeKey);</span><br><span class="line">    File file = editor.getFile(<span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (writer.write(file)) &#123;</span><br><span class="line">        editor.commit();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部使用了 DiskLruCache ，然后通过编码器，将刚刚的响应数据写入到缓存文件中，缓存完毕后又会调用 DataCacheGenerator.startNext 不过这回有缓存了。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">startNext</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (modelLoaders == <span class="keyword">null</span> || !hasNextModelLoader()) &#123;</span><br><span class="line">        sourceIdIndex++;</span><br><span class="line">        <span class="keyword">if</span> (sourceIdIndex &gt;= cacheKeys.size()) &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        Key sourceId = cacheKeys.get(sourceIdIndex);</span><br><span class="line">        Key originalKey = <span class="keyword">new</span> DataCacheKey(sourceId, helper.getSignature());</span><br><span class="line">        cacheFile = helper.getDiskCache().get(originalKey); <span class="comment">// 由于有缓存，因此这里能获取到 cacheFile 了。</span></span><br><span class="line">        <span class="keyword">if</span> (cacheFile != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">this</span>.sourceKey = sourceId;</span><br><span class="line">            <span class="comment">// 获取能处理输入源为 File 的 ModelLoader 并退出当前 while 循环往下执行。</span></span><br><span class="line">            modelLoaders = helper.getModelLoaders(cacheFile);</span><br><span class="line">            modelLoaderIndex = <span class="number">0</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    loadData = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">boolean</span> started = <span class="keyword">false</span>;</span><br><span class="line">    <span class="keyword">while</span> (!started &amp;&amp; hasNextModelLoader()) &#123;</span><br><span class="line">        ModelLoader&lt;File, ?&gt; modelLoader = modelLoaders.get(modelLoaderIndex++);</span><br><span class="line">        loadData =</span><br><span class="line">            modelLoader.buildLoadData(cacheFile, helper.getWidth(), helper.getHeight(), helper.getOptions());</span><br><span class="line">        <span class="keyword">if</span> (loadData != <span class="keyword">null</span> &amp;&amp; helper.hasLoadPath(loadData.fetcher.getDataClass())) &#123;</span><br><span class="line">            started = <span class="keyword">true</span>;</span><br><span class="line">            loadData.fetcher.loadData(helper.getPriority(), <span class="keyword">this</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> started;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于现在原图已经有了缓存，因此会退出上面的 while 循环进入下面的循环，下面的循环会遍历所有能转换 File 的 ModelLoader，经过查询注册表，发现有以下这些。</p>
+<p>![Screen Shot 2021-05-28 at 9.38.02 AM](/Users/hefuwei/Library/Application Support/typora-user-images/Screen Shot 2021-05-28 at 9.38.02 AM.png)</p>
+<p>对每个 ModelLoader 调用 buildLoadData 方法构建 LoadData ，<strong><em>选择第一个不为空的并且存在一条完整加载路径的 loadData 调用loadData.fetcher.loadData 加载数据。</em></strong>那么具体该怎么理解完整加载路径呢？Glide 内部其实是通过 LoadPath 来表示加载路径的，通过分析 DecodeHelper.hasLoadPath 就可以了解。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DecodeHelper.java</span></span><br><span class="line"><span class="function"><span class="keyword">boolean</span> <span class="title">hasLoadPath</span><span class="params">(Class&lt;?&gt; dataClass)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> getLoadPath(dataClass) != <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br><span class="line">&lt;Data&gt; LoadPath&lt;Data, ?, Transcode&gt; getLoadPath(Class&lt;Data&gt; dataClass) &#123;</span><br><span class="line">    <span class="keyword">return</span> glideContext.getRegistry().getLoadPath(dataClass, resourceClass, transcodeClass);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> &lt;Data, TResource, Transcode&gt; <span class="function">LoadPath&lt;Data, TResource, Transcode&gt; <span class="title">getLoadPath</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">    Class&lt;Data&gt; dataClass, Class&lt;TResource&gt; resourceClass, Class&lt;Transcode&gt; transcodeClass)</span> </span>&#123;</span><br><span class="line">    LoadPath&lt;Data, TResource, Transcode&gt; result =</span><br><span class="line">        loadPathCache.get(dataClass, resourceClass, transcodeClass);</span><br><span class="line">    <span class="keyword">if</span> (loadPathCache.isEmptyLoadPath(result)) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        List&lt;DecodePath&lt;Data, TResource, Transcode&gt;&gt; decodePaths =</span><br><span class="line">            getDecodePaths(dataClass, resourceClass, transcodeClass);</span><br><span class="line">        <span class="keyword">if</span> (decodePaths.isEmpty()) &#123;</span><br><span class="line">            result = <span class="keyword">null</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            result = <span class="keyword">new</span> LoadPath&lt;&gt;(</span><br><span class="line">                dataClass, resourceClass, transcodeClass, decodePaths, throwableListPool);</span><br><span class="line">        &#125;</span><br><span class="line">        loadPathCache.put(dataClass, resourceClass, transcodeClass, result);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里主要是处理了一层缓存，忽略缓存，首先调用 getDecodePaths 去获取所有可以满足条件的解码路径，然后使用其构建 LoadPath。那么什么叫满足条件的解码路径呢？继续来分析 getDecodePaths 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> &lt;Data, TResource, Transcode&gt; List&lt;DecodePath&lt;Data, TResource, Transcode&gt;&gt; getDecodePaths(</span><br><span class="line">    Class&lt;Data&gt; dataClass, Class&lt;TResource&gt; resourceClass,  Class&lt;Transcode&gt; transcodeClass) &#123;</span><br><span class="line">    List&lt;DecodePath&lt;Data, TResource, Transcode&gt;&gt; decodePaths = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    List&lt;Class&lt;TResource&gt;&gt; registeredResourceClasses =</span><br><span class="line">        decoderRegistry.getResourceClasses(dataClass, resourceClass); <span class="comment">// 1</span></span><br><span class="line">    <span class="keyword">for</span> (Class&lt;TResource&gt; registeredResourceClass : registeredResourceClasses) &#123;</span><br><span class="line">        List&lt;Class&lt;Transcode&gt;&gt; registeredTranscodeClasses =</span><br><span class="line">            transcoderRegistry.getTranscodeClasses(registeredResourceClass, transcodeClass); <span class="comment">// 2</span></span><br><span class="line">        <span class="keyword">for</span> (Class&lt;Transcode&gt; registeredTranscodeClass : registeredTranscodeClasses) &#123;</span><br><span class="line">            List&lt;ResourceDecoder&lt;Data, TResource&gt;&gt; decoders =</span><br><span class="line">                decoderRegistry.getDecoders(dataClass, registeredResourceClass); <span class="comment">// 3</span></span><br><span class="line">            ResourceTranscoder&lt;TResource, Transcode&gt; transcoder =</span><br><span class="line">                transcoderRegistry.get(registeredResourceClass, registeredTranscodeClass); <span class="comment">// 4</span></span><br><span class="line">            DecodePath&lt;Data, TResource, Transcode&gt; path =</span><br><span class="line">                <span class="keyword">new</span> DecodePath&lt;&gt;(dataClass, registeredResourceClass, registeredTranscodeClass,</span><br><span class="line">                                 decoders, transcoder, throwableListPool);</span><br><span class="line">            decodePaths.add(path);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> decodePaths;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>乍一看这段代码好像很难理解，不过举个例子就会很容易理解，首先选择了 ByteBufferFileLoader，因此 dataClass 为 ByteBuffer.class，resourceClass 为 Object.class（默认），transcodeClasses 为 Drawable.class（asDrawable 设置），一条完整的解码路径为，如何从 ByteBuffer 解码成 Object，然后如何从 Object 转码成 Drawable。下面分析代码</p>
+<p>注释一获取到所有能将 ByteBuffer 解码成的类（GifDrawable、Bitmap、BitmapDrawable）。</p>
+<p>注释二获取到有几种方式能将解码完成的资源（GifDrawable、Bitmap、BitmapDrawable 之一）转码成 Drawable。</p>
+<p>注释三获取到<strong><em>支持转换的所有解码器</em></strong>（如支持 ByteBuffer 转换为 GifDrawable）。</p>
+<p>注释四获取到<strong><em>支持转码的所有转码器</em></strong>（如支持 GifDrawable 转换为 Drawable）。注意：如果可以直接强转会返回 UnitTranscoder。</p>
+<p><strong><em>经过分析 LoadPath 的意义其实很明确了，其实就是 dataClass =&gt; resourceClass =&gt; transcodeClass 的所有解码路径集合。</em></strong></p>
+<p>回到上面，由于值选择第一个不为空的并且存在一条完整加载路径的 loadData 调用 loadData.fetcher.loadData 加载数据，因此 DataCacheGenerator.startNext 其实就可以理解成最终调用了 ByteBufferFileLoader.ByteBufferFetcher（resourceClass 为 Object，transcodeClass 为 Drawable），跟进代码。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">loadData</span><span class="params">(@NonNull Priority priority, DataCallback&lt;? <span class="keyword">super</span> ByteBuffer&gt; callback)</span> </span>&#123;</span><br><span class="line">    ByteBuffer result;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        result = ByteBufferUtil.fromFile(file);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        callback.onLoadFailed(e);</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    callback.onDataReady(result); <span class="comment">// callback 指的是 DataCacheGenerator</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// DataCacheGenerator.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataReady</span><span class="params">(Object data)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// cb 指的是 SourceGenerator，固定传入 dataSource 为 DATA_DISK_CACHE，但是对于 SourceGenerator 而言是错误的</span></span><br><span class="line">    cb.onDataFetcherReady(sourceKey, data, loadData.fetcher, DataSource.DATA_DISK_CACHE, sourceKey);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// SourceGenerator.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataFetcherReady</span><span class="params">(Key sourceKey, Object data, DataFetcher&lt;?&gt; fetcher,</span></span></span><br><span class="line"><span class="function"><span class="params">                               DataSource dataSource, Key attemptedKey)</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 官方注释说明了，传入的 dataSource 是错的，因此需要重新根据原始的 fetcher 重新进行设置，这里 cb 指的是 DecodeJob</span></span><br><span class="line">    cb.onDataFetcherReady(sourceKey, data, fetcher, loadData.fetcher.getDataSource(), sourceKey);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// DecodeJob.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDataFetcherReady</span><span class="params">(Key sourceKey, Object data, DataFetcher&lt;?&gt; fetcher,</span></span></span><br><span class="line"><span class="function"><span class="params">      DataSource dataSource, Key attemptedKey)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.currentSourceKey = sourceKey;</span><br><span class="line">    <span class="keyword">this</span>.currentData = data;</span><br><span class="line">    <span class="keyword">this</span>.currentFetcher = fetcher;</span><br><span class="line">    <span class="keyword">this</span>.currentDataSource = dataSource;</span><br><span class="line">    <span class="keyword">this</span>.currentAttemptingKey = attemptedKey;</span><br><span class="line">    <span class="keyword">if</span> (Thread.currentThread() != currentThread) &#123;</span><br><span class="line">        runReason = RunReason.DECODE_DATA;</span><br><span class="line">        callback.reschedule(<span class="keyword">this</span>);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            decodeFromRetrievedData();</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            GlideTrace.endSection();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>内部也就是通过 NIO 将数据读取进了 ByteBuffer 中，然后一步步回调到 DecodeJob.onDataFetcherReady，接着不需要管线程判断，因此不管怎么样都会调用 decodeFromRetrievedData 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// DecodeJob.java</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">decodeFromRetrievedData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Resource&lt;R&gt; resource = decodeFromData(currentFetcher, currentData, currentDataSource);;</span><br><span class="line">    <span class="keyword">if</span> (resource != <span class="keyword">null</span>) &#123;</span><br><span class="line">        notifyEncodeAndRelease(resource, currentDataSource);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        runGenerators();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> &lt;Data&gt; <span class="function">Resource&lt;R&gt; <span class="title">decodeFromData</span><span class="params">(DataFetcher&lt;?&gt; fetcher, Data data,</span></span></span><br><span class="line"><span class="function"><span class="params">      DataSource dataSource)</span> <span class="keyword">throws</span> GlideException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> decodeFromFetcher(data, dataSource);;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> &lt;Data&gt; <span class="function">Resource&lt;R&gt; <span class="title">decodeFromFetcher</span><span class="params">(Data data, DataSource dataSource)</span> </span>&#123;</span><br><span class="line">    LoadPath&lt;Data, ?, R&gt; path = decodeHelper.getLoadPath((Class&lt;Data&gt;) data.getClass());</span><br><span class="line">    <span class="keyword">return</span> runLoadPath(data, dataSource, path);</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">private</span> &lt;Data, ResourceType&gt; <span class="function">Resource&lt;R&gt; <span class="title">runLoadPath</span><span class="params">(Data data, DataSource dataSource,</span></span></span><br><span class="line"><span class="function"><span class="params">                                                     LoadPath&lt;Data, ResourceType, R&gt; path)</span></span>&#123;</span><br><span class="line">    Options options = getOptionsWithHardwareConfig(dataSource); <span class="comment">// 决定是否支持硬件位图，Android 8 新增</span></span><br><span class="line">    DataRewinder&lt;Data&gt; rewinder = glideContext.getRegistry().getRewinder(data); <span class="comment">// 返回 ByteBufferRewinder</span></span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> path.load(rewinder, options, width, height, <span class="keyword">new</span> DecodeCallback&lt;ResourceType&gt;(dataSource));</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        rewinder.cleanup();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最终根据 LoadPath 解码并转码资源，获取到最终的资源。对于 ByteBuffer =&gt; Object =&gt; Drawable 一共有以下几条路径</p>
+<p>![Screen Shot 2021-05-28 at 10.54.58 AM](/Users/hefuwei/Library/Application Support/typora-user-images/Screen Shot 2021-05-28 at 10.54.58 AM.png)</p>
+<p>接下来就开始真正的进行加载了，跟进 LoadPath.load 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// LoadPath.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Resource&lt;Transcode&gt; <span class="title">load</span><span class="params">(...)</span> <span class="keyword">throws</span> GlideException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> loadWithExceptionList(...);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Resource&lt;Transcode&gt; <span class="title">loadWithExceptionList</span><span class="params">(...)</span> <span class="keyword">throws</span> GlideException </span>&#123;</span><br><span class="line">    Resource&lt;Transcode&gt; result = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = decodePaths.size(); i &lt; size; i++) &#123;</span><br><span class="line">        DecodePath&lt;Data, ResourceType, Transcode&gt; path = decodePaths.get(i);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            result = path.decode(rewinder, width, height, options, decodeCallback);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (GlideException e) &#123;</span><br><span class="line">            exceptions.add(e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> GlideException(failureMessage, <span class="keyword">new</span> ArrayList&lt;&gt;(exceptions)); <span class="comment">// 这里抛出异常会被 DecodeJob.decodeFromRetrievedData 收集</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LoadPath 又委托给 DecodePath 进行加载，只要有一个成功那么就直接退出循环，并返回。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Resource&lt;Transcode&gt; <span class="title">decode</span><span class="params">(DataRewinder&lt;DataType&gt; rewinder, <span class="keyword">int</span> width, <span class="keyword">int</span> height,</span></span></span><br><span class="line"><span class="function"><span class="params">      @NonNull Options options, DecodeCallback&lt;ResourceType&gt; callback)</span> <span class="keyword">throws</span> GlideException </span>&#123;</span><br><span class="line">    Resource&lt;ResourceType&gt; decoded = decodeResource(rewinder, width, height, options); <span class="comment">// 解码资源</span></span><br><span class="line">    Resource&lt;ResourceType&gt; transformed = callback.onResourceDecoded(decoded); <span class="comment">// 解码完成，通知 DecodeJob 应用 transform 及初始化缓存</span></span><br><span class="line">    <span class="keyword">return</span> transcoder.transcode(transformed, options); <span class="comment">// 转码资源</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法主要分为以下三步：</p>
+<ol>
+<li>解码资源，如 ByteBuffer =&gt; GifDrawable</li>
+<li>解码完成回调 DecodeJob 将解码后的资源缓存</li>
+<li>转码资源，用于最终显示。</li>
+</ol>
+<h5 id="decodeResources"><a href="#decodeResources" class="headerlink" title="decodeResources"></a>decodeResources</h5><p>解码资源就是通过解码器进行解码</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> Resource&lt;ResourceType&gt; <span class="title">decodeResource</span><span class="params">(...)</span> <span class="keyword">throws</span> GlideException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> decodeResourceWithList(rewinder, width, height, options, exceptions);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">private</span> Resource&lt;ResourceType&gt; <span class="title">decodeResourceWithList</span><span class="params">(...)</span> </span>&#123;</span><br><span class="line">    Resource&lt;ResourceType&gt; result = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = decoders.size(); i &lt; size; i++) &#123;</span><br><span class="line">        ResourceDecoder&lt;DataType, ResourceType&gt; decoder = decoders.get(i);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            DataType data = rewinder.rewindAndGet();</span><br><span class="line">            <span class="keyword">if</span> (decoder.handles(data, options)) &#123;</span><br><span class="line">                data = rewinder.rewindAndGet();</span><br><span class="line">                result = decoder.decode(data, width, height, options);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException | RuntimeException | OutOfMemoryError e) &#123;</span><br><span class="line">            exceptions.add(e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (result != <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> GlideException(failureMessage, <span class="keyword">new</span> ArrayList&lt;&gt;(exceptions));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>遍历所有 Decoder 调用 handle 方法判断是否能解码，如果可以调用 decode 方法真正解码，只要有一个解码器返回成功就退出循环。</p>
+<p>对于 ByteBufferGifDecoder </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ByteBufferDecoder.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handles</span><span class="params">(@NonNull ByteBuffer source, @NonNull Options options)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> !options.get(GifOptions.DISABLE_ANIMATION)</span><br><span class="line">        &amp;&amp; ImageHeaderParserUtils.getType(parsers, source) == ImageType.GIF;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>只要不禁用 Gif ，那么最终会通过 HeaderParser 读取文件头，判断是否是 Gif 格式，具体细节如下。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> ImageType <span class="title">getType</span><span class="params">(Reader reader)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> firstTwoBytes = reader.getUInt16();</span><br><span class="line">    <span class="keyword">if</span> (firstTwoBytes == EXIF_MAGIC_NUMBER) &#123; <span class="comment">// JPEG</span></span><br><span class="line">        <span class="keyword">return</span> JPEG;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> <span class="keyword">int</span> firstFourBytes = (firstTwoBytes &lt;&lt; <span class="number">16</span> &amp; <span class="number">0xFFFF0000</span>) | (reader.getUInt16() &amp; <span class="number">0xFFFF</span>);</span><br><span class="line">    <span class="keyword">if</span> (firstFourBytes == PNG_HEADER) &#123; <span class="comment">// PNG</span></span><br><span class="line">        reader.skip(<span class="number">25</span> - <span class="number">4</span>);</span><br><span class="line">        <span class="keyword">int</span> alpha = reader.getByte();</span><br><span class="line">        <span class="keyword">return</span> alpha &gt;= <span class="number">3</span> ? PNG_A : PNG;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (firstFourBytes &gt;&gt; <span class="number">8</span> == GIF_HEADER) &#123; <span class="comment">// GIF</span></span><br><span class="line">        <span class="keyword">return</span> GIF;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// WEBP 判断逻辑忽略</span></span><br><span class="line">    <span class="keyword">return</span> ImageType.WEBP;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><em>可以看到通过读取两个字节就能判断是否是 JPEG，通过读取三个字节就能判断是否是 GIF，通过读取四个字节就能判断是否是 PNG。</em></strong></p>
+<p>如果前三个字节为 0x474946 那么就是 GIF 图片，Glide 也提供了选项将 Gif 当做普通图片处理（GifOptions.DISABLE_ANIMATION）</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> GifDrawableResource <span class="title">decode</span><span class="params">(</span></span></span><br><span class="line"><span class="function"><span class="params">      ByteBuffer byteBuffer, <span class="keyword">int</span> width, <span class="keyword">int</span> height, GifHeaderParser parser, Options options)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> startTime = LogTime.getLogTime();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">final</span> GifHeader header = parser.parseHeader(); <span class="comment">// 解析 Gif 头</span></span><br><span class="line">        Bitmap.Config config = options.get(GifOptions.DECODE_FORMAT) == DecodeFormat.PREFER_RGB_565</span><br><span class="line">            ? Bitmap.Config.RGB_565 : Bitmap.Config.ARGB_8888;</span><br><span class="line">        <span class="keyword">int</span> sampleSize = getSampleSize(header, width, height); <span class="comment">// 计算缩放比</span></span><br><span class="line">        GifDecoder gifDecoder = gifDecoderFactory.build(provider, header, byteBuffer, sampleSize);</span><br><span class="line">        gifDecoder.setDefaultBitmapConfig(config);</span><br><span class="line">        gifDecoder.advance();</span><br><span class="line">        Bitmap firstFrame = gifDecoder.getNextFrame();</span><br><span class="line">        Transformation&lt;Bitmap&gt; unitTransformation = UnitTransformation.get();</span><br><span class="line">        GifDrawable gifDrawable =</span><br><span class="line">            <span class="keyword">new</span> GifDrawable(context, gifDecoder, unitTransformation, width, height, firstFrame);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> GifDrawableResource(gifDrawable);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong><em>具体是如何解码这个 Gif 文件逻辑就不看了，因为这个需要了解 Gif 文件格式（后续有兴趣再看），最终返回了一个 GifDrawableResource 内部包含了 GifDrawable。</em></strong></p>
+<p>对于 ByteBufferBitmapDecoder </p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// ByteBufferBitmapDecoder.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handles</span><span class="params">(@NonNull ByteBuffer source, @NonNull Options options)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> downsampler.handles(source); <span class="comment">// 必定返回 true</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Downsampler 的 handles 方法必定返回 true，继续看 decode 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Resource&lt;Bitmap&gt; <span class="title">decode</span><span class="params">(ByteBuffer source, <span class="keyword">int</span> width, <span class="keyword">int</span> height, Options options)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    InputStream is = ByteBufferUtil.toStream(source);</span><br><span class="line">    <span class="keyword">return</span> downsampler.decode(is, width, height, options);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> Resource&lt;Bitmap&gt; <span class="title">decode</span><span class="params">(InputStream is, <span class="keyword">int</span> requestedWidth, <span class="keyword">int</span> requestedHeight,</span></span></span><br><span class="line"><span class="function"><span class="params">                               Options options, DecodeCallbacks callbacks)</span> <span class="keyword">throws</span> IOException </span>&#123;</span><br><span class="line">    Bitmap result = decodeFromWrappedStreams(...);</span><br><span class="line">    <span class="keyword">return</span> BitmapResource.obtain(result, bitmapPool);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>decodeFromWrappedStreams 会通过 BitmapFactory 加载图片，并对图片进行缩放、翻转，代码过于复杂就不贴了。</p>
+<h5 id="onResourceDecoded"><a href="#onResourceDecoded" class="headerlink" title="onResourceDecoded"></a>onResourceDecoded</h5><p>解码完成后，需要通过 DecodeJob ，回调其 onResourceDecoded 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">&lt;Z&gt; <span class="function">Resource&lt;Z&gt; <span class="title">onResourceDecoded</span><span class="params">(DataSource dataSource, Resource&lt;Z&gt; decoded)</span> </span>&#123;</span><br><span class="line">    Class&lt;Z&gt; resourceSubClass = (Class&lt;Z&gt;) decoded.get().getClass();</span><br><span class="line">    Transformation&lt;Z&gt; appliedTransformation = <span class="keyword">null</span>;</span><br><span class="line">    Resource&lt;Z&gt; transformed = decoded;</span><br><span class="line">    <span class="keyword">if</span> (dataSource != DataSource.RESOURCE_DISK_CACHE) &#123;</span><br><span class="line">        appliedTransformation = decodeHelper.getTransformation(resourceSubClass);</span><br><span class="line">        transformed = appliedTransformation.transform(glideContext, decoded, width, height); <span class="comment">// 应用 Transform.</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">final</span> EncodeStrategy encodeStrategy;</span><br><span class="line">    <span class="keyword">final</span> ResourceEncoder&lt;Z&gt; encoder;</span><br><span class="line">    <span class="keyword">if</span> (decodeHelper.isResourceEncoderAvailable(transformed)) &#123; <span class="comment">// 是否有对应的 ResourceEncoder 可以编码该资源</span></span><br><span class="line">        encoder = decodeHelper.getResultEncoder(transformed);</span><br><span class="line">        encodeStrategy = encoder.getEncodeStrategy(options);</span><br><span class="line">    &#125;</span><br><span class="line">    Resource&lt;Z&gt; result = transformed;</span><br><span class="line">    <span class="keyword">boolean</span> isFromAlternateCacheKey = !decodeHelper.isSourceKey(currentSourceKey);</span><br><span class="line">    <span class="comment">// 判断该转换后的资源是否要进行缓存（Encode 操作）</span></span><br><span class="line">    <span class="keyword">if</span> (diskCacheStrategy.isResourceCacheable(isFromAlternateCacheKey, dataSource, encodeStrategy)) &#123;</span><br><span class="line">        <span class="keyword">final</span> Key key;</span><br><span class="line">        <span class="keyword">switch</span> (encodeStrategy) &#123;</span><br><span class="line">            <span class="keyword">case</span> SOURCE:</span><br><span class="line">                key = <span class="keyword">new</span> DataCacheKey(currentSourceKey, signature);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> TRANSFORMED:</span><br><span class="line">                key = <span class="keyword">new</span> ResourceCacheKey(...);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        LockedResource&lt;Z&gt; lockedResult = LockedResource.obtain(transformed);</span><br><span class="line">        deferredEncodeManager.init(key, encoder, lockedResult); <span class="comment">// 延迟进行 Encode 操作。</span></span><br><span class="line">        result = lockedResult;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部主要做了以下几个操作：</p>
+<ol>
+<li>应用 Transform，可以通过 RequestOption 设置。</li>
+<li>检查是否存在编码器可以编码该资源。</li>
+<li>判断当前资源是否需要进行编码（缓存）。</li>
+</ol>
+<p><strong><em>默认的 DiskCacheStrategy 为 AUTOMATIC ，当加载远程数据（比如，从URL下载）时，该策略仅会存储原始数据，因为下载远程数据相比调整磁盘上已经存在的数据要昂贵得多。对于本地数据，该策略则会仅存储变换过的缩略图，因为即使你需要再次生成另一个尺寸或类型的图片，取回原始数据也很容易。</em></strong> <font color=red>远程数据存储原始图片，本地数据存储转换后的图片</font></p>
+<h5 id="transcode"><a href="#transcode" class="headerlink" title="transcode"></a>transcode</h5><p>应用完 transform 以后，又会对资源进行转码，其实根据转码注册表，也就是 Bitmap 能转化为 Drawable，其它都只能转化为 bytes[]。Bitmap 转换为 Drawable 采用方式为创建一个 BitmapDrawable。</p>
+<p>至此资源解码、转换、转码成功，现在又要回到解码前，也就是 DecodeJob.decodeFromRetrievedData 。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">decodeFromRetrievedData</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    Resource&lt;R&gt; resource = decodeFromData(currentFetcher, currentData, currentDataSource);</span><br><span class="line">    <span class="keyword">if</span> (resource != <span class="keyword">null</span>) &#123;</span><br><span class="line">        notifyEncodeAndRelease(resource, currentDataSource); <span class="comment">// 通知进行缓存（编码）</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        runGenerators(); <span class="comment">// 换下一条路，原先 File =&gt; ByteBuffer，后续改为 File =&gt; FileInputSteam</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>主要分析下 notifyEncodeAndRelease 方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">notifyEncodeAndRelease</span><span class="params">(Resource&lt;R&gt; resource, DataSource dataSource)</span> </span>&#123;</span><br><span class="line">    Resource&lt;R&gt; result = resource;</span><br><span class="line">    LockedResource&lt;R&gt; lockedResource = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (deferredEncodeManager.hasResourceToEncode()) &#123;</span><br><span class="line">        lockedResource = LockedResource.obtain(resource);</span><br><span class="line">        result = lockedResource;</span><br><span class="line">    &#125;</span><br><span class="line">    notifyComplete(result, dataSource); <span class="comment">// 通知 EngineJob 资源以及准备完成</span></span><br><span class="line">    stage = Stage.ENCODE;</span><br><span class="line">    <span class="keyword">if</span> (deferredEncodeManager.hasResourceToEncode()) &#123; </span><br><span class="line">        deferredEncodeManager.encode(diskCacheProvider, options); <span class="comment">// 对资源进行编码写入磁盘缓存</span></span><br><span class="line">    &#125;</span><br><span class="line">    onEncodeComplete();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>方法内部首先会通知 EngineJob 资源已经准备完毕，然后如果需要缓存那么进行缓存，缓存完毕后清理下资源。重点看看 EngineJob 收到资源完成后做了什么。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// EngineJob.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResourceReady</span><span class="params">(Resource&lt;R&gt; resource, DataSource dataSource)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.resource = resource;</span><br><span class="line">    <span class="keyword">this</span>.dataSource = dataSource;</span><br><span class="line">    MAIN_THREAD_HANDLER.obtainMessage(MSG_COMPLETE, <span class="keyword">this</span>).sendToTarget();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">handleMessage</span><span class="params">(Message message)</span> </span>&#123;</span><br><span class="line">    EngineJob&lt;?&gt; job = (EngineJob&lt;?&gt;) message.obj;</span><br><span class="line">    <span class="keyword">switch</span> (message.what) &#123;</span><br><span class="line">        <span class="keyword">case</span> MSG_COMPLETE:</span><br><span class="line">            job.handleResultOnMainThread();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">handleResultOnMainThread</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    engineResource = engineResourceFactory.build(resource, isCacheable);</span><br><span class="line">    hasResource = <span class="keyword">true</span>;</span><br><span class="line">    engineResource.acquire(); <span class="comment">// 引用计数加一（防止还没分发完就被回收）</span></span><br><span class="line">listener.onEngineJobComplete(<span class="keyword">this</span>, key, engineResource); <span class="comment">// 缓存到 activeResources 中（弱引用缓存中）</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, size = cbs.size(); i &lt; size; i++) &#123;</span><br><span class="line">        ResourceCallback cb = cbs.get(i);</span><br><span class="line">        <span class="keyword">if</span> (!isInIgnoredCallbacks(cb)) &#123;</span><br><span class="line">            engineResource.acquire(); <span class="comment">// 每分发一次引用计数加一</span></span><br><span class="line">            cb.onResourceReady(engineResource, dataSource); <span class="comment">// 通知 SingleRequest 资源准备完成，最终通知 Target 资源准备完成</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    engineResource.release(); <span class="comment">// 引用计数减一（抵消循环前的）</span></span><br><span class="line">    release(<span class="keyword">false</span> <span class="comment">/*isRemovedFromQueue*/</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>至此图片已经加载完毕，并交付给了 Target。</p>
+<p>注：<a href="https://muyangmin.github.io/glide-docs-cn/doc/hardwarebitmaps.htmls" target="_blank" rel="noopener">关于硬件位图</a></p>
+<p>注：Glide V3 默认使用 RGB_565 ，Glide V4 默认使用 ARGB_8888。</p>
+<h2 id="缓存机制"><a href="#缓存机制" class="headerlink" title="缓存机制"></a>缓存机制</h2><p>Glide 分为内存以及磁盘两级缓存，其中内存又分为弱引用缓存以及一个 LRU 缓存，磁盘缓存又分为转换后的资源缓存以及原图缓存，缓存由 DiskCacheStrategy 控制，除原图缓存其它的缓存键都与加载的图片长宽有关。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">DiskCacheStrategy</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 是否缓存转化后的数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isResourceCacheable</span><span class="params">(<span class="keyword">boolean</span> isFromAlternateCacheKey,</span></span></span><br><span class="line"><span class="function"><span class="params">        DataSource dataSource, EncodeStrategy encodeStrategy)</span></span>;</span><br><span class="line">    <span class="comment">// 是否缓存源数据，未转化过的</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">isDataCacheable</span><span class="params">(DataSource dataSource)</span></span>;</span><br><span class="line">    <span class="comment">// 是否解码缓存转化后的数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">decodeCachedResource</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="comment">// 是否解码缓存的源数据，未转化过的</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">boolean</span> <span class="title">decodeCachedData</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>缓存主要分为以下情况（以加载网络图片为例）：</p>
+<ol>
+<li>无缓存的网络图片加载流程。</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%80.png" alt="缓存一"></p>
+<ol start="2">
+<li>有弱应用缓存的网络图片加载流程</li>
+</ol>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%8C1.png" alt="缓存二"></p>
+<ol start="3">
+<li>无弱引用缓存有 Lru 内存缓存的网络图片加载流程</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%89.png" alt="缓存三"></p>
+<ol start="4">
+<li><p>无弱引用缓存无 Lru 内存缓存有 Resource 磁盘缓存</p>
+<p> 注意：由于缓存的已经是转换过的资源因此不需要再执行 Transform。</p>
+<p> <img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E5%9B%9B1.png" alt="缓存四"></p>
+</li>
+<li><p>无弱引用缓存无 Lru 内存缓存无 Resource 磁盘缓存有原始图片缓存</p>
+<p> 注意：除了不需要从网络下载，其它流程都一样。</p>
+</li>
+</ol>
+<p><img src="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%94.png" alt="缓存五"></p>
+<p><strong>上述五种情况已经涵盖了差不多所有情况，不过有个问题，那就是 Lru 内存缓存的内容是哪里来的，好像没有在上面的图中有所体现?</strong></p>
+<p>通过翻阅代码发现 EngineResource 内部含有一个引用计数器，表示该资源现在被使用的数量。</p>
+<p>每次调用 into()  加载一个资源，这个资源的引用计数就会加一，如果相同的资源被加载到两个不同的 Target，则在两个加载都完成后，它的引用计数将会为二，当在加载资源的 View 或 Target 上调用 clear() 或者在这个 View 或 Target 上调用对另一个资源请求的 into 方法时该资源引用计数就会减一。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">// Engine.java</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResourceReleased</span><span class="params">(Key cacheKey, EngineResource&lt;?&gt; resource)</span> </span>&#123;</span><br><span class="line">    Util.assertMainThread();</span><br><span class="line">    activeResources.deactivate(cacheKey);</span><br><span class="line">    <span class="keyword">if</span> (resource.isCacheable()) &#123;</span><br><span class="line">        cache.put(cacheKey, resource);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        resourceRecycler.recycle(resource);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果引用计数器为 0 了以后就会从弱引用缓存中移除，如果资源可以进行内存缓存那么放入 Lru 内存缓存，否则回收该资源。看到这里终于明白了，Lru 内存缓存的内容哪来的，同时 Lru 内存缓存与弱引用缓存不会存在重复资源。</p>
+<p><strong>那么为什么需要这个弱引用内存缓存，直接统一管理一个 Lru 内存缓存不好吗？</strong></p>
+<p>可能使用弱引用缓存可以杜绝被 Lru 算法删除吧。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/15/RxJava2%20%E7%BA%BF%E7%A8%8B%E5%88%87%E6%8D%A2%E5%8E%9F%E7%90%86/" rel="next" title="RxJava2 线程切换原理">
+                <i class="fa fa-chevron-left"></i> RxJava2 线程切换原理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/18/LeakCanary2-LeakSentry%20%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90/" rel="prev" title="LeakCanary2-LeakSentry 源码分析">
+                LeakCanary2-LeakSentry 源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image"
+                src="/images/avatar.jpg"
+                alt="何富威" />
+            
+              <p class="site-author-name" itemprop="name">何富威</p>
+              <p class="site-description motion-element" itemprop="description">行百里者半九十</p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/%7C%7C%20archive">
+              
+                  <span class="site-state-item-count">54</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                
+              </div>
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本使用"><span class="nav-number">2.</span> <span class="nav-text">基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本概念"><span class="nav-number">3.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Target"><span class="nav-number">3.1.</span> <span class="nav-text">Target</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Encoder"><span class="nav-number">3.2.</span> <span class="nav-text">Encoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Decoder"><span class="nav-number">3.3.</span> <span class="nav-text">Decoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transcoder"><span class="nav-number">3.4.</span> <span class="nav-text">Transcoder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Transformation"><span class="nav-number">3.5.</span> <span class="nav-text">Transformation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DataRewinder"><span class="nav-number">3.6.</span> <span class="nav-text">DataRewinder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ModelLoaderFactory"><span class="nav-number">3.7.</span> <span class="nav-text">ModelLoaderFactory</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ModelLoader"><span class="nav-number">3.8.</span> <span class="nav-text">ModelLoader</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadData"><span class="nav-number">3.9.</span> <span class="nav-text">LoadData</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#DecodePath"><span class="nav-number">3.10.</span> <span class="nav-text">DecodePath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LoadPath"><span class="nav-number">3.11.</span> <span class="nav-text">LoadPath</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestManager"><span class="nav-number">3.12.</span> <span class="nav-text">RequestManager</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestManagerRetriever"><span class="nav-number">3.13.</span> <span class="nav-text">RequestManagerRetriever</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestBuilder"><span class="nav-number">3.14.</span> <span class="nav-text">RequestBuilder</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Request"><span class="nav-number">3.15.</span> <span class="nav-text">Request</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Engine"><span class="nav-number">3.16.</span> <span class="nav-text">Engine</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#源码分析"><span class="nav-number">4.</span> <span class="nav-text">源码分析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Glide-with"><span class="nav-number">4.1.</span> <span class="nav-text">Glide.with</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Glide-getRetriever"><span class="nav-number">4.1.1.</span> <span class="nav-text">Glide.getRetriever</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#ModelLoaderRegistry"><span class="nav-number">4.1.1.1.</span> <span class="nav-text">ModelLoaderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#EncoderRegistry"><span class="nav-number">4.1.1.2.</span> <span class="nav-text">EncoderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ResourceEncoderRegistry"><span class="nav-number">4.1.1.3.</span> <span class="nav-text">ResourceEncoderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ResourceDecoderRegistry"><span class="nav-number">4.1.1.4.</span> <span class="nav-text">ResourceDecoderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DataRewinderRegistry"><span class="nav-number">4.1.1.5.</span> <span class="nav-text">DataRewinderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#TranscoderRegistry"><span class="nav-number">4.1.1.6.</span> <span class="nav-text">TranscoderRegistry</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#ImageHeaderParserRegistry"><span class="nav-number">4.1.1.7.</span> <span class="nav-text">ImageHeaderParserRegistry</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RequestManagerRetriever-get"><span class="nav-number">4.1.2.</span> <span class="nav-text">RequestManagerRetriever.get</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestManager-load"><span class="nav-number">4.2.</span> <span class="nav-text">RequestManager.load</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RequestBuilder-into"><span class="nav-number">4.3.</span> <span class="nav-text">RequestBuilder.into</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RESOURCE-CACHE"><span class="nav-number">4.3.1.</span> <span class="nav-text">RESOURCE_CACHE</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#DecodeHelp-getCacheKeys"><span class="nav-number">4.3.1.1.</span> <span class="nav-text">DecodeHelp.getCacheKeys</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DecodeHelper-getRegisteredResourceClasses"><span class="nav-number">4.3.1.2.</span> <span class="nav-text">DecodeHelper.getRegisteredResourceClasses</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DATA-CACHE"><span class="nav-number">4.3.2.</span> <span class="nav-text">DATA_CACHE</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#SOURCE"><span class="nav-number">4.3.3.</span> <span class="nav-text">SOURCE</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#decodeResources"><span class="nav-number">4.3.3.1.</span> <span class="nav-text">decodeResources</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#onResourceDecoded"><span class="nav-number">4.3.3.2.</span> <span class="nav-text">onResourceDecoded</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#transcode"><span class="nav-number">4.3.3.3.</span> <span class="nav-text">transcode</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#缓存机制"><span class="nav-number">5.</span> <span class="nav-text">缓存机制</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2017 &mdash; <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">何富威</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Gemini</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.4"></script>
+
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
