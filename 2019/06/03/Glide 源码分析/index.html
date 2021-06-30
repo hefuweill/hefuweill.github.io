@@ -124,13 +124,14 @@
 <meta property="og:site_name" content="何富威的博客">
 <meta property="og:description" content="前言以前对 Glide 的认知一直停留在一行代码就可以完成图片加载，现在就来尝试探索下这一行代码下，内部到底做了些什么。本文基于Glide 4.8.0。">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-03/Screen%20Shot%202021-05-26%20at%203.51.57%20PM.png">
+<meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-30/Screen%20Shot%202021-05-25%20at%206.12.39%20PM.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%80.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%8C1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%B8%89.png">
 <meta property="og:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E5%9B%9B1.png">
 <meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-04/%E7%BC%93%E5%AD%98%E4%BA%94.png">
 <meta property="article:published_time" content="2019-06-03T13:28:23.000Z">
-<meta property="article:modified_time" content="2021-06-04T06:56:58.249Z">
+<meta property="article:modified_time" content="2021-06-30T03:09:41.608Z">
 <meta property="article:author" content="何富威">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-03/Screen%20Shot%202021-05-26%20at%203.51.57%20PM.png">
@@ -855,7 +856,7 @@
 
 <p>loadGeneric <strong><em>将数据源（这里是请求地址）进行存储</em></strong>，然后就返回自身。</p>
 <h3 id="RequestBuilder-into"><a href="#RequestBuilder-into" class="headerlink" title="RequestBuilder.into"></a>RequestBuilder.into</h3><p>into 方法有以下好几个重载方法：</p>
-<p>![Screen Shot 2021-05-25 at 6.12.39 PM](/Users/hefuwei/Library/Application Support/typora-user-images/Screen Shot 2021-05-25 at 6.12.39 PM.png)</p>
+<p><img src="https://cdn.jsdelivr.net/gh/hefuweill/Images@master/uPic/2021-06-30/Screen%20Shot%202021-05-25%20at%206.12.39%20PM.png" alt="Screen Shot 2021-05-25 at 6.12.39 PM"></p>
 <p>暂时只关注下参数为 ImageView 类型的方法。</p>
 <figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ViewTarget&lt;ImageView, TranscodeType&gt; <span class="title">into</span><span class="params">(@NonNull ImageView view)</span> </span>&#123;</span><br><span class="line">    RequestOptions requestOptions = <span class="keyword">this</span>.requestOptions;</span><br><span class="line">    <span class="keyword">if</span> (!requestOptions.isTransformationSet()</span><br><span class="line">        &amp;&amp; requestOptions.isTransformationAllowed()</span><br><span class="line">        &amp;&amp; view.getScaleType() != <span class="keyword">null</span>) &#123;</span><br><span class="line">        <span class="comment">// 根据不同的 View.getScaleType 创建对应的 RequestOptions</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> into(</span><br><span class="line">        glideContext.buildImageViewTarget(view, transcodeClass), <span class="keyword">null</span>, requestOptions);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
