@@ -123,10 +123,12 @@
 <meta property="og:url" content="http://yoursite.com/2020/11/23/%E5%85%8D%E5%AF%86%E7%99%BB%E5%BD%95%E8%B0%83%E7%A0%94/index.html">
 <meta property="og:site_name" content="何富威的博客">
 <meta property="og:description" content="前言近期运营提出一个需求：实现租号玩免密登录游戏功能，然后集成进交易虎 App，用户在 App 里面进行租号，我们不需要将用户名密码给到用户，而是只提供一个打开游戏的按钮，用户点击后自动打开游戏，并直接进去区服选择界面。这样既方便了用户，同时也使得卖家的账号信息不被泄漏。">
+<meta property="og:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-30/Screen%20Shot%202021-06-30%20at%204.35.20%20PM.png">
 <meta property="article:published_time" content="2020-11-23T05:13:17.000Z">
-<meta property="article:modified_time" content="2021-02-20T02:06:53.517Z">
+<meta property="article:modified_time" content="2021-06-30T08:37:31.955Z">
 <meta property="article:author" content="何富威">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-30/Screen%20Shot%202021-06-30%20at%204.35.20%20PM.png">
 
 
 
@@ -367,36 +369,39 @@
 
       
         <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>近期运营提出一个需求：实现租号玩免密登录游戏功能，然后集成进交易虎 App，用户在 App 里面进行租号，我们不需要将用户名密码给到用户，而是只提供一个打开游戏的按钮，用户点击后自动打开游戏，并直接进去区服选择界面。这样既方便了用户，同时也使得卖家的账号信息不被泄漏。<a id="more"></a> 我负责前期调研，通过脱壳、反编译破解了租号玩 App，实现了 QQ、微信免密登录。注：说说是免密，<strong>实际上只是我们代替用户去登录，然后把登录信息给到 App。</strong></p>
-<h2 id="本次得到的收获"><a href="#本次得到的收获" class="headerlink" title="本次得到的收获"></a>本次得到的收获</h2><ol>
-<li><p>API <strong>低于 26</strong> 的机型可以结合 Xposed 框架以及以下三个方法实现脱壳。注：成功实现腾讯加固的脱壳</p>
+<h2 id="本次得到的收获"><a href="#本次得到的收获" class="headerlink" title="本次得到的收获"></a>本次得到的收获</h2><h3 id="Xposed-相关"><a href="#Xposed-相关" class="headerlink" title="Xposed 相关"></a>Xposed 相关</h3><p>Xposed 框架可以实现任意方法以及资源的 Hook， <a href="https://github.com/rovo89/Xposed" target="_blank" rel="noopener">Xposed</a> 只支持到 Android 7.0，而我的手机是 Android 10.0 因此不能使用，于是考虑使用 <a href="https://github.com/rovo89/Xposed" target="_blank" rel="noopener">EdXposed</a> 其支持 Android 8.0 ~ 11.0 ，不过安装方式没有 Xposed 那么简单。</p>
+<h4 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h4><p>首先需要 Root 手机（小米手机首先用官方自带的方式解锁，然后刷入开发版即可），然后需要安装 <a href="https://github.com/topjohnwu/Magisk" target="_blank" rel="noopener">Magisk</a> ，安装完毕后在其内部再安装 <a href="https://github.com/RikkaApps/Riru" target="_blank" rel="noopener">Riru</a> 以及 Riru-EdXposed 模块然后重启手机就发现 EdXposed 以及安装完毕，然后后续操作与 Xposed 基本一致。</p>
+<h4 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h4><p>API <strong>低于 26</strong> 的机型可以结合 Xposed 框架以及以下三个方法实现脱壳。注：成功实现腾讯加固的脱壳</p>
 <ul>
-<li><p>ClassLoader.loadClass(String, boolean)</p>
-</li>
-<li><p>Class.getDex()</p>
-</li>
-<li><p>Dex.getBytes()</p>
-<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnShellHook</span> : <span class="type">Hook &#123;</span></span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> getDexMethod =</span><br><span class="line">        getMethod(<span class="string">"java.lang.Class"</span>, <span class="string">"getDex"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> getBytesMethod =</span><br><span class="line">        getMethod(<span class="string">"android.dex.Dex"</span>, <span class="string">"getBytes"</span>)</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">isSupportVersion</span><span class="params">(apiVersion: <span class="type">Int</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> apiVersion &lt; Build.VERSION_CODES.O</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">hook</span><span class="params">(param: <span class="type">PackageParam</span>)</span></span> &#123;</span><br><span class="line">        XposedHelpers.findAndHookMethod(</span><br><span class="line">            ClassLoader::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>, <span class="type">"loadClass"</span>, <span class="type">Boolean::class.java</span>, <span class="type">object : MethodHook</span></span>() &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">afterHookedMethod</span><span class="params">(param: <span class="type">MethodHookParam</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">val</span> clazz = param.args[<span class="number">0</span>] <span class="keyword">as</span> Class&lt;*&gt;</span><br><span class="line">                <span class="keyword">val</span> dex = getDexMethod.invoke(clazz)</span><br><span class="line">                <span class="keyword">val</span> bytes = getBytesMethod.invoke(dex) <span class="keyword">as</span> ByteArray</span><br><span class="line">                <span class="keyword">val</span> context = AndroidAppHelper.currentApplication()</span><br><span class="line">                <span class="keyword">val</span> dexFile = File(context.getExternalFilesDir(<span class="string">"dex"</span>), <span class="string">"dex<span class="subst">$&#123;bytes.size&#125;</span>"</span>)</span><br><span class="line">                <span class="keyword">if</span> (!dexFile.exists()) &#123;</span><br><span class="line">                    dexFile.outputStream().use &#123;</span><br><span class="line">                        it.write(bytes)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>ClassLoader.loadClass(String, boolean)</li>
+<li>Class.getDex()</li>
+<li>Dex.getBytes()</li>
 </ul>
+<figure class="highlight kotlin"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">UnShellHook</span> : <span class="type">Hook &#123;</span></span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> getDexMethod =</span><br><span class="line">        getMethod(<span class="string">"java.lang.Class"</span>, <span class="string">"getDex"</span>)</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">val</span> getBytesMethod =</span><br><span class="line">        getMethod(<span class="string">"android.dex.Dex"</span>, <span class="string">"getBytes"</span>)</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">isSupportVersion</span><span class="params">(apiVersion: <span class="type">Int</span>)</span></span>: <span class="built_in">Boolean</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> apiVersion &lt; Build.VERSION_CODES.O</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">hook</span><span class="params">(param: <span class="type">PackageParam</span>)</span></span> &#123;</span><br><span class="line">        XposedHelpers.findAndHookMethod(</span><br><span class="line">            ClassLoader::<span class="class"><span class="keyword">class</span>.<span class="title">java</span>, <span class="type">"loadClass"</span>, <span class="type">Boolean::class.java</span>, <span class="type">object : MethodHook</span></span>() &#123;</span><br><span class="line">            <span class="keyword">override</span> <span class="function"><span class="keyword">fun</span> <span class="title">afterHookedMethod</span><span class="params">(param: <span class="type">MethodHookParam</span>)</span></span> &#123;</span><br><span class="line">                <span class="keyword">val</span> clazz = param.args[<span class="number">0</span>] <span class="keyword">as</span> Class&lt;*&gt;</span><br><span class="line">                <span class="keyword">val</span> dex = getDexMethod.invoke(clazz)</span><br><span class="line">                <span class="keyword">val</span> bytes = getBytesMethod.invoke(dex) <span class="keyword">as</span> ByteArray</span><br><span class="line">                <span class="keyword">val</span> context = AndroidAppHelper.currentApplication()</span><br><span class="line">                <span class="keyword">val</span> dexFile = File(context.getExternalFilesDir(<span class="string">"dex"</span>), <span class="string">"dex<span class="subst">$&#123;bytes.size&#125;</span>"</span>)</span><br><span class="line">                <span class="keyword">if</span> (!dexFile.exists()) &#123;</span><br><span class="line">                    dexFile.outputStream().use &#123;</span><br><span class="line">                        it.write(bytes)</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Smali-相关"><a href="#Smali-相关" class="headerlink" title="Smali 相关"></a>Smali 相关</h3><p>Smali 也能进行动态调试，这非常有利于分析代码。</p>
+<h4 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h4><ol>
+<li><p>要能调试首先该应用的 AndroidManifest.xml 中的 application 节点下，必须存在 android:debuggable = “true” 否则无法进行调试，修改这个也简单，反编译一下修改后回编译签名就行。</p>
 </li>
-<li><p>Xposed 框架基本使用已经掌握，同时也实现了动态替换资源。</p>
+<li><p>接着使用 adb 启动该应用，该命令执行后，就会打开该应用，然后显示等待 debugger attach 上。</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell am start -D -n com.hefuwei.demo/com.hefuwei.demo.MainActivity # 包名/入口 Activity 全类名</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>Xposed 框架可以用于拦截任意应用程序的任意方法。</p>
+<li><p>接着再使用 adb 获取 pid。</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb shell ps |grep demo # demo 表示过滤条件</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>Xposed 框架使我们的代码运行在目标应用程序内。</p>
+<li><p>接着再设置 adb 进行端口转移。</p>
+ <figure class="highlight shell"><table><tr><td class="code"><pre><span class="line">adb forward tcp:8700 jdwp:16939 # 8700 为调试端口号随意 16939 为应用的 pid</span><br></pre></td></tr></table></figure>
 </li>
-<li><p>Java 内部类无论是静态、匿名、还是非静态，类名都以 $ 符号分隔（<strong>不要认为静态内部类不一样</strong>）。</p>
+<li><p>使用 apktool 反编译 apk，并将 smali、smali_classN 合并到 smali 文件夹下，然后将该文件夹名称修改为 src，并将其放入 demo 文件夹下（名称任意）。</p>
 </li>
-<li><p>Kotlin 字符串如果要使用原始 $ 需要使用 ${‘$’} 进行替代。</p>
+<li><p>使用 as 导入 demo 文件夹，然后安装插件 ideasmali 插件，下载地址 <a href="https://bitbucket.org/JesusFreke/smalidea/downloads/" target="_blank" rel="noopener">https://bitbucket.org/JesusFreke/smalidea/downloads/</a> 安装完毕后重启。</p>
+</li>
+<li><p>然后添加一个 run configurations，类型为 Remote 端口号为刚才指定的端口号。</p>
+<p> <img src="https://raw.githubusercontent.com/hefuweill/Images/master/uPic/2021-06-30/Screen%20Shot%202021-06-30%20at%204.35.20%20PM.png" alt="Screen Shot 2021-06-30 at 4.35.20 PM"></p>
+</li>
+<li><p>打开 smali 文件打上断点，点击启动调试即可。</p>
 </li>
 </ol>
-<h2 id="本次调研遇到的问题"><a href="#本次调研遇到的问题" class="headerlink" title="本次调研遇到的问题"></a>本次调研遇到的问题</h2><ol>
-<li>Xposed 框架如果不进行重启，想要生效必须把目标进程给杀死，而 QQ、微信都较难杀死，因此有时能生效，有时又不能生效。</li>
-<li>Xposed 框架使得我们的代码运行在目标进程，因此没有办法进行断点，只能通过打日志记录一些关键信息，这无疑增加了调试难度。</li>
-<li>Xposed 框架在目标应用程序打印日志，Android Studio 没法根据应用过滤日志，导致只能选择 No Filter。</li>
-<li>QQ、微信等 App 都进行了混淆处理，阅读并理解诸如 a、b、c 等方法名难度不小。</li>
-</ol>
-<h2 id="Xposed-框架安装方式"><a href="#Xposed-框架安装方式" class="headerlink" title="Xposed 框架安装方式"></a>Xposed 框架安装方式</h2><p>首先 <a href="https://github.com/rovo89/Xposed" target="_blank" rel="noopener">Xposed</a> 只支持到 Android 7.0，而我的手机是 Android 10.0 因此不能使用，于是考虑使用 <a href="https://github.com/rovo89/Xposed" target="_blank" rel="noopener">EdXposed</a> 其支持 Android 8.0 ~ 11.0 ，不过安装方式没有 Xposed 那么简单，首先需要 Root 手机（小米手机首先用官方自带的方式解锁，然后刷入开发版即可），然后需要安装 <a href="https://github.com/topjohnwu/Magisk" target="_blank" rel="noopener">Magisk</a> ，安装完毕后在其内部再安装 <a href="https://github.com/RikkaApps/Riru" target="_blank" rel="noopener">Riru</a> 以及 Riru-EdXposed 模块然后重启手机就发现 EdXposed 以及安装完毕，然后后续操作与 Xposed 基本一致。</p>
 
       
     </div>
@@ -560,7 +565,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本次得到的收获"><span class="nav-number">2.</span> <span class="nav-text">本次得到的收获</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本次调研遇到的问题"><span class="nav-number">3.</span> <span class="nav-text">本次调研遇到的问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Xposed-框架安装方式"><span class="nav-number">4.</span> <span class="nav-text">Xposed 框架安装方式</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#本次得到的收获"><span class="nav-number">2.</span> <span class="nav-text">本次得到的收获</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Xposed-相关"><span class="nav-number">2.1.</span> <span class="nav-text">Xposed 相关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#安装"><span class="nav-number">2.1.1.</span> <span class="nav-text">安装</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用"><span class="nav-number">2.1.2.</span> <span class="nav-text">使用</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Smali-相关"><span class="nav-number">2.2.</span> <span class="nav-text">Smali 相关</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#操作步骤"><span class="nav-number">2.2.1.</span> <span class="nav-text">操作步骤</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
